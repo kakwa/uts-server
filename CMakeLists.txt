@@ -8,7 +8,7 @@ add_custom_target(tag
     git push origin ${VERSION}
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DGCCPROG_VERSION='\"${VERSION}\"'")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DUTS_VERSION='\"${VERSION}\"'")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
