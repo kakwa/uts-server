@@ -1,0 +1,1 @@
+void skeleton_daemon();

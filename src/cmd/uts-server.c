@@ -6,6 +6,7 @@
 #include <getopt.h>
 #include <argp.h>
 #include <sys/syslog.h>
+#include "utils.h"
 
 const char *argp_program_version = UTS_VERSION;
 
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
     args.daemonize = 0;
     argp_parse (&argp, argc, argv, 0, 0, &args);
 
-    //skeleton_daemon();
+    skeleton_daemon();
 
     while (1)
     {
