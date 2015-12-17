@@ -62,13 +62,14 @@ int main(int argc, char **argv)
     args.daemonize = 0;
     argp_parse (&argp, argc, argv, 0, 0, &args);
 
-    skeleton_daemon();
+    if (args.daemonize)
+        skeleton_daemon();
 
     while (1)
     {
         //TODO: Insert daemon code here.
         syslog (LOG_NOTICE, "First daemon started.");
-        sleep (20);
+        sleep (5);
         break;
     }
 
