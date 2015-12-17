@@ -17,13 +17,22 @@ find_package(libasyncd REQUIRED)
 MESSAGE( STATUS "Find Header Directory for libasyncd: " ${LIBASYNCD_INCLUDE_DIR})
 MESSAGE( STATUS "Find Dynamic Library for libasyncd:  " ${LIBASYNCD_LIBRARIES})
 
+find_package(OpenSSL REQUIRED)
+
+MESSAGE( STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
+MESSAGE( STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
+
 include_directories(
     ${LIBASYNCD_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIR}
 )
 
 add_executable(uts-server src/cmd/uts-server.c)
 
-target_link_libraries(uts-server  ${LIBASYNCD_LIBRARIES})
+target_link_libraries(uts-server
+    ${LIBASYNCD_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
+)
 
 INSTALL(TARGETS uts-server
     RUNTIME DESTINATION bin
