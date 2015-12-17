@@ -7,6 +7,7 @@
 #include <argp.h>
 #include <sys/syslog.h>
 #include "utils.h"
+#include "rfc3161.h"
 
 const char *argp_program_version = UTS_VERSION;
 
@@ -68,6 +69,7 @@ int main(int argc, char **argv)
     while (1)
     {
         //TODO: Insert daemon code here.
+        http_server_start();
         syslog (LOG_NOTICE, "First daemon started.");
         sleep (5);
         break;
