@@ -1,7 +1,0 @@
-if (NOT LIBASYNCD_LIBRARIES)
-    find_path(LIBASYNCD_INCLUDE_DIR asyncd.h ${_LIBASYNCD_PATHS} PATH_SUFFIXES include include/asyncd/)
-endif ()
-
-if (NOT LIBASYNCD_LIBRARIES)
-    find_library(LIBASYNCD_LIBRARIES NAMES asyncd ${_LIBASYNCD_PATHS} PATH_SUFFIXES lib)
-endif ()

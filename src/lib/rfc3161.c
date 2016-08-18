@@ -7,8 +7,9 @@
 #include <openssl/rand.h>
 #include <openssl/ts.h>
 #include <openssl/bn.h>
-#include <asyncd/asyncd.h>
+#include <civetweb.h>
 
+/*
 int ts_http_respond(short event, ad_conn_t *conn, void *userdata) {
     if (event & AD_EVENT_READ) {
         if (ad_http_get_status(conn) == AD_HTTP_REQ_DONE) {
@@ -28,17 +29,53 @@ int http_default_handler(short event, ad_conn_t *conn, void *userdata) {
     }
     return AD_OK;
 }
+*/
+
+// This function will be called by civetweb on every new request.
+static int begin_request_handler(struct mg_connection *conn)
+{
+    const struct mg_request_info *request_info = mg_get_request_info(conn);
+    char content[100];
+
+    // Prepare the message we're going to send
+    int content_length = snprintf(content, sizeof(content),
+                                  "Hello from civetweb! Remote port: %d",
+                                  request_info->remote_port);
+
+    // Send HTTP reply to the client
+    mg_printf(conn,
+              "HTTP/1.1 200 OK\r\n"
+              "Content-Type: text/plain\r\n"
+              "Content-Length: %d\r\n"        // Always set Content-Length
+              "\r\n"
+              "%s",
+              content_length, content);
+
+    // Returning non-zero tells civetweb that our function has replied to
+    // the client, and civetweb should not send client any more data.
+    return 1;
+}
 
 int http_server_start() {
-    //SSL_load_error_strings();
-    //SSL_library_init();
-    ad_log_level(AD_LOG_DEBUG);
-    ad_server_t *server = ad_server_new();
-    ad_server_set_option(server, "server.port", "8888");
-    //ad_server_set_ssl_ctx(server,
-    //        ad_server_ssl_ctx_create_simple("ssl.cert", "ssl.pkey"));
-    ad_server_register_hook(server, ad_http_handler, NULL); // HTTP Parser is also a hook.
-    ad_server_register_hook_on_method(server, "GET", ts_http_respond, NULL);
-    ad_server_register_hook(server, http_default_handler, NULL);
-    return ad_server_start(server);
+    struct mg_context *ctx;
+    struct mg_callbacks callbacks;
+
+    // List of options. Last element must be NULL.
+    const char *options[] = {"listening_ports", "8080", NULL};
+
+    // Prepare callbacks structure. We have only one callback, the rest are NULL.
+    memset(&callbacks, 0, sizeof(callbacks));
+    callbacks.begin_request = begin_request_handler;
+
+    // Start the web server.
+    ctx = mg_start(&callbacks, NULL, options);
+
+    // Wait until user hits "enter". Server is running in separate thread.
+    // Navigating to http://localhost:8080 will invoke begin_request_handler().
+    getchar();
+
+    // Stop the server.
+    mg_stop(ctx);
+
+    return 0;
 }
