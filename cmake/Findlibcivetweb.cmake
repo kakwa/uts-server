@@ -1,0 +1,7 @@
+if (NOT LIBCIVETWEB_LIBRARIES)
+    find_path(LIBCIVETWEB_INCLUDE_DIR civetweb.h ${_LIBCIVETWEB_PATHS} PATH_SUFFIXES include include/civetweb/)
+endif ()
+
+if (NOT LIBCIVETWEB_LIBRARIES)
+    find_library(LIBCIVETWEB_LIBRARIES NAMES civetweb ${_LIBCIVETWEB_PATHS} PATH_SUFFIXES lib)
+endif ()
