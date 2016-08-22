@@ -1,3 +1,8 @@
+/*    
+ *    "This product includes software developed by the OpenSSL Project
+ *     *    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
