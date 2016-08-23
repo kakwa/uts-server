@@ -26,13 +26,13 @@ static CONF *load_config_file(const char *configfile);
 
 /* Reply related functions. */
 static int reply_command(CONF *conf, char *section, char *engine,
-                         char *queryfile, char *passin, char *inkey,
+                         char *query, char *passin, char *inkey,
                          const EVP_MD *md, char *signer, char *chain,
                          const char *policy, char *in, int token_in, char *out,
                          int token_out, int text);
 static TS_RESP *read_PKCS7(BIO *in_bio);
 static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
-                                char *queryfile, char *passin, char *inkey,
+                                char *query, char *passin, char *inkey,
                                 const EVP_MD *md, char *signer, char *chain,
                                 const char *policy);
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
@@ -159,7 +159,7 @@ static ASN1_OBJECT *txt2obj(const char *oid) {
  */
 
 static int reply_command(CONF *conf, char *section, char *engine,
-                         char *queryfile, char *passin, char *inkey,
+                         char *query, char *passin, char *inkey,
                          const EVP_MD *md, char *signer, char *chain,
                          const char *policy, char *in, int token_in, char *out,
                          int token_out, int text) {
@@ -181,7 +181,7 @@ static int reply_command(CONF *conf, char *section, char *engine,
             response = d2i_TS_RESP_bio(in_bio, NULL);
         }
     } else {
-        response = create_response(conf, section, engine, queryfile, passin,
+        response = create_response(conf, section, engine, query, passin,
                                    inkey, md, signer, chain, policy);
         //		if (response)
         //			BIO_printf(bio_err, "Response has been
@@ -270,7 +270,7 @@ end:
 }
 
 static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
-                                char *queryfile, char *passin, char *inkey,
+                                char *query, char *passin, char *inkey,
                                 const EVP_MD *md, char *signer, char *chain,
                                 const char *policy) {
     int ret = 0;
@@ -278,7 +278,7 @@ static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
     BIO *query_bio = NULL;
     TS_RESP_CTX *resp_ctx = NULL;
 
-    if ((query_bio = BIO_new_file(queryfile, "rb")) == NULL)
+    if ((query_bio = BIO_new_mem_buf(query, -1)) == NULL)
         goto end;
     if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL)
         goto end;
