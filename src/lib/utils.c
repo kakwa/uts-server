@@ -7,8 +7,7 @@
 #include <syslog.h>
 #include "utils.h"
 
-void skeleton_daemon()
-{
+void skeleton_daemon() {
     pid_t pid;
 
     /* Fork off the parent process */
@@ -27,7 +26,7 @@ void skeleton_daemon()
         exit(EXIT_FAILURE);
 
     /* Catch, ignore and handle signals */
-    //TODO: Implement a working signal handler */
+    // TODO: Implement a working signal handler */
     signal(SIGCHLD, SIG_IGN);
     signal(SIGHUP, SIG_IGN);
 
@@ -51,11 +50,10 @@ void skeleton_daemon()
 
     /* Close all open file descriptors */
     int x;
-    for (x = sysconf(_SC_OPEN_MAX); x>0; x--)
-    {
-        close (x);
+    for (x = sysconf(_SC_OPEN_MAX); x > 0; x--) {
+        close(x);
     }
 
     /* Open the log file */
-    openlog ("firstdaemon", LOG_PID, LOG_DAEMON);
+    openlog("firstdaemon", LOG_PID, LOG_DAEMON);
 }
