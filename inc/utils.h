@@ -1,2 +1,4 @@
+#include "context.h"
+
 void skeleton_daemon();
-void logger(int priority, char *fmt, ...);
+void logger(rfc3161_context *ct, int priority, char *fmt, ...);

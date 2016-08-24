@@ -6,7 +6,6 @@
 #include <getopt.h>
 #include <argp.h>
 #include <sys/syslog.h>
-#include "utils.h"
 #include "rfc3161.h"
 #include "http.h"
 

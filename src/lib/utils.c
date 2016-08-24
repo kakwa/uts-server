@@ -5,8 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <syslog.h>
-#include "utils.h"
 #include <stdarg.h>
+#include "context.h"
 
 void skeleton_daemon() {
     pid_t pid;
@@ -59,7 +59,7 @@ void skeleton_daemon() {
     openlog("firstdaemon", LOG_PID, LOG_DAEMON);
 }
 
-void logger(int priority, char *fmt, ...) {
+void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     FILE *stream;
     char *out;
     size_t len;
