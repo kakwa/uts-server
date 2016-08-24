@@ -12,41 +12,38 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/syslog.h>
-#include "utils.h"
-#include "context.h"
-#include "rfc3161.h"
+#include "http.h"
 
 void log_request_debug(const struct mg_request_info *request_info,
-                       int request_id) {
+                       int request_id, void *context) {
     for (int i = 0; i < request_info->num_headers; i++) {
-        logger(LOG_DEBUG, "Request[%d], Header[%s]: %s\n", request_id,
+        logger(context, LOG_DEBUG, "Request[%d], Header[%s]: %s\n", request_id,
                request_info->http_headers[i].name,
                request_info->http_headers[i].value);
     }
-    logger(LOG_DEBUG, "Request[%d], request_method: %s\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], request_method: %s\n", request_id,
            request_info->request_method);
-    logger(LOG_DEBUG, "Request[%d], request_uri: %s\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], request_uri: %s\n", request_id,
            request_info->request_uri);
-    logger(LOG_DEBUG, "Request[%d], local_uri: %s\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], local_uri: %s\n", request_id,
            request_info->local_uri);
-    logger(LOG_DEBUG, "Request[%d], http_version: %s\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], http_version: %s\n", request_id,
            request_info->http_version);
-    logger(LOG_DEBUG, "Request[%d], query_string: %s\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], query_string: %s\n", request_id,
            request_info->query_string);
-    logger(LOG_DEBUG, "Request[%d], remote_addr: %s\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], remote_addr: %s\n", request_id,
            request_info->remote_addr);
-    logger(LOG_DEBUG, "Request[%d], is_ssl: %d\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], is_ssl: %d\n", request_id,
            request_info->is_ssl);
-    logger(LOG_DEBUG, "Request[%d], content_length: %d\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], content_length: %d\n", request_id,
            request_info->content_length);
-    logger(LOG_DEBUG, "Request[%d], remote_port: %d\n", request_id,
+    logger(context, LOG_DEBUG, "Request[%d], remote_port: %d\n", request_id,
            request_info->remote_port);
 }
 
 // This function will be called by civetweb on every new request.
 static int begin_request_handler(struct mg_connection *conn) {
     const struct mg_request_info *request_info = mg_get_request_info(conn);
-    log_request_debug(request_info, 0);
 
     mg_printf(conn,
               "HTTP/1.1 200 OK\r\n"
@@ -65,7 +62,9 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     const struct mg_request_info *request_info = mg_get_request_info(conn);
     rfc3161_context *ct = (rfc3161_context *)context;
     int ret;
-    log_request_debug(request_info, ct->query_counter);
+    ct->query_counter++;
+    uint64_t query_id = ct->query_counter;
+    log_request_debug(request_info, query_id, ct);
 
     bool is_tsq = 0;
 
@@ -97,8 +96,6 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
                   "\r\n"
                   "uts-server, a simple RFC 3161 timestamp server");
     }
-
-    ct->query_counter++;
 
     return 1;
 }

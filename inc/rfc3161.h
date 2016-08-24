@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "utils.h"
 #include <sys/syslog.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
