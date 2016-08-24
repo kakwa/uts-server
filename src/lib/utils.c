@@ -56,7 +56,7 @@ void skeleton_daemon() {
     }
 
     /* Open the log file */
-    openlog("firstdaemon", LOG_PID, LOG_DAEMON);
+    openlog("uts-server", LOG_PID, LOG_DAEMON);
 }
 
 void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
