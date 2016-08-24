@@ -8,6 +8,7 @@
 #include <sys/syslog.h>
 #include "utils.h"
 #include "rfc3161.h"
+#include "http.h"
 
 const char *argp_program_version = UTS_VERSION;
 

@@ -29,6 +29,7 @@ include_directories(
 add_executable(uts-server
     src/cmd/uts-server.c
     src/lib/rfc3161.c
+    src/lib/http.c
     src/lib/utils.c
     src/lib/ini.c
 )
