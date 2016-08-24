@@ -19,14 +19,16 @@ static char doc[] = "\nUTS micro timestamp server (RFC 3161)";
 static struct argp_option options[] = {
     {"conffile", 'c', "CONFFILE", 0, "Path to configuration file"},
     {"daemonize", 'd', 0, 0, "Launch as a daemon"},
+    {"debug", 'D', 0, 0, "STDOUT debugging"},
     {0}};
 
 /* A description of the arguments we accept. */
-static char args_doc[] = "-c CONFFILE -d";
+static char args_doc[] = "-c CONFFILE [-d] [-D]";
 
 struct arguments {
     char *args[2]; /* arg1 & arg2 */
     int daemonize;
+    bool stdout_dbg;
     char *conffile;
 };
 
@@ -38,6 +40,9 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     switch (key) {
     case 'd':
         arguments->daemonize = 1;
+        break;
+    case 'D':
+        arguments->stdout_dbg = 1;
         break;
     case 'c':
         arguments->conffile = arg;
@@ -62,13 +67,12 @@ int main(int argc, char **argv) {
 
     while (1) {
         // TODO: Insert daemon code here.
-        http_server_start();
-        syslog(LOG_NOTICE, "First daemon started.");
-        sleep(5);
+        http_server_start(args.conffile, args.stdout_dbg);
+        syslog(LOG_NOTICE, "uts-server daemon started.");
         break;
     }
 
-    syslog(LOG_NOTICE, "First daemon terminated.");
+    syslog(LOG_NOTICE, "uts-server daemon terminated.");
     closelog();
 
     return EXIT_SUCCESS;
