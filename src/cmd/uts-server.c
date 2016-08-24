@@ -60,6 +60,7 @@ int main(int argc, char **argv) {
     struct arguments args;
     args.conffile = NULL;
     args.daemonize = 0;
+    args.stdout_dbg = 0;
     argp_parse(&argp, argc, argv, 0, 0, &args);
 
     if (args.daemonize)

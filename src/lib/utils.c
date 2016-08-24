@@ -60,6 +60,10 @@ void skeleton_daemon() {
 }
 
 void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
+    // ignore all messages less critical than the loglevel
+    // except if the debug flag is set
+    if (priority > ct->loglevel && !ct->stdout_dbg)
+        return;
     FILE *stream;
     char *out;
     size_t len;
@@ -69,10 +73,36 @@ void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     va_start(args, fmt);
     vfprintf(stream, fmt, args);
     va_end(args);
-
     fflush(stream);
     fclose(stream);
-    printf(out);
+    if (ct->stdout_dbg) {
+        switch (priority) {
+        case LOG_EMERG:
+            printf("LOG_EMER   : %s", out);
+            ;
+        case LOG_ALERT:
+            printf("LOG_ALERT  : %s", out);
+            ;
+        case LOG_CRIT:
+            printf("LOG_CRIT   : %s", out);
+            ;
+        case LOG_ERR:
+            printf("LOG_ERR    : %s", out);
+            ;
+        case LOG_WARNING:
+            printf("LOG_WARNING: %s", out);
+            ;
+        case LOG_NOTICE:
+            printf("LOG_NOTICE : %s", out);
+            ;
+        case LOG_INFO:
+            printf("LOG_INFO   : %s", out);
+            ;
+        case LOG_DEBUG:
+            printf("LOG_DEBUG  : %s", out);
+            ;
+        }
+    }
     syslog(priority, out);
     free(out);
 }

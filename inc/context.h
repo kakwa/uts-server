@@ -9,4 +9,5 @@ typedef struct {
     uint64_t query_counter;
     bool stdout_dbg;
     TS_RESP_CTX *resp_ctx;
+    int loglevel;
 } rfc3161_context;
