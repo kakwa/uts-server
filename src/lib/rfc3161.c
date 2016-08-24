@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include "utils.h"
+#include <sys/syslog.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/pem.h>
@@ -25,11 +28,11 @@ static ASN1_OBJECT *txt2obj(const char *oid);
 static CONF *load_config_file(const char *configfile);
 
 /* Reply related functions. */
-static int reply_command(CONF *conf, char *section, char *engine,
-                         char *query, char *passin, char *inkey,
-                         const EVP_MD *md, char *signer, char *chain,
-                         const char *policy, char *in, int token_in, char *out,
-                         int token_out, int text);
+static int reply_command(CONF *conf, char *section, char *engine, char *query,
+                         char *passin, char *inkey, const EVP_MD *md,
+                         char *signer, char *chain, const char *policy,
+                         char *in, int token_in, char *out, int token_out,
+                         int text);
 static TS_RESP *read_PKCS7(BIO *in_bio);
 static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
                                 char *query, char *passin, char *inkey,
@@ -66,55 +69,6 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
    }
    */
 
-// This function will be called by civetweb on every new request.
-static int begin_request_handler(struct mg_connection *conn) {
-    const struct mg_request_info *request_info = mg_get_request_info(conn);
-    char content[100];
-
-    // Prepare the message we're going to send
-    int content_length = snprintf(content, sizeof(content),
-                                  "Hello from civetweb! Remote port: %d",
-                                  request_info->remote_port);
-
-    // Send HTTP reply to the client
-    mg_printf(conn,
-              "HTTP/1.1 200 OK\r\n"
-              "Content-Type: application/timestamp-reply\r\n"
-              "Content-Length: %d\r\n" // Always set Content-Length
-              "\r\n"
-              "%s",
-              content_length, content);
-
-    // Returning non-zero tells civetweb that our function has replied to
-    // the client, and civetweb should not send client any more data.
-    return 1;
-}
-
-int http_server_start() {
-    struct mg_context *ctx;
-    struct mg_callbacks callbacks;
-
-    // List of options. Last element must be NULL.
-    const char *options[] = {"listening_ports", "8080", NULL};
-
-    // Prepare callbacks structure. We have only one callback, the rest are
-    // NULL.
-    memset(&callbacks, 0, sizeof(callbacks));
-    callbacks.begin_request = begin_request_handler;
-
-    // Start the web server.
-    ctx = mg_start(&callbacks, NULL, options);
-
-    // Wait until user hits "enter". Server is running in separate thread.
-    // Navigating to http://localhost:8080 will invoke begin_request_handler().
-    getchar();
-
-    // Stop the server.
-    mg_stop(ctx);
-
-    return 0;
-}
-
 /*
  * Configuration file-related function definitions.
  */
@@ -136,7 +90,7 @@ static ASN1_OBJECT *txt2obj(const char *oid) {
 //		const char *p;
 //
 ////		BIO_printf(bio_err, "Using configuration from %s\n",
-///configfile);
+/// configfile);
 //		p = NCONF_get_string(conf, NULL, ENV_OID_FILE);
 //		if (p != NULL) {
 //			BIO *oid_bio = BIO_new_file(p, "r");
@@ -158,11 +112,11 @@ static ASN1_OBJECT *txt2obj(const char *oid) {
  * Reply-related method definitions.
  */
 
-static int reply_command(CONF *conf, char *section, char *engine,
-                         char *query, char *passin, char *inkey,
-                         const EVP_MD *md, char *signer, char *chain,
-                         const char *policy, char *in, int token_in, char *out,
-                         int token_out, int text) {
+static int reply_command(CONF *conf, char *section, char *engine, char *query,
+                         char *passin, char *inkey, const EVP_MD *md,
+                         char *signer, char *chain, const char *policy,
+                         char *in, int token_in, char *out, int token_out,
+                         int text) {
     int ret = 0;
     TS_RESP *response = NULL;
     BIO *in_bio = NULL;
@@ -181,22 +135,23 @@ static int reply_command(CONF *conf, char *section, char *engine,
             response = d2i_TS_RESP_bio(in_bio, NULL);
         }
     } else {
-        response = create_response(conf, section, engine, query, passin,
-                                   inkey, md, signer, chain, policy);
+        response = create_response(conf, section, engine, query, passin, inkey,
+                                   md, signer, chain, policy);
         //		if (response)
         //			BIO_printf(bio_err, "Response has been
-        //generated.\n");
+        // generated.\n");
         //		else
         //			BIO_printf(bio_err, "Response is not
-        //generated.\n");
+        // generated.\n");
     }
     if (response == NULL)
         goto end;
 
     /* Write response. */
     if (text) {
-        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_TEXT)) ==
-        //NULL)
+        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_TEXT))
+        //==
+        // NULL)
         //			goto end;
         if (token_out) {
             TS_TST_INFO *tst_info = TS_RESP_get_tst_info(response);
@@ -207,8 +162,9 @@ static int reply_command(CONF *conf, char *section, char *engine,
                 goto end;
         }
     } else {
-        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_ASN1)) ==
-        //NULL)
+        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_ASN1))
+        //==
+        // NULL)
         //			goto end;
         if (token_out) {
             PKCS7 *token = TS_RESP_get_token(response);
@@ -363,7 +319,7 @@ static ASN1_INTEGER *next_serial(const char *serialfile) {
         //		BIO_printf(bio_err, "Warning: could not open file %s for
         //"
         //				"reading, using serial number: 1\n",
-        //serialfile);
+        // serialfile);
         if (!ASN1_INTEGER_set(serial, 1))
             goto err;
     } else {

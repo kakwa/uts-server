@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <syslog.h>
 #include "utils.h"
+#include <stdarg.h>
 
 void skeleton_daemon() {
     pid_t pid;
@@ -56,4 +57,22 @@ void skeleton_daemon() {
 
     /* Open the log file */
     openlog("firstdaemon", LOG_PID, LOG_DAEMON);
+}
+
+void logger(int priority, char *fmt, ...) {
+    FILE *stream;
+    char *out;
+    size_t len;
+    stream = open_memstream(&out, &len);
+    va_list args;
+
+    va_start(args, fmt);
+    vfprintf(stream, fmt, args);
+    va_end(args);
+
+    fflush(stream);
+    fclose(stream);
+    printf(out);
+    syslog(priority, out);
+    free(out);
 }
