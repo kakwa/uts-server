@@ -100,7 +100,7 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     return 1;
 }
 
-int http_server_start() {
+int http_server_start(char *conffile, bool stdout_dbg) {
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
 
@@ -115,6 +115,7 @@ int http_server_start() {
     // Start the web server.
     ctx = mg_start(&callbacks, NULL, options);
     rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
+    ct->stdout_dbg = stdout_dbg;
     mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
 
     // Wait until user hits "enter". Server is running in separate thread.
