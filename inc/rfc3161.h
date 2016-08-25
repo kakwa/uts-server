@@ -14,6 +14,11 @@
 /* Name of config entry that defines the OID file. */
 #define ENV_OID_FILE "oid_file"
 
+#define B_FORMAT_TEXT 0x8000
+#define FORMAT_UNDEF 0
+#define FORMAT_TEXT (1 | B_FORMAT_TEXT) /* Generic text */
+#define FORMAT_ASN1 4                   /* ASN.1/DER */
+
 static ASN1_OBJECT *txt2obj(const char *oid);
 
 /* Reply related functions. */
@@ -30,9 +35,4 @@ static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
 static ASN1_INTEGER *next_serial(const char *serialfile);
 static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
-
-
-#define B_FORMAT_TEXT 0x8000
-#define FORMAT_UNDEF 0
-#define FORMAT_TEXT (1 | B_FORMAT_TEXT) /* Generic text */
-#define FORMAT_ASN1 4                   /* ASN.1/DER */
+TS_RESP_CTX *create_tsctx(CONF *conf, const char *section, const char *policy);

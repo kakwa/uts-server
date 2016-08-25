@@ -9,10 +9,8 @@
 #include <openssl/bio.h>
 #include <errno.h>
 #include <string.h>
-#include "context.h"
 #include <syslog.h>
-
-#define FORMAT_TEXT 1
+#include "utils.h"
 
 typedef struct _code {
     char *c_name;
@@ -239,7 +237,10 @@ int set_params(rfc3161_context *ct, char *conf_file) {
         }
         ct->http_options[http_counter] = NULL;
     }
-    // device = NCONF_get_string(conf, section, ENV_CRYPTO_DEVICE);
+
+    ct->ts_ctx = create_tsctx(conf, "tsa", NULL);
+    if (ct->ts_ctx == NULL)
+        ret = 0;
     return ret;
 
 end:
