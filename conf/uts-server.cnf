@@ -80,7 +80,8 @@ request_timeout_ms = 30000
 # Enable TCP_NODELAY socket option on client connections.
 tcp_nodelay = 0
 
-# loglevel
+# loglevel 
+# debug, info, notice, warn, err, emerg, crit
 log_level = info
 
 ####################################################################
