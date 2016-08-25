@@ -104,19 +104,17 @@ int http_server_start(char *conffile, bool stdout_dbg) {
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
 
-    // List of options. Last element must be NULL.
-    const char *options[] = {"listening_ports", "8080", NULL};
+    rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
+    ct->stdout_dbg = stdout_dbg;
+    ct->loglevel = 8;
+    set_params(ct, conffile);
 
     // Prepare callbacks structure. We have only one callback, the rest are
     // NULL.
     memset(&callbacks, 0, sizeof(callbacks));
-    // callbacks.begin_request = begin_request_handler;
 
     // Start the web server.
-    ctx = mg_start(&callbacks, NULL, options);
-    rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
-    ct->stdout_dbg = stdout_dbg;
-    ct->loglevel = 8;
+    ctx = mg_start(&callbacks, NULL, ct->http_options);
     mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
 
     // Wait until user hits "enter". Server is running in separate thread.

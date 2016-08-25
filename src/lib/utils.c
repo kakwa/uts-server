@@ -82,28 +82,35 @@ void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     if (ct->stdout_dbg) {
         switch (priority) {
         case LOG_EMERG:
-            printf("LOG_EMER   : %s", out);
-            ;
+            printf("LOG_EMER   : %s\n", out);
+            break;
         case LOG_ALERT:
-            printf("LOG_ALERT  : %s", out);
+            printf("LOG_ALERT  : %s\n", out);
+            break;
             ;
         case LOG_CRIT:
-            printf("LOG_CRIT   : %s", out);
+            printf("LOG_CRIT   : %s\n", out);
+            break;
             ;
         case LOG_ERR:
-            printf("LOG_ERR    : %s", out);
+            printf("LOG_ERR    : %s\n", out);
+            break;
             ;
         case LOG_WARNING:
-            printf("LOG_WARNING: %s", out);
+            printf("LOG_WARNING: %s\n", out);
+            break;
             ;
         case LOG_NOTICE:
-            printf("LOG_NOTICE : %s", out);
+            printf("LOG_NOTICE : %s\n", out);
+            break;
             ;
         case LOG_INFO:
-            printf("LOG_INFO   : %s", out);
+            printf("LOG_INFO   : %s\n", out);
+            break;
             ;
         case LOG_DEBUG:
-            printf("LOG_DEBUG  : %s", out);
+            printf("LOG_DEBUG  : %s\n", out);
+            break;
             ;
         }
     }
@@ -136,6 +143,10 @@ static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
     CONF *conf;
     int i;
     ct->loglevel = LOG_INFO;
+    if (filename == NULL) {
+        logger(ct, LOG_WARNING, "no configuration file passed");
+        return NULL;
+    }
     in = bio_open_default(ct, filename, 'r');
     if (in == NULL) {
         logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
@@ -161,6 +172,38 @@ int set_params(rfc3161_context *ct, char *conf_file) {
     int ret = 0;
     CONF *conf = load_config_file(ct, conf_file);
     ret = 1;
+    int http_counter = 0;
+    for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
+        int type = rfc3161_options[i].type;
+        const char *name = rfc3161_options[i].name;
+        const char *default_value = rfc3161_options[i].default_value;
+        const char *value = NCONF_get_string(conf, MAIN_CONF_SECTION, name);
+        if (value == NULL) {
+            logger(ct, LOG_NOTICE,
+                   "configuration param['%s'] not set, using default: '%s'",
+                   name, default_value);
+            value = default_value;
+        }
+        logger(ct, LOG_DEBUG, "configuration param['%s'] = '%s'", name, value);
+        switch (type) {
+        case HTTP_OPTIONS:
+            if (value != NULL) {
+                ct->http_options[http_counter] = name;
+                http_counter++;
+                ct->http_options[http_counter] = value;
+                http_counter++;
+            }
+            break;
+            ;
+        case LOGLEVEL_OPTIONS:
+            break;
+            ;
+        case TSA_OPTIONS:
+            break;
+            ;
+        }
+        ct->http_options[http_counter] = NULL;
+    }
     // device = NCONF_get_string(conf, section, ENV_CRYPTO_DEVICE);
     return ret;
 
