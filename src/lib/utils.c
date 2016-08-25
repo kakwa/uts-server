@@ -8,9 +8,29 @@
 #include <stdarg.h>
 #include <openssl/bio.h>
 #include <errno.h>
+#include <string.h>
 #include "context.h"
+#include <syslog.h>
 
 #define FORMAT_TEXT 1
+
+typedef struct _code {
+    char *c_name;
+    int c_val;
+} CODE;
+
+CODE prioritynames[] = {{"alert", LOG_ALERT},
+                        {"crit", LOG_CRIT},
+                        {"debug", LOG_DEBUG},
+                        {"emerg", LOG_EMERG},
+                        {"err", LOG_ERR},
+                        {"error", LOG_ERR},
+                        {"info", LOG_INFO},
+                        {"notice", LOG_NOTICE},
+                        {"panic", LOG_EMERG},
+                        {"warn", LOG_WARNING},
+                        {"warning", LOG_WARNING},
+                        {NULL, -1}};
 
 void skeleton_daemon() {
     pid_t pid;
@@ -173,6 +193,24 @@ int set_params(rfc3161_context *ct, char *conf_file) {
     CONF *conf = load_config_file(ct, conf_file);
     ret = 1;
     int http_counter = 0;
+    // first pass to set the loglevel as soon as possible
+    for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
+        int type = rfc3161_options[i].type;
+        const char *name = rfc3161_options[i].name;
+        const char *default_value = rfc3161_options[i].default_value;
+        const char *value = NCONF_get_string(conf, MAIN_CONF_SECTION, name);
+        switch (type) {
+        case LOGLEVEL_OPTIONS:
+            for (int j = 0;; j++) {
+                if (prioritynames[j].c_name == NULL)
+                    break;
+                if (strcmp(prioritynames[j].c_name, value))
+                    ct->loglevel = prioritynames[j].c_val;
+            }
+            break;
+            ;
+        }
+    }
     for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
         int type = rfc3161_options[i].type;
         const char *name = rfc3161_options[i].name;
@@ -193,9 +231,6 @@ int set_params(rfc3161_context *ct, char *conf_file) {
                 ct->http_options[http_counter] = value;
                 http_counter++;
             }
-            break;
-            ;
-        case LOGLEVEL_OPTIONS:
             break;
             ;
         case TSA_OPTIONS:
