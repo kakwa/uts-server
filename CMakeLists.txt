@@ -31,7 +31,6 @@ add_executable(uts-server
     src/lib/rfc3161.c
     src/lib/http.c
     src/lib/utils.c
-    src/lib/ini.c
 )
 
 target_link_libraries(uts-server
