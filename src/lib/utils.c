@@ -6,7 +6,11 @@
 #include <sys/stat.h>
 #include <syslog.h>
 #include <stdarg.h>
+#include <openssl/bio.h>
+#include <errno.h>
 #include "context.h"
+
+#define FORMAT_TEXT 1
 
 void skeleton_daemon() {
     pid_t pid;
@@ -105,4 +109,61 @@ void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     }
     syslog(priority, out);
     free(out);
+}
+
+static BIO *bio_open_default(rfc3161_context *ct, const char *filename,
+                             int format) {
+    BIO *ret;
+    format = FORMAT_TEXT;
+
+    if (filename == NULL || strcmp(filename, "-") == 0) {
+        logger(ct, LOG_CRIT, "Can't open %s, %s", filename, strerror(errno));
+        return NULL;
+    } else {
+        ret = BIO_new_file(filename, "rb");
+        if (ret != NULL)
+            return ret;
+        logger(ct, LOG_CRIT, "Can't open %s for %s, %s", filename, "rb",
+               strerror(errno));
+    }
+    // ERR_print_errors(bio_err);
+    return NULL;
+}
+
+static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
+    long errorline = -1;
+    BIO *in;
+    CONF *conf;
+    int i;
+    ct->loglevel = LOG_INFO;
+    in = bio_open_default(ct, filename, 'r');
+    if (in == NULL) {
+        logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
+        return NULL;
+    }
+
+    conf = NCONF_new(NULL);
+    i = NCONF_load_bio(conf, in, &errorline);
+    BIO_free(in);
+    if (i > 0) {
+        return conf;
+    }
+    if (errorline <= 0)
+        logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
+    else
+        logger(ct, LOG_CRIT, "Error on line %ld of config file \"%s\"",
+               errorline, filename);
+    NCONF_free(conf);
+    return NULL;
+}
+
+int set_params(rfc3161_context *ct, char *conf_file) {
+    int ret = 0;
+    CONF *conf = load_config_file(ct, conf_file);
+    ret = 1;
+    // device = NCONF_get_string(conf, section, ENV_CRYPTO_DEVICE);
+    return ret;
+
+end:
+    return 0;
 }
