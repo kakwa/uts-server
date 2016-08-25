@@ -107,7 +107,8 @@ int http_server_start(char *conffile, bool stdout_dbg) {
     rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
     ct->stdout_dbg = stdout_dbg;
     ct->loglevel = 8;
-    set_params(ct, conffile);
+    if (!set_params(ct, conffile))
+        return 1;
 
     // Prepare callbacks structure. We have only one callback, the rest are
     // NULL.

@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "utils.h"
 #include <sys/syslog.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -20,6 +19,7 @@
 #include <openssl/rand.h>
 #include <openssl/ts.h>
 #include <openssl/bn.h>
+#include "rfc3161.h"
 
 /* Name of config entry that defines the OID file. */
 #define ENV_OID_FILE "oid_file"
@@ -196,6 +196,53 @@ end:
     }
     TS_STATUS_INFO_free(si);
     return resp;
+}
+
+TS_RESP_CTX *create_tsctx(CONF *conf, const char *section, const char *policy) {
+    int ret = 0;
+    TS_RESP_CTX *resp_ctx = NULL;
+    if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL)
+        goto end;
+    if ((resp_ctx = TS_RESP_CTX_new()) == NULL)
+        goto end;
+    if (!TS_CONF_set_serial(conf, section, NULL, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_crypto_device(conf, section, NULL))
+        goto end;
+    if (!TS_CONF_set_signer_cert(conf, section, NULL, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_certs(conf, section, NULL, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_signer_key(conf, section, NULL, NULL, resp_ctx))
+        goto end;
+
+    // if (md) {
+    //         if (!TS_RESP_CTX_set_signer_digest(resp_ctx, md))
+    //                 goto end;
+    // } else if (!TS_CONF_set_signer_digest(conf, section, NULL, resp_ctx)) {
+    //         goto end;
+    // }
+
+    if (!TS_CONF_set_def_policy(conf, section, policy, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_policies(conf, section, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_digests(conf, section, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_accuracy(conf, section, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_clock_precision_digits(conf, section, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_ordering(conf, section, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_tsa_name(conf, section, resp_ctx))
+        goto end;
+    if (!TS_CONF_set_ess_cert_id_chain(conf, section, resp_ctx))
+        goto end;
+    ret = 1;
+
+end:
+    return resp_ctx;
 }
 
 static TS_RESP *create_response(CONF *conf, const char *section, char *engine,

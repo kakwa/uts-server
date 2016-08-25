@@ -20,6 +20,7 @@ typedef struct {
     TS_RESP_CTX *resp_ctx;
     int loglevel;
     const char *http_options[40];
+    TS_RESP_CTX *ts_ctx;
 } rfc3161_context;
 
 struct rfc3161_option {
