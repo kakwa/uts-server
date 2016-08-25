@@ -1,0 +1,68 @@
+[ new_oids ]
+
+# We can add new OIDs in here for use by 'ca', 'req' and 'ts'.
+# Add a simple OID like this:
+# testoid1=1.2.3.4
+# Or use config file substitution like this:
+# testoid2=${testoid1}.5.6
+
+# Policies used by the TSA examples.
+tsa_policy1 = 1.2.3.4.1
+tsa_policy2 = 1.2.3.4.5.6
+tsa_policy3 = 1.2.3.4.5.7
+
+[ main ]
+num_threads = 10
+#run_as_user = uts-server
+enable_keep_alive = no
+listening_ports = 127.0.0.1:2020
+#listening_ports = 80,443s
+
+num_threads = 50
+run_as_user = uts-server
+throttle = 10
+enable_keep_alive = no
+request_timeout_ms = 30000
+#ssl_certificate = /etc/uts-server/cert.pem
+#ssl_verify_peer = yes
+#ssl_ca_path = /etc/ssl/ca/
+#ssl_ca_file = /etc/uts-server/ca.pem
+#ssl_verify_depth = 9
+#ssl_default_verify_paths = yes
+#ssl_cipher_list = TLS_DH_anon_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA256
+#ssl_protocol_version = 0
+#ssl_short_trust = no
+#access_control_allow_origin = *
+tcp_nodelay = 0
+log_level = info
+
+
+####################################################################
+[ tsa ]
+
+default_tsa = tsa_config1	# the default TSA section
+
+[ tsa_config1 ]
+
+# These are used by the TSA reply generation only.
+dir		= ./demoCA		# TSA root directory
+serial		= $dir/tsaserial	# The current serial number (mandatory)
+crypto_device	= builtin		# OpenSSL engine to use for signing
+signer_cert	= $dir/tsacert.pem 	# The TSA signing certificate
+					# (optional)
+certs		= $dir/cacert.pem	# Certificate chain to include in reply
+					# (optional)
+signer_key	= $dir/private/tsakey.pem # The TSA private key (optional)
+
+default_policy	= tsa_policy1		# Policy if request did not specify it
+					# (optional)
+other_policies	= tsa_policy2, tsa_policy3	# acceptable policies (optional)
+digests		= md5, sha1		# Acceptable message digests (mandatory)
+accuracy	= secs:1, millisecs:500, microsecs:100	# (optional)
+clock_precision_digits  = 0	# number of digits after dot. (optional)
+ordering		= yes	# Is ordering defined for timestamps?
+				# (optional, default: no)
+tsa_name		= yes	# Must the TSA name be included in the reply?
+				# (optional, default: no)
+ess_cert_id_chain	= no	# Must the ESS cert id chain be included?
+				# (optional, default: no)
