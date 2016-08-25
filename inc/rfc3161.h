@@ -15,7 +15,6 @@
 #define ENV_OID_FILE "oid_file"
 
 static ASN1_OBJECT *txt2obj(const char *oid);
-static CONF *load_config_file(const char *configfile);
 
 /* Reply related functions. */
 static int reply_command(CONF *conf, char *section, char *engine, char *query,
@@ -31,6 +30,7 @@ static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
 static ASN1_INTEGER *next_serial(const char *serialfile);
 static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
+
 
 #define B_FORMAT_TEXT 0x8000
 #define FORMAT_UNDEF 0
