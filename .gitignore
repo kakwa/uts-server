@@ -37,3 +37,14 @@ CMakeFiles/
 Makefile
 cmake_install.cmake
 uts-server
+
+# cert/ca/key test file
+tests/cfg/pki/*.pem
+tests/cfg/pki/*.srl
+tests/cfg/pki/.rnd
+
+# timestamps
+*.ts
+*.tsr
+*.tsq
+
