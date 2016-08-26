@@ -88,7 +88,7 @@ while getopts ":lhu:i:o:O:C:" opt; do
 done
 
 # If no output file specified, output to <input file>.ts
-[ -z "$OUTPUT_FILE" ]   && OUTPUT_FILE="${INPUT_FILE}.ts"
+[ -z "$OUTPUT_FILE" ]   && OUTPUT_FILE="${INPUT_FILE}.tsr"
 
 # Check that input file exists
 [ -f "$INPUT_FILE" ]    || exit_error "Input file '$INPUT_FILE' doesn't exist"
