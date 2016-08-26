@@ -10,6 +10,7 @@
 #include <openssl/rand.h>
 #include <openssl/ts.h>
 #include <openssl/bn.h>
+#include "context.h"
 
 /* Name of config entry that defines the OID file. */
 #define ENV_OID_FILE "oid_file"
@@ -35,4 +36,5 @@ static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
 static ASN1_INTEGER *next_serial(const char *serialfile);
 static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
-TS_RESP_CTX *create_tsctx(CONF *conf, const char *section, const char *policy);
+TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
+                          const char *policy);

@@ -81,7 +81,7 @@ void skeleton_daemon() {
     openlog("uts-server", LOG_PID, LOG_DAEMON);
 }
 
-void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
+void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     // ignore all messages less critical than the loglevel
     // except if the debug flag is set
     if (priority > ct->loglevel && !ct->stdout_dbg)
@@ -132,7 +132,7 @@ void logger(rfc3161_context *ct, int priority, char *fmt, ...) {
             ;
         }
     }
-    syslog(priority, out);
+    syslog(priority, "%s", out);
     free(out);
 }
 
@@ -142,14 +142,15 @@ static BIO *bio_open_default(rfc3161_context *ct, const char *filename,
     format = FORMAT_TEXT;
 
     if (filename == NULL || strcmp(filename, "-") == 0) {
-        logger(ct, LOG_CRIT, "Can't open %s, %s", filename, strerror(errno));
+        uts_logger(ct, LOG_CRIT, "Can't open %s, %s", filename,
+                   strerror(errno));
         return NULL;
     } else {
         ret = BIO_new_file(filename, "rb");
         if (ret != NULL)
             return ret;
-        logger(ct, LOG_CRIT, "Can't open %s for %s, %s", filename, "rb",
-               strerror(errno));
+        uts_logger(ct, LOG_CRIT, "Can't open %s for %s, %s", filename, "rb",
+                   strerror(errno));
     }
     // ERR_print_errors(bio_err);
     return NULL;
@@ -162,12 +163,12 @@ static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
     int i;
     ct->loglevel = LOG_INFO;
     if (filename == NULL) {
-        logger(ct, LOG_WARNING, "no configuration file passed");
+        uts_logger(ct, LOG_WARNING, "no configuration file passed");
         return NULL;
     }
     in = bio_open_default(ct, filename, 'r');
     if (in == NULL) {
-        logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
+        uts_logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
         return NULL;
     }
 
@@ -178,10 +179,10 @@ static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
         return conf;
     }
     if (errorline <= 0)
-        logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
+        uts_logger(ct, LOG_CRIT, "Can't load config file \"%s\"", filename);
     else
-        logger(ct, LOG_CRIT, "Error on line %ld of config file \"%s\"",
-               errorline, filename);
+        uts_logger(ct, LOG_CRIT, "Error on line %ld of config file \"%s\"",
+                   errorline, filename);
     NCONF_free(conf);
     return NULL;
 }
@@ -215,12 +216,13 @@ int set_params(rfc3161_context *ct, char *conf_file) {
         const char *default_value = rfc3161_options[i].default_value;
         const char *value = NCONF_get_string(conf, MAIN_CONF_SECTION, name);
         if (value == NULL) {
-            logger(ct, LOG_NOTICE,
-                   "configuration param['%s'] not set, using default: '%s'",
-                   name, default_value);
+            uts_logger(ct, LOG_NOTICE,
+                       "configuration param['%s'] not set, using default: '%s'",
+                       name, default_value);
             value = default_value;
         }
-        logger(ct, LOG_DEBUG, "configuration param['%s'] = '%s'", name, value);
+        uts_logger(ct, LOG_DEBUG, "configuration param['%s'] = '%s'", name,
+                   value);
         switch (type) {
         case HTTP_OPTIONS:
             if (value != NULL) {
@@ -238,7 +240,7 @@ int set_params(rfc3161_context *ct, char *conf_file) {
         ct->http_options[http_counter] = NULL;
     }
 
-    ct->ts_ctx = create_tsctx(conf, "tsa", NULL);
+    ct->ts_ctx = create_tsctx(ct, conf, "tsa", NULL);
     if (ct->ts_ctx == NULL)
         ret = 0;
     return ret;
