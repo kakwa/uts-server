@@ -3,6 +3,8 @@
 
 export OPENSSL_CONF="./CAtsa.cnf"
 
+cd `dirname $0`
+
 error () {
 
     echo "TSA test failed!" >&2
