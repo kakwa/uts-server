@@ -240,7 +240,7 @@ int set_params(rfc3161_context *ct, char *conf_file) {
         ct->http_options[http_counter] = NULL;
     }
 
-    ct->ts_ctx = create_tsctx(ct, conf, "tsa", NULL);
+    ct->ts_ctx = create_tsctx(ct, conf, NULL, NULL);
     if (ct->ts_ctx == NULL)
         ret = 0;
     return ret;
