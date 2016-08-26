@@ -280,8 +280,12 @@ end:
     while ((err_code = ERR_get_error())) {
         if (err_code_prev != err_code) {
             ERR_load_TS_strings();
-            uts_logger(ct, LOG_ERR, "openssl exception: '%s'",
+            uts_logger(ct, LOG_DEBUG, "OpenSSL exception: '%s'",
                        ERR_error_string(err_code, NULL));
+            uts_logger(ct, LOG_ERR, "error '%s' in component '%s'",
+                       ERR_reason_error_string(err_code),
+                       ERR_lib_error_string(err_code));
+
             // printf("%lu\n", err_code, NULL);
             // printf("%s\n", ERR_reason_error_string(err_code));
             // printf("%s\n", ERR_func_error_string(err_code));
