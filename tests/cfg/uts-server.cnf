@@ -89,26 +89,26 @@ default_tsa = tsa_config1
 # These are used by the TSA reply generation only.
 
 # TSA root directory
-dir		= ./demoCA
+dir		= ./test/cfg/pki
 
 # The current serial number
 # (mandatory)
-serial		= ./tsaserial
+serial		= ./test/tsaserial
 
 # OpenSSL engine to use for signing
 crypto_device	= builtin
 
 # The TSA signing certificat
 # (optional)
-signer_cert	= $dir/tsacert.pem
+signer_cert	= $dir/keys/tsa1.crt
 
 # Certificate chain to include in reply
 # (optional)
-certs		= $dir/cacert.pem
+certs		= $dir/keys/ca.crt
 
 # The TSA private key
 # (optional)
-signer_key	= $dir/private/tsakey.pem
+signer_key	= $dir/keys/tsa1.key
 
 # Policy if request did not specify it
 # (optional)
