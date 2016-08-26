@@ -19,12 +19,11 @@
 #include <openssl/rand.h>
 #include <openssl/ts.h>
 #include <openssl/bn.h>
-#include "rfc3161.h"
+#include <syslog.h>
+#include "utils.h"
 
 /* Name of config entry that defines the OID file. */
 #define ENV_OID_FILE "oid_file"
-
-static ASN1_OBJECT *txt2obj(const char *oid);
 
 /* Reply related functions. */
 static int reply_command(CONF *conf, char *section, char *engine, char *query,
@@ -67,19 +66,6 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
    return AD_OK;
    }
    */
-
-/*
- * Configuration file-related function definitions.
- */
-
-static ASN1_OBJECT *txt2obj(const char *oid) {
-    ASN1_OBJECT *oid_obj = NULL;
-
-    if ((oid_obj = OBJ_txt2obj(oid, 0)) == NULL)
-        //		BIO_printf(bio_err, "cannot convert %s to OID\n", oid);
-
-        return oid_obj;
-}
 
 /*
  * Reply-related method definitions.
@@ -198,11 +184,14 @@ end:
     return resp;
 }
 
-TS_RESP_CTX *create_tsctx(CONF *conf, const char *section, const char *policy) {
+TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
+                          const char *policy) {
     int ret = 0;
     TS_RESP_CTX *resp_ctx = NULL;
-    if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL)
+    if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
+        uts_logger(ct, LOG_ERR, "failed to get the tsa default section");
         goto end;
+    }
     if ((resp_ctx = TS_RESP_CTX_new()) == NULL)
         goto end;
     if (!TS_CONF_set_serial(conf, section, NULL, resp_ctx))
