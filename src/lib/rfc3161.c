@@ -187,6 +187,8 @@ end:
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
     int ret = 0;
+    unsigned long err_code;
+    unsigned long err_code_prev = 0;
     TS_RESP_CTX *resp_ctx = NULL;
     if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
@@ -275,6 +277,18 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     }
     ret = 1;
 end:
+    while ((err_code = ERR_get_error())) {
+        if (err_code_prev != err_code) {
+            ERR_load_TS_strings();
+            uts_logger(ct, LOG_ERR, "openssl exception: '%s'",
+                       ERR_error_string(err_code, NULL));
+            // printf("%lu\n", err_code, NULL);
+            // printf("%s\n", ERR_reason_error_string(err_code));
+            // printf("%s\n", ERR_func_error_string(err_code));
+            // printf("%s\n", ERR_lib_error_string(err_code));
+        }
+        err_code_prev = err_code;
+    }
     return resp_ctx;
 }
 
