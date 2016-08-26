@@ -1,0 +1,142 @@
+[ new_oids ]
+
+# Policies used by the TSA examples.
+tsa_policy1 = 1.2.3.4.1
+tsa_policy2 = 1.2.3.4.5.6
+tsa_policy3 = 1.2.3.4.5.7
+
+[ main ]
+
+# Comma-separated list of ips:ports to listen on.
+# If the port is SSL, a letter s must be appended.
+listening_ports = 127.0.0.1:2020
+#listening_ports = 80,443s
+
+# Allows clients to reuse TCP connection for subsequent HTTP requests, which improves performance.
+enable_keep_alive = no
+
+# Number of worker threads.
+num_threads = 50
+
+# Switch to given user credentials after startup.
+# Required to run on privileged ports and not be run as root.
+# run_as_user = uts-server
+
+# Limit download speed for clients. throttle is a comma-separated list of key=value pairs:
+# *                   limit speed for all connections
+# x.x.x.x/mask        limit speed for specified subnet
+# The value is a floating-point number of bytes per second, optionally followed by a k or m character
+# meaning kilobytes and megabytes respectively. A limit of 0 means unlimited rate
+throttle = *
+#throttle = *=1k,10.10.0.0/16=10m,10.20.0.0/16=0
+
+# Timeout for network read and network write operations, in milliseconds.
+request_timeout_ms = 30000
+
+# Path to the SSL certificate file. (PEM format containing private key and certificate)
+#ssl_certificate = /etc/uts-server/cert.pem
+
+# Enable client's certificate verification by the server.
+#ssl_verify_peer = yes
+
+# Name of a directory containing trusted CA certificates
+#ssl_ca_path = /etc/ssl/ca/
+
+# Path to a .pem file containing trusted certificates. The file may contain more than one certificate.
+#ssl_ca_file = /etc/uts-server/ca.pem
+
+# Sets maximum depth of certificate chain.
+# If client's certificate chain is longer than the depth set here connection is refused.
+#ssl_verify_depth = 9
+
+# Loads default trusted certificates locations set at openssl compile time.
+#ssl_default_verify_paths = yes
+
+# see https://www.openssl.org/docs/manmaster/apps/ciphers.html for more detailed
+#ssl_cipher_list = ALL:!eNULL
+
+# Sets the minimal accepted version of SSL/TLS protocol according to the table:
+# SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2  0
+# SSL3+TLS1.0+TLS1.1+TLS1.2       1
+# TLS1.0+TLS1.1+TLS1.2            2
+# TLS1.1+TLS1.2                   3
+# TLS1.2                          4
+
+#ssl_protocol_version = 3
+
+# Enables the use of short lived certificates
+#ssl_short_trust = no
+
+# comma separated list of IP subnets to accept/deny
+# deny all accesses, only allow 192.168/16 subnet
+#access_control_allow_origin = -0.0.0.0/0,+192.168/16
+
+# Enable TCP_NODELAY socket option on client connections.
+tcp_nodelay = 0
+
+# loglevel
+# debug, info, notice, warn, err, emerg, crit
+log_level = info
+
+####################################################################
+[ tsa ]
+
+# The default TSA section.
+default_tsa = tsa_config1
+
+[ tsa_config1 ]
+
+# These are used by the TSA reply generation only.
+
+# TSA root directory
+dir		= ./demoCA
+
+# The current serial number
+# (mandatory)
+serial		= ./tsaserial
+
+# OpenSSL engine to use for signing
+crypto_device	= builtin
+
+# The TSA signing certificat
+# (optional)
+signer_cert	= $dir/tsacert.pem
+
+# Certificate chain to include in reply
+# (optional)
+certs		= $dir/cacert.pem
+
+# The TSA private key
+# (optional)
+signer_key	= $dir/private/tsakey.pem
+
+# Policy if request did not specify it
+# (optional)
+default_policy	= tsa_policy1
+
+# Acceptable policies
+# (optional)
+other_policies	= tsa_policy2, tsa_policy3
+
+# Acceptable message digests
+# (mandatory)
+digests		= md5, sha1
+
+# (optional)
+accuracy	= secs:1, millisecs:500, microsecs:100
+
+# Number of digits after dot.
+# (optional)
+clock_precision_digits  = 0
+
+# Is ordering defined for timestamps?
+# (optional, default: no)
+ordering		= yes
+
+# Must the TSA name be included in the reply?
+## (optional, default: no)
+tsa_name		= yes
+
+# Must the ESS cert id chain be included?
+# (optional, default: no)
+ess_cert_id_chain	= no
