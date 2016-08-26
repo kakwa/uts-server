@@ -89,11 +89,11 @@ default_tsa = tsa_config1
 # These are used by the TSA reply generation only.
 
 # TSA root directory
-dir		= ./demoCA
+dir		= /etc/uts-server/pki
 
 # The current serial number
 # (mandatory)
-serial		= ./tsaserial
+serial		= /var/lib/uts-server/tsaserial
 
 # OpenSSL engine to use for signing
 crypto_device	= builtin
