@@ -17,27 +17,27 @@
 void log_request_debug(const struct mg_request_info *request_info,
                        int request_id, void *context) {
     for (int i = 0; i < request_info->num_headers; i++) {
-        uts_logger(context, LOG_DEBUG, "Request[%d], Header[%s]: %s\n",
+        uts_logger(context, LOG_DEBUG, "Request[%d], Header[%s]: %s",
                    request_id, request_info->http_headers[i].name,
                    request_info->http_headers[i].value);
     }
-    uts_logger(context, LOG_DEBUG, "Request[%d], request_method: %s\n",
+    uts_logger(context, LOG_DEBUG, "Request[%d], request_method: %s",
                request_id, request_info->request_method);
-    uts_logger(context, LOG_DEBUG, "Request[%d], request_uri: %s\n", request_id,
+    uts_logger(context, LOG_DEBUG, "Request[%d], request_uri: %s", request_id,
                request_info->request_uri);
-    uts_logger(context, LOG_DEBUG, "Request[%d], local_uri: %s\n", request_id,
+    uts_logger(context, LOG_DEBUG, "Request[%d], local_uri: %s", request_id,
                request_info->local_uri);
-    uts_logger(context, LOG_DEBUG, "Request[%d], http_version: %s\n",
+    uts_logger(context, LOG_DEBUG, "Request[%d], http_version: %s",
                request_id, request_info->http_version);
-    uts_logger(context, LOG_DEBUG, "Request[%d], query_string: %s\n",
+    uts_logger(context, LOG_DEBUG, "Request[%d], query_string: %s",
                request_id, request_info->query_string);
-    uts_logger(context, LOG_DEBUG, "Request[%d], remote_addr: %s\n", request_id,
+    uts_logger(context, LOG_DEBUG, "Request[%d], remote_addr: %s", request_id,
                request_info->remote_addr);
-    uts_logger(context, LOG_DEBUG, "Request[%d], is_ssl: %d\n", request_id,
+    uts_logger(context, LOG_DEBUG, "Request[%d], is_ssl: %d", request_id,
                request_info->is_ssl);
-    uts_logger(context, LOG_DEBUG, "Request[%d], content_length: %d\n",
+    uts_logger(context, LOG_DEBUG, "Request[%d], content_length: %d",
                request_id, request_info->content_length);
-    uts_logger(context, LOG_DEBUG, "Request[%d], remote_port: %d\n", request_id,
+    uts_logger(context, LOG_DEBUG, "Request[%d], remote_port: %d", request_id,
                request_info->remote_port);
 }
 
