@@ -27,7 +27,7 @@ num_threads = 50
 # x.x.x.x/mask        limit speed for specified subnet
 # The value is a floating-point number of bytes per second, optionally followed by a k or m character
 # meaning kilobytes and megabytes respectively. A limit of 0 means unlimited rate
-throttle = *
+throttle = *=0
 #throttle = *=1k,10.10.0.0/16=10m,10.20.0.0/16=0
 
 # Timeout for network read and network write operations, in milliseconds.
