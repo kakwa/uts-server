@@ -189,21 +189,42 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     int ret = 0;
     TS_RESP_CTX *resp_ctx = NULL;
     if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
-        uts_logger(ct, LOG_ERR, "failed to get the tsa default section");
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "default_tsa", "tsa");
         goto end;
     }
-    if ((resp_ctx = TS_RESP_CTX_new()) == NULL)
+    if ((resp_ctx = TS_RESP_CTX_new()) == NULL) {
+        uts_logger(ct, LOG_ERR, "failed to initialize tsa context");
         goto end;
-    if (!TS_CONF_set_serial(conf, section, NULL, resp_ctx))
+    }
+    if (!TS_CONF_set_serial(conf, section, NULL, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "serial", section);
         goto end;
-    if (!TS_CONF_set_crypto_device(conf, section, NULL))
+    }
+    if (!TS_CONF_set_crypto_device(conf, section, NULL)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "crypto_device", section);
+        uts_logger(ct, LOG_ERR,
+                   "failed to get or use the crypto device in section [ %s ]",
+                   section);
         goto end;
-    if (!TS_CONF_set_signer_cert(conf, section, NULL, resp_ctx))
+    }
+    if (!TS_CONF_set_signer_cert(conf, section, NULL, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "signer_cert", section);
         goto end;
-    if (!TS_CONF_set_certs(conf, section, NULL, resp_ctx))
+    }
+    if (!TS_CONF_set_certs(conf, section, NULL, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "default_certs", section);
         goto end;
-    if (!TS_CONF_set_signer_key(conf, section, NULL, NULL, resp_ctx))
+    }
+    if (!TS_CONF_set_signer_key(conf, section, NULL, NULL, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "signer_key", section);
         goto end;
+    }
 
     // if (md) {
     //         if (!TS_RESP_CTX_set_signer_digest(resp_ctx, md))
@@ -212,24 +233,47 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     //         goto end;
     // }
 
-    if (!TS_CONF_set_def_policy(conf, section, policy, resp_ctx))
+    if (!TS_CONF_set_def_policy(conf, section, policy, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "default_policy", section);
         goto end;
-    if (!TS_CONF_set_policies(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_policies(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "policies", section);
         goto end;
-    if (!TS_CONF_set_digests(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_digests(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "digests", section);
         goto end;
-    if (!TS_CONF_set_accuracy(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_accuracy(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "accuracy", section);
         goto end;
-    if (!TS_CONF_set_clock_precision_digits(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_clock_precision_digits(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "clock_precision_digits", section);
         goto end;
-    if (!TS_CONF_set_ordering(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_ordering(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "ordering", section);
         goto end;
-    if (!TS_CONF_set_tsa_name(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_tsa_name(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "tsa_name", section);
         goto end;
-    if (!TS_CONF_set_ess_cert_id_chain(conf, section, resp_ctx))
+    }
+    if (!TS_CONF_set_ess_cert_id_chain(conf, section, resp_ctx)) {
+        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+                   "ess_cert_id_chain", section);
         goto end;
+    }
     ret = 1;
-
 end:
     return resp_ctx;
 }
