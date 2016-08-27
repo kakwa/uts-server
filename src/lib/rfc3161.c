@@ -22,8 +22,7 @@
 #include <syslog.h>
 #include "utils.h"
 
-/* Name of config entry that defines the OID file. */
-#define ENV_OID_FILE "oid_file"
+#define OID_SECTION "oids"
 
 /* Reply related functions. */
 static int reply_command(CONF *conf, char *section, char *engine, char *query,
@@ -70,6 +69,28 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
 /*
  * Reply-related method definitions.
  */
+
+int add_oid_section(rfc3161_context *ct, CONF *conf)
+{
+    char *p;
+    STACK_OF(CONF_VALUE) *sktmp;
+    CONF_VALUE *cnf;
+    int i;
+
+    if ((sktmp = NCONF_get_section(conf, OID_SECTION)) == NULL) {
+        uts_logger(ct, LOG_ERR, "problem loading oid section %s\n", p);
+        return 0;
+    }
+    for (i = 0; i < sk_CONF_VALUE_num(sktmp); i++) {
+        cnf = sk_CONF_VALUE_value(sktmp, i);
+        if (OBJ_create(cnf->value, cnf->name, cnf->name) == NID_undef) {
+            uts_logger(ct, LOG_ERR, "problem creating object %s=%s\n",
+                       cnf->name, cnf->value);
+            return 0;
+        }
+    }
+    return 1;
+}
 
 static int reply_command(CONF *conf, char *section, char *engine, char *query,
                          char *passin, char *inkey, const EVP_MD *md,
@@ -282,10 +303,9 @@ end:
             ERR_load_TS_strings();
             uts_logger(ct, LOG_DEBUG, "OpenSSL exception: '%s'",
                        ERR_error_string(err_code, NULL));
-            uts_logger(ct, LOG_ERR, "error '%s' in component '%s'",
+            uts_logger(ct, LOG_ERR, "error '%s' in OpenSSL component '%s'",
                        ERR_reason_error_string(err_code),
                        ERR_lib_error_string(err_code));
-
             // printf("%lu\n", err_code, NULL);
             // printf("%s\n", ERR_reason_error_string(err_code));
             // printf("%s\n", ERR_func_error_string(err_code));

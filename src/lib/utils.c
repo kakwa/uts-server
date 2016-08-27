@@ -240,6 +240,8 @@ int set_params(rfc3161_context *ct, char *conf_file) {
         ct->http_options[http_counter] = NULL;
     }
 
+    if(! add_oid_section(ct, conf))
+	ret = 0;
     ct->ts_ctx = create_tsctx(ct, conf, NULL, NULL);
     if (ct->ts_ctx == NULL)
         ret = 0;
