@@ -1,4 +1,4 @@
-[ new_oids ]
+[ oids ]
 
 # Policies used by the TSA examples.
 tsa_policy1 = 1.2.3.4.1
