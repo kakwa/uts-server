@@ -15,6 +15,7 @@
 #include <sys/syslog.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
+#include <openssl/ssl.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/ts.h>
@@ -211,6 +212,11 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     unsigned long err_code;
     unsigned long err_code_prev = 0;
     TS_RESP_CTX *resp_ctx = NULL;
+
+    SSL_load_error_strings();
+    ERR_load_BIO_strings();
+    SSL_library_init();
+
     if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
                    "default_tsa", "tsa");
