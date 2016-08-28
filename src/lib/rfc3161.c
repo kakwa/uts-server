@@ -208,7 +208,6 @@ end:
 
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
-    int ret = 0;
     unsigned long err_code;
     unsigned long err_code_prev = 0;
     TS_RESP_CTX *resp_ctx = NULL;
@@ -302,7 +301,7 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                    "ess_cert_id_chain", section);
         goto end;
     }
-    ret = 1;
+    return resp_ctx;
 end:
     while ((err_code = ERR_get_error())) {
         if (err_code_prev != err_code) {
@@ -319,7 +318,8 @@ end:
         }
         err_code_prev = err_code;
     }
-    return resp_ctx;
+    TS_RESP_CTX_free(resp_ctx);
+    return NULL;
 }
 
 static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
