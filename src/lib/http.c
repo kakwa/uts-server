@@ -27,10 +27,10 @@ void log_request_debug(const struct mg_request_info *request_info,
                request_info->request_uri);
     uts_logger(context, LOG_DEBUG, "Request[%d], local_uri: %s", request_id,
                request_info->local_uri);
-    uts_logger(context, LOG_DEBUG, "Request[%d], http_version: %s",
-               request_id, request_info->http_version);
-    uts_logger(context, LOG_DEBUG, "Request[%d], query_string: %s",
-               request_id, request_info->query_string);
+    uts_logger(context, LOG_DEBUG, "Request[%d], http_version: %s", request_id,
+               request_info->http_version);
+    uts_logger(context, LOG_DEBUG, "Request[%d], query_string: %s", request_id,
+               request_info->query_string);
     uts_logger(context, LOG_DEBUG, "Request[%d], remote_addr: %s", request_id,
                request_info->remote_addr);
     uts_logger(context, LOG_DEBUG, "Request[%d], is_ssl: %d", request_id,
@@ -39,6 +39,12 @@ void log_request_debug(const struct mg_request_info *request_info,
                request_id, request_info->content_length);
     uts_logger(context, LOG_DEBUG, "Request[%d], remote_port: %d", request_id,
                request_info->remote_port);
+    //    uts_logger(context, LOG_DEBUG, "Request[%d], user_data: %s",
+    //    request_id,
+    //               request_info->user_data);
+    //    uts_logger(context, LOG_DEBUG, "Request[%d], conn_data: %s",
+    //    request_id,
+    //               request_info->conn_data);
 }
 
 // This function will be called by civetweb on every new request.
@@ -76,18 +82,38 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
             is_tsq = 1;
     }
 
-    char *content = "\0";
+    unsigned char *content;
     int content_length = 0;
 
     // Send HTTP reply to the client
     if (is_tsq) {
-        mg_printf(conn,
-                  "HTTP/1.1 200 OK\r\n"
-                  "Content-Type: application/timestamp-reply\r\n"
-                  "Content-Length: %d\r\n" // Always set Content-Length
-                  "\r\n"
-                  "%s",
-                  content_length, content);
+        char *query = calloc(request_info->content_length, sizeof(char));
+        mg_read(conn, query, request_info->content_length);
+
+        log_hex(ct, LOG_DEBUG, "query hexdump content", query,
+                request_info->content_length);
+
+        int ts_resp =
+            create_response(ct, query, ct->ts_ctx, &content_length, &content);
+        if (ts_resp) {
+            log_hex(ct, LOG_DEBUG, "response hexdump content", content,
+                content_length);
+            mg_printf(conn,
+                      "HTTP/1.1 200 OK\r\n"
+                      "Content-Type: application/timestamp-reply\r\n"
+                      "Content-Length: %d\r\n" // Always set Content-Length
+                      "\r\n",
+                      content_length);
+            mg_write(conn, content, content_length);
+            // free(content);
+        } else {
+            mg_printf(conn,
+                      "HTTP/1.1 500 OK\r\n"
+                      "Content-Type: text/plain\r\n"
+                      "Content-Length: 17\r\n" // Always set Content-Length
+                      "\r\n"
+                      "uts-server error");
+        }
     } else {
         mg_printf(conn,
                   "HTTP/1.1 200 OK\r\n"

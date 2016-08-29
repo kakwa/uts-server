@@ -81,6 +81,26 @@ void skeleton_daemon() {
     openlog("uts-server", LOG_PID, LOG_DAEMON);
 }
 
+void log_hex(rfc3161_context *ct, int priority, char *id,
+             unsigned char *content, int content_length) {
+    if (priority > ct->loglevel && !ct->stdout_dbg)
+        return;
+    FILE *stream;
+    char *out;
+    size_t len;
+    stream = open_memstream(&out, &len);
+
+    for (int i = 0; i < content_length; i++) {
+        fprintf(stream, "%02x ", content[i]);
+        //if (i % 4 == 3)
+        //    fprintf(stream, " ");
+    }
+    fflush(stream);
+    fclose(stream);
+    uts_logger(ct, priority, "%s: %s", id, out);
+    free(out);
+}
+
 void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     // ignore all messages less critical than the loglevel
     // except if the debug flag is set
@@ -240,8 +260,8 @@ int set_params(rfc3161_context *ct, char *conf_file) {
         ct->http_options[http_counter] = NULL;
     }
 
-    if(! add_oid_section(ct, conf))
-	ret = 0;
+    if (!add_oid_section(ct, conf))
+        ret = 0;
     ct->ts_ctx = create_tsctx(ct, conf, NULL, NULL);
     if (ct->ts_ctx == NULL)
         ret = 0;

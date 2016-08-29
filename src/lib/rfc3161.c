@@ -32,10 +32,6 @@ static int reply_command(CONF *conf, char *section, char *engine, char *query,
                          char *in, int token_in, char *out, int token_out,
                          int text);
 static TS_RESP *read_PKCS7(BIO *in_bio);
-static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
-                                char *query, char *passin, char *inkey,
-                                const EVP_MD *md, char *signer, char *chain,
-                                const char *policy);
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
 static ASN1_INTEGER *next_serial(const char *serialfile);
 static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
@@ -71,10 +67,9 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
  * Reply-related method definitions.
  */
 
-int add_oid_section(rfc3161_context *ct, CONF *conf)
-{
+int add_oid_section(rfc3161_context *ct, CONF *conf) {
     char *p;
-    STACK_OF(CONF_VALUE) *sktmp;
+    STACK_OF(CONF_VALUE) * sktmp;
     CONF_VALUE *cnf;
     int i;
 
@@ -93,82 +88,84 @@ int add_oid_section(rfc3161_context *ct, CONF *conf)
     return 1;
 }
 
-static int reply_command(CONF *conf, char *section, char *engine, char *query,
-                         char *passin, char *inkey, const EVP_MD *md,
-                         char *signer, char *chain, const char *policy,
-                         char *in, int token_in, char *out, int token_out,
-                         int text) {
-    int ret = 0;
-    TS_RESP *response = NULL;
-    BIO *in_bio = NULL;
-    BIO *query_bio = NULL;
-    BIO *inkey_bio = NULL;
-    BIO *signer_bio = NULL;
-    BIO *out_bio = NULL;
-    BIO *bio_err;
-
-    if (in != NULL) {
-        if ((in_bio = BIO_new_file(in, "rb")) == NULL)
-            goto end;
-        if (token_in) {
-            response = read_PKCS7(in_bio);
-        } else {
-            response = d2i_TS_RESP_bio(in_bio, NULL);
-        }
-    } else {
-        response = create_response(conf, section, engine, query, passin, inkey,
-                                   md, signer, chain, policy);
-        //		if (response)
-        //			BIO_printf(bio_err, "Response has been
-        // generated.\n");
-        //		else
-        //			BIO_printf(bio_err, "Response is not
-        // generated.\n");
-    }
-    if (response == NULL)
-        goto end;
-
-    /* Write response. */
-    if (text) {
-        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_TEXT))
-        //==
-        // NULL)
-        //			goto end;
-        if (token_out) {
-            TS_TST_INFO *tst_info = TS_RESP_get_tst_info(response);
-            if (!TS_TST_INFO_print_bio(out_bio, tst_info))
-                goto end;
-        } else {
-            if (!TS_RESP_print_bio(out_bio, response))
-                goto end;
-        }
-    } else {
-        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_ASN1))
-        //==
-        // NULL)
-        //			goto end;
-        if (token_out) {
-            PKCS7 *token = TS_RESP_get_token(response);
-            if (!i2d_PKCS7_bio(out_bio, token))
-                goto end;
-        } else {
-            if (!i2d_TS_RESP_bio(out_bio, response))
-                goto end;
-        }
-    }
-
-    ret = 1;
-
-end:
-    ERR_print_errors(bio_err);
-    BIO_free_all(in_bio);
-    BIO_free_all(query_bio);
-    BIO_free_all(inkey_bio);
-    BIO_free_all(signer_bio);
-    BIO_free_all(out_bio);
-    TS_RESP_free(response);
-    return ret;
-}
+// static int reply_command(CONF *conf, char *section, char *engine, char
+// *query,
+//                         char *passin, char *inkey, const EVP_MD *md,
+//                         char *signer, char *chain, const char *policy,
+//                         char *in, int token_in, char *out, int token_out,
+//                         int text) {
+//    int ret = 0;
+//    TS_RESP *response = NULL;
+//    BIO *in_bio = NULL;
+//    BIO *query_bio = NULL;
+//    BIO *inkey_bio = NULL;
+//    BIO *signer_bio = NULL;
+//    BIO *out_bio = NULL;
+//    BIO *bio_err;
+//
+//    if (in != NULL) {
+//        if ((in_bio = BIO_new_file(in, "rb")) == NULL)
+//            goto end;
+//        if (token_in) {
+//            response = read_PKCS7(in_bio);
+//        } else {
+//            response = d2i_TS_RESP_bio(in_bio, NULL);
+//        }
+//    } else {
+//        response = create_response(conf, section, engine, query, passin,
+//        inkey,
+//                                   md, signer, chain, policy);
+//        //		if (response)
+//        //			BIO_printf(bio_err, "Response has been
+//        // generated.\n");
+//        //		else
+//        //			BIO_printf(bio_err, "Response is not
+//        // generated.\n");
+//    }
+//    if (response == NULL)
+//        goto end;
+//
+//    /* Write response. */
+//    if (text) {
+//        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_TEXT))
+//        //==
+//        // NULL)
+//        //			goto end;
+//        if (token_out) {
+//            TS_TST_INFO *tst_info = TS_RESP_get_tst_info(response);
+//            if (!TS_TST_INFO_print_bio(out_bio, tst_info))
+//                goto end;
+//        } else {
+//            if (!TS_RESP_print_bio(out_bio, response))
+//                goto end;
+//        }
+//    } else {
+//        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_ASN1))
+//        //==
+//        // NULL)
+//        //			goto end;
+//        if (token_out) {
+//            PKCS7 *token = TS_RESP_get_token(response);
+//            if (!i2d_PKCS7_bio(out_bio, token))
+//                goto end;
+//        } else {
+//            if (!i2d_TS_RESP_bio(out_bio, response))
+//                goto end;
+//        }
+//    }
+//
+//    ret = 1;
+//
+// end:
+//    ERR_print_errors(bio_err);
+//    BIO_free_all(in_bio);
+//    BIO_free_all(query_bio);
+//    BIO_free_all(inkey_bio);
+//    BIO_free_all(signer_bio);
+//    BIO_free_all(out_bio);
+//    TS_RESP_free(response);
+//    return ret;
+//}
 
 /* Reads a PKCS7 token and adds default 'granted' status info to it. */
 static TS_RESP *read_PKCS7(BIO *in_bio) {
@@ -322,69 +319,34 @@ end:
     return NULL;
 }
 
-static TS_RESP *create_response(CONF *conf, const char *section, char *engine,
-                                char *query, char *passin, char *inkey,
-                                const EVP_MD *md, char *signer, char *chain,
-                                const char *policy) {
+int create_response(rfc3161_context *ct, char *query, TS_RESP_CTX *resp_ctx,
+                    int *resp_size, unsigned char **resp) {
     int ret = 0;
-    TS_RESP *response = NULL;
+    TS_RESP *ts_response = NULL;
+    char *response = NULL;
     BIO *query_bio = NULL;
-    TS_RESP_CTX *resp_ctx = NULL;
+    BIO *out_bio = NULL;
 
     if ((query_bio = BIO_new_mem_buf(query, -1)) == NULL)
         goto end;
-    if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL)
-        goto end;
-    if ((resp_ctx = TS_RESP_CTX_new()) == NULL)
-        goto end;
-    if (!TS_CONF_set_serial(conf, section, serial_cb, resp_ctx))
-        goto end;
-#ifndef OPENSSL_NO_ENGINE
-    if (!TS_CONF_set_crypto_device(conf, section, engine))
-        goto end;
-#endif
-    if (!TS_CONF_set_signer_cert(conf, section, signer, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_certs(conf, section, chain, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_signer_key(conf, section, inkey, passin, resp_ctx))
-        goto end;
 
-    //	if (md) {
-    //		if (!TS_RESP_CTX_set_signer_digest(resp_ctx, md))
-    //			goto end;
-    //	} else if (!TS_CONF_set_signer_digest(conf, section, NULL, resp_ctx)) {
-    //		goto end;
-    //	}
+    if ((ts_response = TS_RESP_create_response(resp_ctx, query_bio)) == NULL) {
+        uts_logger(ct, LOG_ERR, "failed to create ts response");
+        goto end;
+    }
+    *resp_size = i2d_TS_RESP(ts_response, NULL);
+    *resp = calloc(*resp_size, sizeof(char));
 
-    if (!TS_CONF_set_def_policy(conf, section, policy, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_policies(conf, section, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_digests(conf, section, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_accuracy(conf, section, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_clock_precision_digits(conf, section, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_ordering(conf, section, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_tsa_name(conf, section, resp_ctx))
-        goto end;
-    if (!TS_CONF_set_ess_cert_id_chain(conf, section, resp_ctx))
-        goto end;
-    if ((response = TS_RESP_create_response(resp_ctx, query_bio)) == NULL)
-        goto end;
+    i2d_TS_RESP(ts_response, resp);
     ret = 1;
 
 end:
     if (!ret) {
-        TS_RESP_free(response);
+        TS_RESP_free(ts_response);
         response = NULL;
     }
-    TS_RESP_CTX_free(resp_ctx);
     BIO_free_all(query_bio);
-    return response;
+    return ret;
 }
 
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data) {
@@ -461,7 +423,7 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial) {
     ret = 1;
 err:
     if (!ret)
-        //		BIO_printf(bio_err, "could not save serial number to
+        //		BIO_Printf(bio_err, "could not save serial number to
         //%s\n",
         //				serialfile);
         BIO_free_all(out);

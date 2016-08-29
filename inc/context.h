@@ -17,7 +17,6 @@
 typedef struct {
     uint64_t query_counter;
     bool stdout_dbg;
-    TS_RESP_CTX *resp_ctx;
     int loglevel;
     const char *http_options[40];
     TS_RESP_CTX *ts_ctx;
