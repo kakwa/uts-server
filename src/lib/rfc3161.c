@@ -323,7 +323,6 @@ int create_response(rfc3161_context *ct, char *query, TS_RESP_CTX *resp_ctx,
                     int *resp_size, unsigned char **resp) {
     int ret = 0;
     TS_RESP *ts_response = NULL;
-    char *response = NULL;
     BIO *query_bio = NULL;
     BIO *out_bio = NULL;
 
@@ -343,7 +342,6 @@ int create_response(rfc3161_context *ct, char *query, TS_RESP_CTX *resp_ctx,
 end:
     if (!ret) {
         TS_RESP_free(ts_response);
-        response = NULL;
     }
     BIO_free_all(query_bio);
     return ret;
