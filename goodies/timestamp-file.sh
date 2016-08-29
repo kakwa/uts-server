@@ -73,7 +73,9 @@ success(){
 trap clean_exit HUP INT TERM
 TMPREQ=`mktemp`
 
-while getopts ":lhu:i:o:O:C:" opt; do
+REMOVE_TS=0
+
+while getopts ":lhru:i:o:O:C:" opt; do
   case $opt in
     h)  help;;
     l)  SYSLOG=0;;
@@ -82,6 +84,7 @@ while getopts ":lhu:i:o:O:C:" opt; do
     o)  OUTPUT_FILE="`readlink -f $OPTARG`";;
     O)  OPENSSL_OPTS="$OPTARG";;
     C)  CURL_OPTS="$OPTARG";;
+    r)  REMOVE_TS=1;;
     \?) echo "Invalid option: -$OPTARG" >&2; help; exit 1;;
     :)  echo "Option -$OPTARG requires an argument." >&2; help; exit 1;;
   esac
@@ -93,7 +96,12 @@ done
 # Check that input file exists
 [ -f "$INPUT_FILE" ]    || exit_error "Input file '$INPUT_FILE' doesn't exist"
 # Check that output file doesn't exit
-! [ -f "$OUTPUT_FILE" ] || exit_error "Output timestamp file '$OUTPUT_FILE' already exists"
+if [ $REMOVE_TS -eq 1 ]
+then
+	[ -f "$OUTPUT_FILE" ] && rm -f "$OUTPUT_FILE"
+else
+	! [ -f "$OUTPUT_FILE" ] || exit_error "Output timestamp file '$OUTPUT_FILE' already exists"
+fi
 # Check that url is not empty
 ! [ -z "$TS_URL" ]      || exit_error "Missing timestamp server url"
 
@@ -110,6 +118,9 @@ curl "$TS_URL" $CURL_OPTS \
     -f -g \
     --data-binary @$TMPREQ \
     -o "$OUTPUT_FILE" 2>/dev/null || exit_error "Timestamp query failed"
+
+openssl ts -verify -data "$INPUT_FILE" -in "$OUTPUT_FILE" 2>&1 | grep -q "asn1 encoding routines" && exit_error \
+	"Reponse doesn't appear to be a timestamp response"
 
 success "Timestamp of file '$INPUT_FILE' using server '$TS_URL' succeed, ts written to '$OUTPUT_FILE'"
 
