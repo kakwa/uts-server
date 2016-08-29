@@ -38,7 +38,7 @@ EOF
   exit 1
 }
 
-simple_uts_logger(){
+simple_logger(){
     [ $SYSLOG -eq 0 ] && logger -t `basename $0` -p  user.$1 $2
 }
 
