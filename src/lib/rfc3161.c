@@ -31,10 +31,7 @@ static int reply_command(CONF *conf, char *section, char *engine, char *query,
                          char *signer, char *chain, const char *policy,
                          char *in, int token_in, char *out, int token_out,
                          int text);
-static TS_RESP *read_PKCS7(BIO *in_bio);
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
-static ASN1_INTEGER *next_serial(const char *serialfile);
-static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
 
 #define B_FORMAT_TEXT 0x8000
 #define FORMAT_UNDEF 0
@@ -64,121 +61,6 @@ int add_oid_section(rfc3161_context *ct, CONF *conf) {
         }
     }
     return 1;
-}
-
-// static int reply_command(CONF *conf, char *section, char *engine, char
-// *query,
-//                         char *passin, char *inkey, const EVP_MD *md,
-//                         char *signer, char *chain, const char *policy,
-//                         char *in, int token_in, char *out, int token_out,
-//                         int text) {
-//    int ret = 0;
-//    TS_RESP *response = NULL;
-//    BIO *in_bio = NULL;
-//    BIO *query_bio = NULL;
-//    BIO *inkey_bio = NULL;
-//    BIO *signer_bio = NULL;
-//    BIO *out_bio = NULL;
-//    BIO *bio_err;
-//
-//    if (in != NULL) {
-//        if ((in_bio = BIO_new_file(in, "rb")) == NULL)
-//            goto end;
-//        if (token_in) {
-//            response = read_PKCS7(in_bio);
-//        } else {
-//            response = d2i_TS_RESP_bio(in_bio, NULL);
-//        }
-//    } else {
-//        response = create_response(conf, section, engine, query, passin,
-//        inkey,
-//                                   md, signer, chain, policy);
-//        //		if (response)
-//        //			BIO_printf(bio_err, "Response has been
-//        // generated.\n");
-//        //		else
-//        //			BIO_printf(bio_err, "Response is not
-//        // generated.\n");
-//    }
-//    if (response == NULL)
-//        goto end;
-//
-//    /* Write response. */
-//    if (text) {
-//        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_TEXT))
-//        //==
-//        // NULL)
-//        //			goto end;
-//        if (token_out) {
-//            TS_TST_INFO *tst_info = TS_RESP_get_tst_info(response);
-//            if (!TS_TST_INFO_print_bio(out_bio, tst_info))
-//                goto end;
-//        } else {
-//            if (!TS_RESP_print_bio(out_bio, response))
-//                goto end;
-//        }
-//    } else {
-//        //		if ((out_bio = bio_open_default(out, 'w', FORMAT_ASN1))
-//        //==
-//        // NULL)
-//        //			goto end;
-//        if (token_out) {
-//            PKCS7 *token = TS_RESP_get_token(response);
-//            if (!i2d_PKCS7_bio(out_bio, token))
-//                goto end;
-//        } else {
-//            if (!i2d_TS_RESP_bio(out_bio, response))
-//                goto end;
-//        }
-//    }
-//
-//    ret = 1;
-//
-// end:
-//    ERR_print_errors(bio_err);
-//    BIO_free_all(in_bio);
-//    BIO_free_all(query_bio);
-//    BIO_free_all(inkey_bio);
-//    BIO_free_all(signer_bio);
-//    BIO_free_all(out_bio);
-//    TS_RESP_free(response);
-//    return ret;
-//}
-
-/* Reads a PKCS7 token and adds default 'granted' status info to it. */
-static TS_RESP *read_PKCS7(BIO *in_bio) {
-    int ret = 0;
-    PKCS7 *token = NULL;
-    TS_TST_INFO *tst_info = NULL;
-    TS_RESP *resp = NULL;
-    TS_STATUS_INFO *si = NULL;
-
-    if ((token = d2i_PKCS7_bio(in_bio, NULL)) == NULL)
-        goto end;
-    if ((tst_info = PKCS7_to_TS_TST_INFO(token)) == NULL)
-        goto end;
-    if ((resp = TS_RESP_new()) == NULL)
-        goto end;
-    if ((si = TS_STATUS_INFO_new()) == NULL)
-        goto end;
-    //	if (!TS_STATUS_INFO_set_status(si, TS_STATUS_GRANTED))
-    //		goto end;
-    if (!TS_RESP_set_status_info(resp, si))
-        goto end;
-    TS_RESP_set_tst_info(resp, token, tst_info);
-    token = NULL;    /* Ownership is lost. */
-    tst_info = NULL; /* Ownership is lost. */
-    ret = 1;
-
-end:
-    PKCS7_free(token);
-    TS_TST_INFO_free(tst_info);
-    if (!ret) {
-        TS_RESP_free(resp);
-        resp = NULL;
-    }
-    TS_STATUS_INFO_free(si);
-    return resp;
 }
 
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
