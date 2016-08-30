@@ -88,16 +88,16 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     // Send HTTP reply to the client
     if (is_tsq) {
         char *query = calloc(request_info->content_length, sizeof(char));
-        mg_read(conn, query, request_info->content_length);
+        int query_len = mg_read(conn, query, request_info->content_length);
 
-        log_hex(ct, LOG_DEBUG, "query hexdump content", query,
+        log_hex(ct, LOG_DEBUG, "query hexdump content", (unsigned char *)query,
                 request_info->content_length);
 
-        int ts_resp =
-            create_response(ct, query, ct->ts_ctx, &content_length, &content);
+        int ts_resp = create_response(ct, query, query_len, ct->ts_ctx,
+                                      &content_length, &content);
         if (ts_resp) {
             log_hex(ct, LOG_DEBUG, "response hexdump content", content,
-                content_length);
+                    content_length);
             mg_printf(conn,
                       "HTTP/1.1 200 OK\r\n"
                       "Content-Type: application/timestamp-reply\r\n"
