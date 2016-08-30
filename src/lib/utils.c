@@ -92,8 +92,6 @@ void log_hex(rfc3161_context *ct, int priority, char *id,
 
     for (int i = 0; i < content_length; i++) {
         fprintf(stream, "%02x ", content[i]);
-        //if (i % 4 == 3)
-        //    fprintf(stream, " ");
     }
     fflush(stream);
     fclose(stream);
