@@ -91,10 +91,6 @@ default_tsa = tsa_config1
 # TSA root directory
 dir		= ./tests/cfg/pki
 
-# The current serial number
-# (mandatory)
-serial		= ./test/tsaserial
-
 # OpenSSL engine to use for signing
 crypto_device	= builtin
 
