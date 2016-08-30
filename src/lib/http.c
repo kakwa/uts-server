@@ -82,8 +82,8 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
             is_tsq = 1;
     }
 
-    unsigned char *content;
-    int content_length = 0;
+    unsigned char *content = NULL;
+    size_t content_length = 0;
 
     // Send HTTP reply to the client
     if (is_tsq) {
@@ -96,16 +96,17 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
         int ts_resp = create_response(ct, query, query_len, ct->ts_ctx,
                                       &content_length, &content);
         if (ts_resp) {
-            log_hex(ct, LOG_DEBUG, "response hexdump content", content,
-                    content_length);
             mg_printf(conn,
                       "HTTP/1.1 200 OK\r\n"
                       "Content-Type: application/timestamp-reply\r\n"
                       "Content-Length: %d\r\n" // Always set Content-Length
                       "\r\n",
-                      content_length);
+                      (int)content_length);
             mg_write(conn, content, content_length);
-            // free(content);
+            log_hex(ct, LOG_DEBUG, "response hexdump content", content,
+                    content_length);
+
+            free(content);
         } else {
             mg_printf(conn,
                       "HTTP/1.1 500 OK\r\n"
