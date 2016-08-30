@@ -42,28 +42,6 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
 #define FORMAT_ASN1 4                   /* ASN.1/DER */
 
 /*
-   int ts_http_respond(short event, ad_conn_t *conn, void *userdata) {
-   if (event & AD_EVENT_READ) {
-   if (ad_http_get_status(conn) == AD_HTTP_REQ_DONE) {
-   ad_http_response(conn, 200, "text/html", "Hello World", 11);
-   return ad_http_is_keepalive_request(conn) ? AD_DONE : AD_CLOSE;
-   }
-   }
-   return AD_OK;
-   }
-
-   int http_default_handler(short event, ad_conn_t *conn, void *userdata) {
-   if (event & AD_EVENT_READ) {
-   if (ad_http_get_status(conn) == AD_HTTP_REQ_DONE) {
-   ad_http_response(conn, 501, "text/html", "Not implemented", 15);
-   return AD_CLOSE; // Close connection.
-   }
-   }
-   return AD_OK;
-   }
-   */
-
-/*
  * Reply-related method definitions.
  */
 
@@ -222,11 +200,7 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
         uts_logger(ct, LOG_ERR, "failed to initialize tsa context");
         goto end;
     }
-    if (!TS_CONF_set_serial(conf, section, NULL, resp_ctx)) {
-        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
-                   "serial", section);
-        goto end;
-    }
+    TS_RESP_CTX_set_serial_cb(resp_ctx, serial_cb, NULL);
     if (!TS_CONF_set_crypto_device(conf, section, NULL)) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
                    "crypto_device", section);
@@ -308,10 +282,6 @@ end:
             uts_logger(ct, LOG_ERR, "error '%s' in OpenSSL component '%s'",
                        ERR_reason_error_string(err_code),
                        ERR_lib_error_string(err_code));
-            // printf("%lu\n", err_code, NULL);
-            // printf("%s\n", ERR_reason_error_string(err_code));
-            // printf("%s\n", ERR_func_error_string(err_code));
-            // printf("%s\n", ERR_lib_error_string(err_code));
         }
         err_code_prev = err_code;
     }
@@ -319,16 +289,22 @@ end:
     return NULL;
 }
 
-int create_response(rfc3161_context *ct, char *query, TS_RESP_CTX *resp_ctx,
-                    int *resp_size, unsigned char **resp) {
+int create_response(rfc3161_context *ct, char *query, int query_len,
+                    TS_RESP_CTX *resp_ctx, int *resp_size,
+                    unsigned char **resp) {
     int ret = 0;
     TS_RESP *ts_response = NULL;
     BIO *query_bio = NULL;
     BIO *out_bio = NULL;
+    BIO *status_bio = BIO_new(BIO_s_mem());
+    ;
+    unsigned long err_code;
+    unsigned long err_code_prev = 0;
 
-    if ((query_bio = BIO_new_mem_buf(query, -1)) == NULL)
+    if ((query_bio = BIO_new_mem_buf(query, query_len)) == NULL) {
+        uts_logger(ct, LOG_ERR, "failed to parse query");
         goto end;
-
+    }
     if ((ts_response = TS_RESP_create_response(resp_ctx, query_bio)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to create ts response");
         goto end;
@@ -344,86 +320,73 @@ end:
         TS_RESP_free(ts_response);
     }
     BIO_free_all(query_bio);
-    return ret;
-}
+    TS_STATUS_INFO_print_bio(status_bio, ts_response->status_info);
+    BUF_MEM *bptr;
+    BIO_get_mem_ptr(status_bio, &bptr);
 
-static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data) {
-    const char *serial_file = (const char *)data;
-    ASN1_INTEGER *serial = next_serial(serial_file);
+    // replacing '\n' by '|' to log on one line only
+    char *temp = strstr(bptr->data, "\n");
+    while ((temp = strstr(bptr->data, "\n")) != NULL) {
+        temp[0] = '|';
+    }
 
-    if (!serial) {
-        TS_RESP_CTX_set_status_info(ctx, TS_STATUS_REJECTION,
-                                    "Error during serial number "
-                                    "generation.");
-        TS_RESP_CTX_add_failure_info(ctx, TS_INFO_ADD_INFO_NOT_AVAILABLE);
-    } else
-        save_ts_serial(serial_file, serial);
+    long status = ASN1_INTEGER_get(ts_response->status_info->status);
+    switch (status) {
+    case TS_STATUS_GRANTED:
+        uts_logger(ct, LOG_INFO, "timestamp request granted");
+        break;
+    case TS_STATUS_GRANTED_WITH_MODS:
+        uts_logger(ct, LOG_NOTICE,
+                   "timestamp request granted with modification");
+        break;
+    case TS_STATUS_REJECTION:
+        uts_logger(ct, LOG_WARNING, "timestamp request rejected");
+        break;
+    case TS_STATUS_WAITING:
+        uts_logger(ct, LOG_NOTICE, "timestamp request waiting");
+        break;
+    case TS_STATUS_REVOCATION_WARNING:
+        uts_logger(ct, LOG_WARNING, "timestamp request revocation warning");
+        break;
+    case TS_STATUS_REVOCATION_NOTIFICATION:
+        uts_logger(ct, LOG_NOTICE, "timestamp request revovation notification");
+        break;
+    default:
+        uts_logger(ct, LOG_ERR, "unknown error code '%d'", status);
+    }
+    uts_logger(ct, LOG_DEBUG, "TimeStamp OpenSSL status: |%s", bptr->data);
 
-    return serial;
-}
-
-static ASN1_INTEGER *next_serial(const char *serialfile) {
-    int ret = 0;
-    BIO *in = NULL;
-    ASN1_INTEGER *serial = NULL;
-    BIGNUM *bn = NULL;
-
-    if ((serial = ASN1_INTEGER_new()) == NULL)
-        goto err;
-
-    if ((in = BIO_new_file(serialfile, "r")) == NULL) {
-        ERR_clear_error();
-        //		BIO_printf(bio_err, "Warning: could not open file %s for
-        //"
-        //				"reading, using serial number: 1\n",
-        // serialfile);
-        if (!ASN1_INTEGER_set(serial, 1))
-            goto err;
-    } else {
-        char buf[1024];
-        if (!a2i_ASN1_INTEGER(in, serial, buf, sizeof(buf))) {
-            //			BIO_printf(bio_err, "unable to load number from
-            //%s\n",
-            //					serialfile);
-            goto err;
+    while ((err_code = ERR_get_error())) {
+        if (err_code_prev != err_code) {
+            ERR_load_TS_strings();
+            uts_logger(ct, LOG_DEBUG, "OpenSSL exception: '%s'",
+                       ERR_error_string(err_code, NULL));
+            uts_logger(ct, LOG_ERR, "error '%s' in OpenSSL component '%s'",
+                       ERR_reason_error_string(err_code),
+                       ERR_lib_error_string(err_code));
         }
-        if ((bn = ASN1_INTEGER_to_BN(serial, NULL)) == NULL)
-            goto err;
-        ASN1_INTEGER_free(serial);
-        serial = NULL;
-        if (!BN_add_word(bn, 1))
-            goto err;
-        if ((serial = BN_to_ASN1_INTEGER(bn, NULL)) == NULL)
-            goto err;
+        err_code_prev = err_code;
     }
-    ret = 1;
-
-err:
-    if (!ret) {
-        ASN1_INTEGER_free(serial);
-        serial = NULL;
-    }
-    BIO_free_all(in);
-    BN_free(bn);
-    return serial;
+    // TS_TST_INFO_free(tst_info);
+    BIO_free(status_bio);
+    return ret;
 }
 
-static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial) {
-    int ret = 0;
-    BIO *out = NULL;
+static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
+    unsigned char data[150] = {0};
+    RAND_bytes(data, sizeof(data));
+    // data[0] &= 0x7F;
 
-    if ((out = BIO_new_file(serialfile, "w")) == NULL)
-        goto err;
-    if (i2a_ASN1_INTEGER(out, serial) <= 0)
-        goto err;
-    if (BIO_puts(out, "\n") <= 0)
-        goto err;
-    ret = 1;
-err:
-    if (!ret)
-        //		BIO_Printf(bio_err, "could not save serial number to
-        //%s\n",
-        //				serialfile);
-        BIO_free_all(out);
-    return ret;
+    // build big number from our bytes
+    BIGNUM *bn = BN_new();
+    BN_bin2bn(data, sizeof(data), bn);
+
+    // build the ASN1_INTEGER from our BIGNUM
+    ASN1_INTEGER *asnInt = ASN1_INTEGER_new();
+    BN_to_ASN1_INTEGER(bn, asnInt);
+
+    // cleanup
+    // ASN1_INTEGER_free(asnInt);
+    BN_free(bn);
+    return asnInt;
 }
