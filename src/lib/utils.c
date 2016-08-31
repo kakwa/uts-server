@@ -221,8 +221,10 @@ int set_params(rfc3161_context *ct, char *conf_file) {
             for (int j = 0;; j++) {
                 if (prioritynames[j].c_name == NULL)
                     break;
-                if (strcmp(prioritynames[j].c_name, value))
+                if (strcmp(prioritynames[j].c_name, value) == 0) {
                     ct->loglevel = prioritynames[j].c_val;
+                    break;
+                }
             }
             break;
             ;
