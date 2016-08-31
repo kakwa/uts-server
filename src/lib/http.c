@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <sys/syslog.h>
+#include <unistd.h>
 #include "http.h"
 
 void log_request_debug(const struct mg_request_info *request_info,
@@ -147,7 +148,9 @@ int http_server_start(char *conffile, bool stdout_dbg) {
 
     // Wait until user hits "enter". Server is running in separate thread.
     // Navigating to http://localhost:8080 will invoke begin_request_handler().
-    getchar();
+    while ( g_uts_sig == 0 ){
+	sleep(1);
+    }
 
     // Stop the server.
     mg_stop(ctx);

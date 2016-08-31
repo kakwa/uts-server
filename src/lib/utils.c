@@ -30,6 +30,14 @@ CODE prioritynames[] = {{"alert", LOG_ALERT},
                         {"warning", LOG_WARNING},
                         {NULL, -1}};
 
+static void signal_handler_general(int sig_num) {
+    g_uts_sig = sig_num;
+}
+
+static void signal_handler_up(int sig_num) {
+    g_uts_sig_up = sig_num;
+}
+
 void skeleton_daemon() {
     pid_t pid;
 
@@ -48,10 +56,14 @@ void skeleton_daemon() {
     if (setsid() < 0)
         exit(EXIT_FAILURE);
 
+    g_uts_sig_up = 0;
+    g_uts_sig = 0;
     /* Catch, ignore and handle signals */
     // TODO: Implement a working signal handler */
+    signal(SIGTERM, signal_handler_general);
+    signal(SIGINT, signal_handler_general);
+    signal(SIGHUP, signal_handler_up);
     signal(SIGCHLD, SIG_IGN);
-    signal(SIGHUP, SIG_IGN);
 
     /* Fork off for the second time*/
     pid = fork();
