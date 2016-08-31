@@ -67,8 +67,8 @@ int main(int argc, char **argv) {
 
     while (1) {
         // TODO: Insert daemon code here.
+        syslog(LOG_NOTICE, "uts-server daemon starting.");
         http_server_start(args.conffile, args.stdout_dbg);
-        syslog(LOG_NOTICE, "uts-server daemon started.");
         break;
     }
 
