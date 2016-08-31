@@ -192,7 +192,7 @@ int create_response(rfc3161_context *ct, char *query, int query_len,
         goto end;
     }
 
-    FILE * stream = open_memstream((char **)resp, (size_t *)resp_size);
+    FILE *stream = open_memstream((char **)resp, (size_t *)resp_size);
     ret = i2d_TS_RESP_fp(stream, ts_response);
     fflush(stream);
     fclose(stream);
@@ -214,37 +214,36 @@ end:
     uts_logger(ct, LOG_DEBUG, "TimeStamp OpenSSL status: |%s", bptr->data);
     BUF_MEM_free(bptr);
 
-
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
     case TS_STATUS_GRANTED:
         uts_logger(ct, LOG_INFO, "timestamp request granted");
-	ret = 1;
+        ret = 1;
         break;
     case TS_STATUS_GRANTED_WITH_MODS:
         uts_logger(ct, LOG_NOTICE,
                    "timestamp request granted with modification");
-	ret = 1;
+        ret = 1;
         break;
     case TS_STATUS_REJECTION:
         uts_logger(ct, LOG_WARNING, "timestamp request rejected");
-	ret = 0;
+        ret = 0;
         break;
     case TS_STATUS_WAITING:
         uts_logger(ct, LOG_NOTICE, "timestamp request waiting");
-	ret = 0;
+        ret = 0;
         break;
     case TS_STATUS_REVOCATION_WARNING:
         uts_logger(ct, LOG_WARNING, "timestamp request revocation warning");
-	ret = 0;
+        ret = 0;
         break;
     case TS_STATUS_REVOCATION_NOTIFICATION:
         uts_logger(ct, LOG_NOTICE, "timestamp request revovation notification");
-	ret = 0;
+        ret = 0;
         break;
     default:
         uts_logger(ct, LOG_ERR, "unknown error code '%d'", status);
-	ret = 0;
+        ret = 0;
     }
 
     while ((err_code = ERR_get_error())) {
@@ -258,7 +257,7 @@ end:
         }
         err_code_prev = err_code;
     }
-    //BIO_free_all(status_bio);
+    // BIO_free_all(status_bio);
     TS_RESP_free(ts_response);
     return ret;
 }
