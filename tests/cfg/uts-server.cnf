@@ -89,7 +89,7 @@ default_tsa = tsa_config1
 # These are used by the TSA reply generation only.
 
 # TSA root directory
-dir		= ./tests/cfg/pki
+dir		= ./pki
 
 # OpenSSL engine to use for signing
 crypto_device	= builtin
