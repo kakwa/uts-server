@@ -90,7 +90,7 @@ void skeleton_daemon() {
     }
 
     /* Open the log file */
-    openlog("uts-server", LOG_PID, LOG_DAEMON);
+    //openlog("uts-server", LOG_PID, LOG_DAEMON);
 }
 
 void log_hex(rfc3161_context *ct, int priority, char *id,
@@ -218,18 +218,26 @@ static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
 }
 
 int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
-    int ret = 0;
-    CONF *conf = load_config_file(ct, conf_file);
-    ret = 1;
+    chdir(conf_wd);
+    int ret = 1;
     int http_counter = 0;
 
-    chdir(conf_wd);
+    CONF *conf = load_config_file(ct, conf_file);
+    if(conf == NULL)
+	goto end;
+
     // first pass to set the loglevel as soon as possible
     for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
         int type = rfc3161_options[i].type;
         const char *name = rfc3161_options[i].name;
         const char *default_value = rfc3161_options[i].default_value;
         const char *value = NCONF_get_string(conf, MAIN_CONF_SECTION, name);
+        if (value == NULL) {
+            uts_logger(ct, LOG_NOTICE,
+                       "configuration param['%s'] not set, using default: '%s'",
+                       name, default_value);
+            value = default_value;
+        }
         switch (type) {
         case LOGLEVEL_OPTIONS:
             for (int j = 0;; j++) {
