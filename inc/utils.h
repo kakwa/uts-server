@@ -1,6 +1,8 @@
 #include "rfc3161.h"
 
 void skeleton_daemon();
+int init_pid(char *pidfile_path);
+int write_pid(char *pidfile_path);
 void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...);
 void log_hex(rfc3161_context *ct, int priority, char *id,
              unsigned char *content, int content_length);
