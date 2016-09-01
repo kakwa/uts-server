@@ -64,16 +64,18 @@ int main(int argc, char **argv) {
     int ret = EXIT_SUCCESS;
 
     // get the current path, the configuration can be relative to this path
-   char conf_wd[PATH_MAX];
-   if (getcwd(conf_wd, sizeof(conf_wd)) == NULL){
+    char conf_wd[PATH_MAX];
+    if (getcwd(conf_wd, sizeof(conf_wd)) == NULL) {
         syslog(LOG_CRIT, "unable to get the current, uts-server start failed");
-	return EXIT_FAILURE;
-   }
+        return EXIT_FAILURE;
+    }
 
     if (args.daemonize)
         skeleton_daemon();
 
-    syslog(LOG_NOTICE, "uts-server daemon starting with conf '%s' from working dir '%s'", args.conffile, conf_wd);
+    syslog(LOG_NOTICE,
+           "uts-server daemon starting with conf '%s' from working dir '%s'",
+           args.conffile, conf_wd);
 
     while (1) {
         ret = http_server_start(args.conffile, conf_wd, args.stdout_dbg);

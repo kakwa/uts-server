@@ -90,7 +90,7 @@ void skeleton_daemon() {
     }
 
     /* Open the log file */
-    //openlog("uts-server", LOG_PID, LOG_DAEMON);
+    // openlog("uts-server", LOG_PID, LOG_DAEMON);
 }
 
 void log_hex(rfc3161_context *ct, int priority, char *id,
@@ -223,8 +223,8 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     int http_counter = 0;
 
     CONF *conf = load_config_file(ct, conf_file);
-    if(conf == NULL)
-	goto end;
+    if (conf == NULL)
+        goto end;
 
     // first pass to set the loglevel as soon as possible
     for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
