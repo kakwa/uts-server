@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
     init_pid(args.pidfile);
     // get the full path for the pid file
     char pid_file[PATH_MAX];
-    if (realpath(args.pidfile, pid_file) == NULL) {
+    if ((args.pidfile != NULL) && realpath(args.pidfile, pid_file) == NULL) {
         syslog(LOG_CRIT, "unable to get the full path of the pid "
                          "file, uts-server start failed");
         return EXIT_FAILURE;
@@ -101,9 +101,11 @@ int main(int argc, char **argv) {
            "uts-server daemon starting with conf '%s' from working dir '%s'",
            conf_fp, conf_wd);
 
-    if (write_pid(pid_file) == 0) {
-        syslog(LOG_CRIT, "failed to write pid file '%s'", pid_file);
-        return EXIT_FAILURE;
+    if (args.pidfile != NULL) {
+        if (write_pid(pid_file) == 0) {
+            syslog(LOG_CRIT, "failed to write pid file '%s'", pid_file);
+            return EXIT_FAILURE;
+        }
     }
 
     while (1) {
