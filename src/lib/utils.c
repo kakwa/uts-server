@@ -217,11 +217,13 @@ static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
     return NULL;
 }
 
-int set_params(rfc3161_context *ct, char *conf_file) {
+int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     int ret = 0;
     CONF *conf = load_config_file(ct, conf_file);
     ret = 1;
     int http_counter = 0;
+
+    chdir(conf_wd);
     // first pass to set the loglevel as soon as possible
     for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
         int type = rfc3161_options[i].type;
@@ -277,8 +279,10 @@ int set_params(rfc3161_context *ct, char *conf_file) {
     ct->ts_ctx = create_tsctx(ct, conf, NULL, NULL);
     if (ct->ts_ctx == NULL)
         ret = 0;
+    chdir("/");
     return ret;
 
 end:
+    chdir("/");
     return 0;
 }

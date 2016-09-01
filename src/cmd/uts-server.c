@@ -61,19 +61,27 @@ int main(int argc, char **argv) {
     args.daemonize = 0;
     args.stdout_dbg = 0;
     argp_parse(&argp, argc, argv, 0, 0, &args);
+    int ret = EXIT_SUCCESS;
 
     if (args.daemonize)
         skeleton_daemon();
 
+    // get the current path, the configuration can be relative to this path
+   char conf_wd[PATH_MAX];
+   if (getcwd(conf_wd, sizeof(conf_wd)) == NULL){
+        syslog(LOG_CRIT, "unable to get the current, uts-server start failed");
+	return EXIT_FAILURE;
+   }
+
+    syslog(LOG_NOTICE, "uts-server daemon starting with conf '%s' from working dir '%s'", args.conffile, conf_wd);
+
     while (1) {
-        // TODO: Insert daemon code here.
-        syslog(LOG_NOTICE, "uts-server daemon starting.");
-        http_server_start(args.conffile, args.stdout_dbg);
+        ret = http_server_start(args.conffile, conf_wd, args.stdout_dbg);
         break;
     }
 
     syslog(LOG_NOTICE, "uts-server daemon terminated.");
     closelog();
 
-    return EXIT_SUCCESS;
+    return ret;
 }

@@ -128,15 +128,15 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     return 1;
 }
 
-int http_server_start(char *conffile, bool stdout_dbg) {
+int http_server_start(char *conffile, char * conf_wd, bool stdout_dbg) {
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
 
     rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
     ct->stdout_dbg = stdout_dbg;
     ct->loglevel = 8;
-    if (!set_params(ct, conffile))
-        return 1;
+    if (!set_params(ct, conffile, conf_wd))
+        return EXIT_FAILURE;
 
     // Prepare callbacks structure. We have only one callback, the rest are
     // NULL.
@@ -146,8 +146,7 @@ int http_server_start(char *conffile, bool stdout_dbg) {
     ctx = mg_start(&callbacks, NULL, ct->http_options);
     mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
 
-    // Wait until user hits "enter". Server is running in separate thread.
-    // Navigating to http://localhost:8080 will invoke begin_request_handler().
+    // Wait until some signals are received
     while ( g_uts_sig == 0 ){
 	sleep(1);
     }
