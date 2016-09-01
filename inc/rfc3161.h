@@ -31,7 +31,7 @@ static int reply_command(CONF *conf, char *section, char *engine, char *query,
 static TS_RESP *read_PKCS7(BIO *in_bio);
 int create_response(rfc3161_context *ct, char *query, int query_len,
                     TS_RESP_CTX *resp_ctx, size_t *resp_size,
-                    unsigned char **resp);
+                    unsigned char **resp, char **serial_id);
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
 static ASN1_INTEGER *next_serial(const char *serialfile);
 static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
