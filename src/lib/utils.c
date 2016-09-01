@@ -146,7 +146,7 @@ void log_hex(rfc3161_context *ct, int priority, char *id,
     stream = open_memstream(&out, &len);
 
     for (int i = 0; i < content_length; i++) {
-        fprintf(stream, "%02x ", content[i]);
+        fprintf(stream, "%02x", content[i]);
     }
     fflush(stream);
     fclose(stream);

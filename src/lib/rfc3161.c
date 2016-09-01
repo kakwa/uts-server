@@ -25,6 +25,9 @@
 
 #define OID_SECTION "oids"
 
+// number of char we get to log for the serial
+#define SERIAL_ID_SIZE 8
+
 /* Reply related functions. */
 static int reply_command(CONF *conf, char *section, char *engine, char *query,
                          char *passin, char *inkey, const EVP_MD *md,
@@ -173,11 +176,12 @@ end:
 
 int create_response(rfc3161_context *ct, char *query, int query_len,
                     TS_RESP_CTX *resp_ctx, size_t *resp_size,
-                    unsigned char **resp) {
+                    unsigned char **resp, char **serial_id) {
     int ret = 0;
     TS_RESP *ts_response = NULL;
     BIO *query_bio = NULL;
     BIO *out_bio = NULL;
+    BIO *text_bio = BIO_new(BIO_s_mem());
     BIO *status_bio = BIO_new(BIO_s_mem());
     ;
     unsigned long err_code;
@@ -206,43 +210,69 @@ end:
     TS_STATUS_INFO_print_bio(status_bio, ts_response->status_info);
     BIO_get_mem_ptr(status_bio, &bptr);
 
+    ASN1_INTEGER *serial = ts_response->tst_info->serial;
+    BIGNUM *serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
+    char *serial_hex = BN_bn2hex(serial_bn);
+    BN_free(serial_bn);
+    *serial_id = calloc(SERIAL_ID_SIZE, sizeof(char));
+    strncpy(*serial_id, serial_hex, SERIAL_ID_SIZE);
+
     // replacing '\n' by '|' to log on one line only
     char *temp = strstr(bptr->data, "\n");
     while ((temp = strstr(bptr->data, "\n")) != NULL) {
         temp[0] = '|';
     }
-    uts_logger(ct, LOG_DEBUG, "TimeStamp OpenSSL status: |%s", bptr->data);
+    uts_logger(ct, LOG_DEBUG,
+               "timestamp full serial: %s (response serial '%s...')",
+               serial_hex, *serial_id);
+    uts_logger(ct, LOG_DEBUG,
+               "TimeStamp OpenSSL status: |%s (response serial '%s...')",
+               bptr->data, *serial_id);
     BUF_MEM_free(bptr);
 
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
     case TS_STATUS_GRANTED:
-        uts_logger(ct, LOG_INFO, "timestamp request granted");
+        uts_logger(ct, LOG_INFO,
+                   "timestamp request granted (response serial '%s...')",
+                   *serial_id);
         ret = 1;
         break;
     case TS_STATUS_GRANTED_WITH_MODS:
-        uts_logger(ct, LOG_NOTICE,
-                   "timestamp request granted with modification");
+        uts_logger(ct, LOG_NOTICE, "timestamp request granted with "
+                                   "modification (response serial '%s...')",
+                   *serial_id);
         ret = 1;
         break;
     case TS_STATUS_REJECTION:
-        uts_logger(ct, LOG_WARNING, "timestamp request rejected");
+        uts_logger(ct, LOG_WARNING,
+                   "timestamp request rejected (response serial '%s...')",
+                   *serial_id);
         ret = 0;
         break;
     case TS_STATUS_WAITING:
-        uts_logger(ct, LOG_NOTICE, "timestamp request waiting");
+        uts_logger(ct, LOG_NOTICE,
+                   "timestamp request waiting (response serial '%s...')",
+                   *serial_id);
         ret = 0;
         break;
     case TS_STATUS_REVOCATION_WARNING:
-        uts_logger(ct, LOG_WARNING, "timestamp request revocation warning");
+        uts_logger(
+            ct, LOG_WARNING,
+            "timestamp request revocation warning (response serial '%s...')",
+            *serial_id);
         ret = 0;
         break;
     case TS_STATUS_REVOCATION_NOTIFICATION:
-        uts_logger(ct, LOG_NOTICE, "timestamp request revovation notification");
+        uts_logger(ct, LOG_NOTICE, "timestamp request revovation notification "
+                                   "(response serial '%s...')",
+                   *serial_id);
         ret = 0;
         break;
     default:
-        uts_logger(ct, LOG_ERR, "unknown error code '%d'", status);
+        uts_logger(ct, LOG_ERR,
+                   "unknown error code '%d' (response serial '%s...')", status,
+                   *serial_id);
         ret = 0;
     }
 
@@ -259,6 +289,7 @@ end:
     }
     // BIO_free_all(status_bio);
     TS_RESP_free(ts_response);
+    free(serial_hex);
     return ret;
 }
 
