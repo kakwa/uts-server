@@ -63,15 +63,15 @@ int main(int argc, char **argv) {
     argp_parse(&argp, argc, argv, 0, 0, &args);
     int ret = EXIT_SUCCESS;
 
-    if (args.daemonize)
-        skeleton_daemon();
-
     // get the current path, the configuration can be relative to this path
    char conf_wd[PATH_MAX];
    if (getcwd(conf_wd, sizeof(conf_wd)) == NULL){
         syslog(LOG_CRIT, "unable to get the current, uts-server start failed");
 	return EXIT_FAILURE;
    }
+
+    if (args.daemonize)
+        skeleton_daemon();
 
     syslog(LOG_NOTICE, "uts-server daemon starting with conf '%s' from working dir '%s'", args.conffile, conf_wd);
 
