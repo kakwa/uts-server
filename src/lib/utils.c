@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <string.h>
 #include <syslog.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "utils.h"
 
 typedef struct _code {
@@ -36,6 +38,47 @@ static void signal_handler_general(int sig_num) {
 
 static void signal_handler_up(int sig_num) {
     g_uts_sig_up = sig_num;
+}
+
+int init_pid(char *pidfile_path) {
+    // if pidfile_path is null, the user did not request one
+    // exit success
+    if (pidfile_path == NULL)
+        return 1;
+
+    int fd = open(pidfile_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    // in case we can't open it
+    if (fd == -1) {
+        syslog(LOG_CRIT, "failed to open the pid file");
+        return 0;
+    }
+
+    close(fd);
+    return 1;
+}
+
+int write_pid(char *pidfile_path) {
+    // if pidfile_path is null, the user did not request one
+    // exit success
+    if (pidfile_path == NULL)
+        return 1;
+
+    int fd = open(pidfile_path, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+    // in case we can't open it
+    if (fd == -1) {
+        syslog(LOG_CRIT, "failed to open the pid file");
+        return 0;
+    }
+
+    char buf[100];
+    snprintf(buf, 100, "%ld\n", (long)getpid());
+    if (write(fd, buf, strlen(buf)) != strlen(buf)) {
+        syslog(LOG_CRIT, "failed to write the pid");
+        close(fd);
+        return 0;
+    }
+    close(fd);
+    return 1;
 }
 
 void skeleton_daemon() {
