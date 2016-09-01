@@ -16,7 +16,7 @@ listening_ports = 127.0.0.1:2020
 enable_keep_alive = no
 
 # Number of worker threads.
-num_threads = 50
+num_threads = 1
 
 # Switch to given user credentials after startup.
 # Required to run on privileged ports and not be run as root.
