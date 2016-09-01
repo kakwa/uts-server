@@ -48,3 +48,5 @@ tests/cfg/pki/.rnd
 *.tsr
 *.tsq
 
+# pid file
+*.pid
