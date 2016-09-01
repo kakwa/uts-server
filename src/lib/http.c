@@ -128,7 +128,7 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     return 1;
 }
 
-int http_server_start(char *conffile, char * conf_wd, bool stdout_dbg) {
+int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
 
@@ -147,8 +147,8 @@ int http_server_start(char *conffile, char * conf_wd, bool stdout_dbg) {
     mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
 
     // Wait until some signals are received
-    while ( g_uts_sig == 0 ){
-	sleep(1);
+    while (g_uts_sig == 0) {
+        sleep(1);
     }
 
     // Stop the server.
