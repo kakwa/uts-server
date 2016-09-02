@@ -167,7 +167,7 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
                   "uts-server, a simple RFC 3161 timestamp server");
     }
     if (serial_id == NULL) {
-        serial_id = calloc(8, sizeof(char));
+        serial_id = calloc(9, sizeof(char));
         serial_id = rand_string(serial_id, 8);
     }
 
