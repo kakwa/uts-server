@@ -187,7 +187,6 @@ int create_response(rfc3161_context *ct, char *query, int query_len,
     TS_RESP *ts_response = NULL;
     BIO *query_bio = NULL;
     BIO *out_bio = NULL;
-    BIO *text_bio = BIO_new(BIO_s_mem());
     BIO *status_bio = BIO_new(BIO_s_mem());
     ;
     unsigned long err_code;
@@ -234,7 +233,6 @@ end:
     uts_logger(ct, LOG_DEBUG,
                "TimeStamp OpenSSL status: |%s (response serial '%s...')",
                bptr->data, *serial_id);
-    BUF_MEM_free(bptr);
 
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
@@ -293,7 +291,7 @@ end:
         }
         err_code_prev = err_code;
     }
-    // BIO_free_all(status_bio);
+    BIO_free_all(status_bio);
     TS_RESP_free(ts_response);
     free(serial_hex);
     return ret;
