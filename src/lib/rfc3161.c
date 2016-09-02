@@ -311,7 +311,6 @@ static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
     BN_to_ASN1_INTEGER(bn, asnInt);
 
     // cleanup
-    // ASN1_INTEGER_free(asnInt);
     BN_free(bn);
     return asnInt;
 }
