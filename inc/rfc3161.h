@@ -38,3 +38,4 @@ static int save_ts_serial(const char *serialfile, ASN1_INTEGER *serial);
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy);
 int add_oid_section(rfc3161_context *ct, CONF *conf);
+void init_ssl();

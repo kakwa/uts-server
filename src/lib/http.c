@@ -186,6 +186,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
     ct->stdout_dbg = stdout_dbg;
     ct->loglevel = 8;
+    init_ssl();
     if (!set_params(ct, conffile, conf_wd))
         return EXIT_FAILURE;
 
