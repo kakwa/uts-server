@@ -66,15 +66,18 @@ int add_oid_section(rfc3161_context *ct, CONF *conf) {
     return 1;
 }
 
+void init_ssl(){
+    SSL_load_error_strings();
+    ERR_load_BIO_strings();
+    SSL_library_init();
+    ERR_load_TS_strings();
+}
+
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
     unsigned long err_code;
     unsigned long err_code_prev = 0;
     TS_RESP_CTX *resp_ctx = NULL;
-
-    SSL_load_error_strings();
-    ERR_load_BIO_strings();
-    SSL_library_init();
 
     if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
@@ -161,7 +164,6 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
 end:
     while ((err_code = ERR_get_error())) {
         if (err_code_prev != err_code) {
-            ERR_load_TS_strings();
             uts_logger(ct, LOG_DEBUG, "OpenSSL exception: '%s'",
                        ERR_error_string(err_code, NULL));
             uts_logger(ct, LOG_ERR, "error '%s' in OpenSSL component '%s'",
@@ -214,12 +216,12 @@ end:
     BIGNUM *serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
     char *serial_hex = BN_bn2hex(serial_bn);
     BN_free(serial_bn);
-    *serial_id = calloc(SERIAL_ID_SIZE, sizeof(char));
+    *serial_id = calloc(SERIAL_ID_SIZE + 1, sizeof(char));
     strncpy(*serial_id, serial_hex, SERIAL_ID_SIZE);
 
     // replacing '\n' by '|' to log on one line only
     char *temp = strstr(bptr->data, "\n");
-    while ((temp = strstr(bptr->data, "\n")) != NULL) {
+    while (temp != NULL && (temp = strstr(bptr->data, "\n")) != NULL) {
         temp[0] = '|';
     }
     uts_logger(ct, LOG_DEBUG,
