@@ -73,6 +73,10 @@ void init_ssl(){
     ERR_load_TS_strings();
 }
 
+void free_ssl() {
+    ERR_free_strings();
+}
+
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
     unsigned long err_code;
