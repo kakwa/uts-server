@@ -134,10 +134,10 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
         log_hex(ct, LOG_DEBUG, "query hexdump content", (unsigned char *)query,
                 request_info->content_length);
 
-        int ts_resp = create_response(ct, query, query_len, ct->ts_ctx,
-                                      &content_length, &content, &serial_id);
-        if (ts_resp) {
-            resp_code = 200;
+        resp_code = create_response(ct, query, query_len, ct->ts_ctx,
+                                    &content_length, &content, &serial_id);
+        switch (resp_code) {
+        case 200:
             mg_printf(conn,
                       "HTTP/1.1 200 OK\r\n"
                       "Content-Type: application/timestamp-reply\r\n"
@@ -147,8 +147,16 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
             mg_write(conn, content, content_length);
             log_hex(ct, LOG_DEBUG, "response hexdump content", content,
                     content_length);
-        } else {
-            resp_code = 500;
+            break;
+        case 400:
+            mg_printf(conn,
+                      "HTTP/1.1 400 Bad Request\r\n"
+                      "Content-Type: text/plain\r\n"
+                      "Content-Length: 12\r\n" // Always set Content-Length
+                      "\r\n"
+                      "client error");
+            break;
+        default:
             mg_printf(conn,
                       "HTTP/1.1 500 Internal Server Error\r\n"
                       "Content-Type: text/plain\r\n"
