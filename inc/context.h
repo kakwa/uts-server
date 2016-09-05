@@ -30,7 +30,7 @@ struct rfc3161_option {
 };
 
 static struct rfc3161_option rfc3161_options[] = {
-    {"num_threads", HTTP_OPTIONS, "50"},
+    {"num_threads", HTTP_OPTIONS, "1"},
     {"run_as_user", HTTP_OPTIONS, NULL},
     {"throttle", HTTP_OPTIONS, NULL},
     {"enable_keep_alive", HTTP_OPTIONS, "no"},

@@ -15,8 +15,8 @@ listening_ports = 127.0.0.1:2020
 # Allows clients to reuse TCP connection for subsequent HTTP requests, which improves performance.
 enable_keep_alive = no
 
-# Number of worker threads.
-num_threads = 1
+# Number of worker threads. don't set, crashes if other than 1 (default)
+#num_threads = 10
 
 # Switch to given user credentials after startup.
 # Required to run on privileged ports and not be run as root.
