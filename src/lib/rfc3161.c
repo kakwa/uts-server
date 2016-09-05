@@ -208,6 +208,7 @@ int create_response(rfc3161_context *ct, char *query, int query_len,
         goto end;
     }
 
+    // put the reponse data in *resp char *
     FILE *stream = open_memstream((char **)resp, (size_t *)resp_size);
     ret = i2d_TS_RESP_fp(stream, ts_response);
     fflush(stream);
@@ -222,25 +223,40 @@ end:
     TS_STATUS_INFO_print_bio(status_bio, ts_response->status_info);
     BIO_get_mem_ptr(status_bio, &bptr);
 
-    ASN1_INTEGER *serial = ts_response->tst_info->serial;
-    BIGNUM *serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
-    char *serial_hex = BN_bn2hex(serial_bn);
-    BN_free(serial_bn);
+    char *serial_hex = NULL;
     *serial_id = calloc(SERIAL_ID_SIZE + 1, sizeof(char));
+    // if we have a proper response, we recover the serial to identify the logs
+    if (ts_response->tst_info != NULL &&
+        ts_response->tst_info->serial != NULL) {
+        ASN1_INTEGER *serial = ts_response->tst_info->serial;
+        BIGNUM *serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
+        serial_hex = BN_bn2hex(serial_bn);
+        BN_free(serial_bn);
+    } else {
+        serial_hex = calloc(SERIAL_ID_SIZE, sizeof(char));
+        strncpy(serial_hex, " NO ID   ", SERIAL_ID_SIZE + 2);
+    }
+    // get a short version of the serial (150 bits in hexa is a bit long)
     strncpy(*serial_id, serial_hex, SERIAL_ID_SIZE);
+
+    // log the full serial as a debug message
+    uts_logger(ct, LOG_DEBUG,
+               "timestamp full serial: %s (response serial '%s...')",
+               serial_hex, *serial_id);
+
+    free(serial_hex);
 
     // replacing '\n' by '|' to log on one line only
     char *temp = strstr(bptr->data, "\n");
     while (temp != NULL && (temp = strstr(bptr->data, "\n")) != NULL) {
         temp[0] = '|';
     }
-    uts_logger(ct, LOG_DEBUG,
-               "timestamp full serial: %s (response serial '%s...')",
-               serial_hex, *serial_id);
+    // log the full responce status, info and failure info
     uts_logger(ct, LOG_DEBUG,
                "TimeStamp OpenSSL status: |%s (response serial '%s...')",
                bptr->data, *serial_id);
 
+    // emit logs according the return value
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
     case TS_STATUS_GRANTED:
@@ -287,6 +303,7 @@ end:
         ret = 0;
     }
 
+    // log the openssl errors
     while ((err_code = ERR_get_error())) {
         if (err_code_prev != err_code) {
             ERR_load_TS_strings();
@@ -298,9 +315,10 @@ end:
         }
         err_code_prev = err_code;
     }
+
+    // some cleaning
     BIO_free_all(status_bio);
     TS_RESP_free(ts_response);
-    free(serial_hex);
     return ret;
 }
 
