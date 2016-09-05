@@ -265,8 +265,9 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     int ret = 1;
     int http_counter = 0;
 
-    CONF *conf = load_config_file(ct, conf_file);
-    if (conf == NULL)
+    NCONF_free(ct->conf);
+    ct->conf = load_config_file(ct, conf_file);
+    if (ct->conf == NULL)
         goto end;
 
     // first pass to set the loglevel as soon as possible
@@ -274,7 +275,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         int type = rfc3161_options[i].type;
         const char *name = rfc3161_options[i].name;
         const char *default_value = rfc3161_options[i].default_value;
-        const char *value = NCONF_get_string(conf, MAIN_CONF_SECTION, name);
+        const char *value = NCONF_get_string(ct->conf, MAIN_CONF_SECTION, name);
         if (value == NULL) {
             uts_logger(ct, LOG_NOTICE,
                        "configuration param['%s'] not set, using default: '%s'",
@@ -299,7 +300,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         int type = rfc3161_options[i].type;
         const char *name = rfc3161_options[i].name;
         const char *default_value = rfc3161_options[i].default_value;
-        const char *value = NCONF_get_string(conf, MAIN_CONF_SECTION, name);
+        const char *value = NCONF_get_string(ct->conf, MAIN_CONF_SECTION, name);
         if (value == NULL) {
             uts_logger(ct, LOG_NOTICE,
                        "configuration param['%s'] not set, using default: '%s'",
@@ -325,9 +326,9 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         ct->http_options[http_counter] = NULL;
     }
 
-    if (!add_oid_section(ct, conf))
+    if (!add_oid_section(ct, ct->conf))
         ret = 0;
-    ct->ts_ctx = create_tsctx(ct, conf, NULL, NULL);
+    ct->ts_ctx = create_tsctx(ct, ct->conf, NULL, NULL);
     if (ct->ts_ctx == NULL)
         ret = 0;
     chdir("/");
@@ -336,4 +337,10 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
 end:
     chdir("/");
     return 0;
+}
+
+void free_uts_context(rfc3161_context *context) {
+    TS_RESP_CTX_free(context->ts_ctx);
+    NCONF_free(context->conf);
+    free(context);
 }

@@ -205,7 +205,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
 
     // Stop the server.
     mg_stop(ctx);
-    free(ct);
+    free_uts_context(ct);
     free_ssl();
 
     return 0;
