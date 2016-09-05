@@ -263,44 +263,44 @@ end:
         uts_logger(ct, LOG_INFO,
                    "timestamp request granted (response serial '%s...')",
                    *serial_id);
-        ret = 1;
+        ret = 200;
         break;
     case TS_STATUS_GRANTED_WITH_MODS:
         uts_logger(ct, LOG_NOTICE, "timestamp request granted with "
                                    "modification (response serial '%s...')",
                    *serial_id);
-        ret = 1;
+        ret = 200;
         break;
     case TS_STATUS_REJECTION:
         uts_logger(ct, LOG_WARNING,
                    "timestamp request rejected (response serial '%s...')",
                    *serial_id);
-        ret = 0;
+        ret = 400;
         break;
     case TS_STATUS_WAITING:
         uts_logger(ct, LOG_NOTICE,
                    "timestamp request waiting (response serial '%s...')",
                    *serial_id);
-        ret = 0;
+        ret = 400;
         break;
     case TS_STATUS_REVOCATION_WARNING:
         uts_logger(
             ct, LOG_WARNING,
             "timestamp request revocation warning (response serial '%s...')",
             *serial_id);
-        ret = 0;
+        ret = 200;
         break;
     case TS_STATUS_REVOCATION_NOTIFICATION:
         uts_logger(ct, LOG_NOTICE, "timestamp request revovation notification "
                                    "(response serial '%s...')",
                    *serial_id);
-        ret = 0;
+        ret = 500;
         break;
     default:
         uts_logger(ct, LOG_ERR,
                    "unknown error code '%d' (response serial '%s...')", status,
                    *serial_id);
-        ret = 0;
+        ret = 500;
     }
 
     // log the openssl errors
