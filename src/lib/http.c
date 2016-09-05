@@ -156,6 +156,7 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
                       "\r\n"
                       "uts-server error");
         }
+        free(query);
         free(content);
     } else {
         resp_code = 200;
