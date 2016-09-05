@@ -66,7 +66,7 @@ int add_oid_section(rfc3161_context *ct, CONF *conf) {
     return 1;
 }
 
-void init_ssl(){
+void init_ssl() {
     SSL_load_error_strings();
     ERR_load_BIO_strings();
     SSL_library_init();
@@ -74,6 +74,12 @@ void init_ssl(){
 }
 
 void free_ssl() {
+    CONF_modules_unload(1);
+    EVP_cleanup();
+    // ENGINE_cleanup();
+    ERR_remove_state(1);
+    CRYPTO_cleanup_all_ex_data();
+    EVP_cleanup();
     ERR_free_strings();
 }
 
