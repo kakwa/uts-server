@@ -202,6 +202,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     while (g_uts_sig == 0) {
         sleep(1);
     }
+    // getchar();
 
     // Stop the server.
     mg_stop(ctx);
