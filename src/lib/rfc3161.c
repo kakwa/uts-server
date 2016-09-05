@@ -77,10 +77,11 @@ void free_ssl() {
     CONF_modules_unload(1);
     EVP_cleanup();
     // ENGINE_cleanup();
-    ERR_remove_state(1);
+    ERR_remove_state(0);
     CRYPTO_cleanup_all_ex_data();
     EVP_cleanup();
     ERR_free_strings();
+    OBJ_cleanup();
 }
 
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
