@@ -24,7 +24,7 @@ static struct argp_option options[] = {
     {0}};
 
 /* A description of the arguments we accept. */
-static char args_doc[] = "-c CONFFILE [-d] [-D]";
+static char args_doc[] = "-c CONFFILE [-d] [-D] [-p <pidfile>]";
 
 struct arguments {
     char *args[2]; /* arg1 & arg2 */
