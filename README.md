@@ -8,7 +8,7 @@ Alpha
 
 ## Dependencies
 
-* OpenSSL (https://github.com/civetweb/civetweb)
+* OpenSSL (https://github.com/openssl/openssl)
 * civetweb (https://github.com/civetweb/civetweb)
 
 ## License
