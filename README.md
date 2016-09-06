@@ -50,3 +50,12 @@ for any corresponding short options.
 
 Report bugs to Pierre-Francois Carpentier <carpentier.pf@gmail.com>.
 ```
+
+## Configuration
+
+## Building
+
+```bash
+$ cmake .
+$ make -j 2
+```
