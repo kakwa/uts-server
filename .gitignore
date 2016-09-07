@@ -51,5 +51,6 @@ tests/cfg/pki/.rnd
 # pid file
 *.pid
 
-# civetweb build directory
+# civetweb build/install directory (in bundle mode)
 civetweb-prefix/
+vendor/
