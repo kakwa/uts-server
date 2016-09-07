@@ -6,6 +6,7 @@ matrix:
 sudo: false
 
 before_install:
+  - ./tests/cfg/pki/create_tsa_certs
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then xcode-select --install; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update  ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install argp-standalone; fi
@@ -31,4 +32,4 @@ language: c
 
 compiler: clang
 
-script: cmake . -DBUNDLE_CIVETWEB=ON && make 
+script: cmake . -DBUNDLE_CIVETWEB=ON && make && ./tests/external_test.sh
