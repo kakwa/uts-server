@@ -50,3 +50,6 @@ tests/cfg/pki/.rnd
 
 # pid file
 *.pid
+
+# civetweb build directory
+civetweb-prefix/
