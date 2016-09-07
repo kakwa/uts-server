@@ -1,5 +1,7 @@
 # uts-server
 
+[![Build Status](https://travis-ci.org/kakwa/uts-server.svg?branch=master)](https://travis-ci.org/kakwa/uts-server)
+
 Micro timestamp server (RFC 3161) written in C
 
 ## Status
