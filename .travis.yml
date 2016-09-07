@@ -17,16 +17,18 @@ before_install:
 addons:
   apt:
     packages:
-    - cmake
-    - time
-    - valgrind
-    - libxml2-utils
-    - libc6-dev
-    - gcc
-    - g++
-    - libssl-dev
+      - cmake
+      - time
+      - valgrind
+      - libxml2-utils
+      - libc6-dev
+      - gcc
+      - g++
+      - libssl-dev
+    sources:
+      - kubuntu-backports
 
-language: cpp
+language: c
 
 compiler: clang
 
