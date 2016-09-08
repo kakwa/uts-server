@@ -264,6 +264,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     chdir(conf_wd);
     int ret = 1;
     int http_counter = 0;
+    int numthreads = 42;
 
     NCONF_free(ct->conf);
     ct->conf = load_config_file(ct, conf_file);
@@ -317,6 +318,8 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
                 ct->http_options[http_counter] = value;
                 http_counter++;
             }
+            if (strcmp(name, "num_threads") == 0)
+                numthreads = atoi(value);
             break;
             ;
         case TSA_OPTIONS:
@@ -328,9 +331,14 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
 
     if (!add_oid_section(ct, ct->conf))
         ret = 0;
-    ct->ts_ctx = create_tsctx(ct, ct->conf, NULL, NULL);
-    if (ct->ts_ctx == NULL)
-        ret = 0;
+    ct->ts_ctx_pool = calloc(numthreads, sizeof(ts_resp_ctx_wrapper));
+    ct->numthreads = numthreads;
+    for (int i = 0; i < numthreads; i++) {
+        ct->ts_ctx_pool[i].ts_ctx = create_tsctx(ct, ct->conf, NULL, NULL);
+        ct->ts_ctx_pool[i].available = 1;
+        if (ct->ts_ctx_pool[i].ts_ctx == NULL)
+            ret = 0;
+    }
     chdir("/");
     return ret;
 
@@ -339,8 +347,11 @@ end:
     return 0;
 }
 
-void free_uts_context(rfc3161_context *context) {
-    TS_RESP_CTX_free(context->ts_ctx);
-    NCONF_free(context->conf);
-    free(context);
+void free_uts_context(rfc3161_context *ct) {
+    for (int i = 0; i < ct->numthreads; i++) {
+        TS_RESP_CTX_free(ct->ts_ctx_pool[i].ts_ctx);
+    }
+    free(ct->ts_ctx_pool);
+    NCONF_free(ct->conf);
+    free(ct);
 }

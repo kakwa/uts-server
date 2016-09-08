@@ -84,6 +84,22 @@ void free_ssl() {
     OBJ_cleanup();
 }
 
+// recover a ts wrapper
+ts_resp_ctx_wrapper *get_ctxw(rfc3161_context *ct) {
+    ts_resp_ctx_wrapper *ret = NULL;
+    for (int i = 0; i < ct->numthreads; i++) {
+        pthread_mutex_lock(&ct->ts_ctx_pool[i].lock);
+        if (ct->ts_ctx_pool[i].available) {
+            ct->ts_ctx_pool[i].available = 0;
+            ret = &(ct->ts_ctx_pool[i]);
+            pthread_mutex_unlock(&ct->ts_ctx_pool[i].lock);
+            return ret;
+        }
+        pthread_mutex_unlock(&ct->ts_ctx_pool[i].lock);
+    }
+    return ret;
+}
+
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
     unsigned long err_code;

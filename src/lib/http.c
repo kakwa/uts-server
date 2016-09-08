@@ -139,9 +139,17 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
 
         log_hex(ct, LOG_DEBUG, "query hexdump content", (unsigned char *)query,
                 request_info->content_length);
+        ts_resp_ctx_wrapper *ctx_w = get_ctxw(ct);
+        if (ctx_w == NULL) {
+            resp_code = 500;
+            uts_logger(context, LOG_WARNING,
+                       "Unable to get an OpenSSL ts_context in the pool");
 
-        resp_code = create_response(ct, query, query_len, ct->ts_ctx,
-                                    &content_length, &content, &serial_id);
+        } else {
+            resp_code = create_response(ct, query, query_len, ctx_w->ts_ctx,
+                                        &content_length, &content, &serial_id);
+            ctx_w->available = 1;
+        }
         switch (resp_code) {
         case 200:
             mg_printf(conn,
