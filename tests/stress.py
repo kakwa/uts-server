@@ -18,7 +18,7 @@ while True:
     response = h1.getresponse()
     h1.close()
     counter += 1
-    if counter % 10000 == 0:
+    if counter % 1000 == 0:
         new_time = time.time()
-        print( str(int(10000 / (new_time - old_time))) + " req/s (10000 requests in " + str(new_time - old_time) + " seconds)")
+        print( str(int(1000 / (new_time - old_time))) + " req/s (1000 requests in " + str(new_time - old_time) + " seconds)")
         old_time = time.time()
