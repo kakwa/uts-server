@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h> /* for offsetof() macro */
 #include <string.h>
+#include <pthread.h>
 #include <civetweb.h>
 #include <openssl/ts.h>
 
@@ -15,11 +16,18 @@
     sizeof(rfc3161_options) / sizeof(struct rfc3161_option)
 
 typedef struct {
+    TS_RESP_CTX *ts_ctx;
+    bool available;
+    pthread_mutex_t lock;
+} ts_resp_ctx_wrapper;
+
+typedef struct {
     uint64_t query_counter;
     bool stdout_dbg;
     int loglevel;
+    int numthreads;
     const char *http_options[40];
-    TS_RESP_CTX *ts_ctx;
+    ts_resp_ctx_wrapper *ts_ctx_pool;
     CONF *conf;
 } rfc3161_context;
 
@@ -30,7 +38,7 @@ struct rfc3161_option {
 };
 
 static struct rfc3161_option rfc3161_options[] = {
-    {"num_threads", HTTP_OPTIONS, "1"},
+    {"num_threads", HTTP_OPTIONS, "10"},
     {"run_as_user", HTTP_OPTIONS, NULL},
     {"throttle", HTTP_OPTIONS, NULL},
     {"enable_keep_alive", HTTP_OPTIONS, "no"},
