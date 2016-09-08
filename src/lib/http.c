@@ -30,7 +30,10 @@ static char *rand_string(char *str, size_t size) {
 }
 
 void log_request_debug(const struct mg_request_info *request_info,
-                       char *request_id, void *context) {
+                       char *request_id, rfc3161_context *context) {
+    if (LOG_DEBUG > context->loglevel && !context->stdout_dbg)
+        return;
+
     for (int i = 0; i < request_info->num_headers; i++) {
         uts_logger(context, LOG_DEBUG, "Request[%s], Header[%s]: %s",
                    request_id, request_info->http_headers[i].name,
@@ -63,7 +66,10 @@ void log_request_debug(const struct mg_request_info *request_info,
 }
 
 void log_request(const struct mg_request_info *request_info, char *request_id,
-                 void *context, int response_code, int timer) {
+                 rfc3161_context *context, int response_code, int timer) {
+    if (LOG_INFO > context->loglevel && !context->stdout_dbg)
+        return;
+
     const char *user_agent = NULL;
     const char *content_type = NULL;
 
