@@ -260,7 +260,7 @@ end:
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
     case TS_STATUS_GRANTED:
-        uts_logger(ct, LOG_INFO,
+        uts_logger(ct, LOG_DEBUG,
                    "timestamp request granted (response serial '%s...')",
                    *serial_id);
         ret = 200;
