@@ -1,4 +1,4 @@
-# Section for declaring OID mapping. Just add <name> = <OID> pairs
+# Section for declarinG OID mapping. Just add <name> = <OID> pairs.
 [ oids ]
 
 tsa_policy1 = 1.2.3.4.1
@@ -25,9 +25,8 @@ num_threads = 50
 #run_as_user = uts-server
 
 # Limit download speed for clients. throttle is a comma-separated list of key=value pairs:
-#
-# *            -> limit speed for all connections
-# x.x.x.x/mask ->  limit speed for specified subnet
+# - *            -> limit speed for all connections
+# - x.x.x.x/mask ->  limit speed for specified subnet
 #
 # The value is a floating-point number of bytes per second, optionally followed by a k or m character
 # meaning kilobytes and megabytes respectively. A limit of 0 means unlimited rate.
@@ -37,7 +36,7 @@ throttle = *=0
 # Timeout for network read and network write operations, in milliseconds.
 request_timeout_ms = 30000
 
-# Path to the SSL certificate file. (PEM format containing private key and certificate).
+# Path to the SSL certificate file (PEM format containing private key and certificate).
 #ssl_certificate = /etc/uts-server/cert.pem
 
 # Enable client's certificate verification by the server.
@@ -84,7 +83,7 @@ log_level = info
 # Section defining which TSA section to use.
 [ tsa ]
 
-# Name of the default TSA section.
+# Name of the TSA section to use as default.
 default_tsa = tsa_config1
 
 # Example of timestamp section configuration.
