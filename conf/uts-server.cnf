@@ -1,4 +1,4 @@
-[ new_oids ]
+[ oids ]
 
 # Policies used by the TSA examples.
 tsa_policy1 = 1.2.3.4.1
@@ -9,10 +9,11 @@ tsa_policy3 = 1.2.3.4.5.7
 
 # Comma-separated list of ips:ports to listen on.
 # If the port is SSL, a letter s must be appended.
+# ex: listening_ports = 80,443s
 listening_ports = 127.0.0.1:2020
-#listening_ports = 80,443s
 
-# Allows clients to reuse TCP connection for subsequent HTTP requests, which improves performance.
+# Allows clients to reuse TCP connection for subsequent 
+# HTTP requests, which improves performance.
 enable_keep_alive = no
 
 # Number of worker threads.
@@ -27,8 +28,8 @@ num_threads = 50
 # x.x.x.x/mask        limit speed for specified subnet
 # The value is a floating-point number of bytes per second, optionally followed by a k or m character
 # meaning kilobytes and megabytes respectively. A limit of 0 means unlimited rate
+# ex: throttle = *=1k,10.10.0.0/16=10m,10.20.0.0/16=0
 throttle = *=0
-#throttle = *=1k,10.10.0.0/16=10m,10.20.0.0/16=0
 
 # Timeout for network read and network write operations, in milliseconds.
 request_timeout_ms = 30000
@@ -61,7 +62,6 @@ request_timeout_ms = 30000
 # TLS1.0+TLS1.1+TLS1.2            2
 # TLS1.1+TLS1.2                   3
 # TLS1.2                          4
-
 #ssl_protocol_version = 3
 
 # Enables the use of short lived certificates
@@ -91,12 +91,8 @@ default_tsa = tsa_config1
 # TSA root directory
 dir		= /etc/uts-server/pki
 
-# The current serial number
-# (mandatory)
-serial		= /var/lib/uts-server/tsaserial
-
 # OpenSSL engine to use for signing
-crypto_device	= builtin
+#crypto_device	= builtin
 
 # The TSA signing certificat
 # (optional)
@@ -134,7 +130,7 @@ clock_precision_digits  = 0
 ordering		= yes
 
 # Must the TSA name be included in the reply?
-## (optional, default: no)
+# (optional, default: no)
 tsa_name		= yes
 
 # Must the ESS cert id chain be included?
