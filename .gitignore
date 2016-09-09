@@ -54,3 +54,6 @@ tests/cfg/pki/.rnd
 # civetweb build/install directory (in bundle mode)
 civetweb-prefix/
 vendor/
+
+# vim swap file
+*.swp
