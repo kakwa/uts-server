@@ -256,8 +256,7 @@ end:
     strncpy(*serial_id, serial_hex, SERIAL_ID_SIZE);
 
     // log the full serial as a debug message
-    uts_logger(ct, LOG_DEBUG,
-               "timestamp full serial: %s (response serial '%s...')",
+    uts_logger(ct, LOG_DEBUG, "Request[%s], timestamp full serial: %s",
                serial_hex, *serial_id);
 
     free(serial_hex);
@@ -268,53 +267,47 @@ end:
         temp[0] = '|';
     }
     // log the full responce status, info and failure info
-    uts_logger(ct, LOG_DEBUG,
-               "TimeStamp OpenSSL status: |%s (response serial '%s...')",
+    uts_logger(ct, LOG_DEBUG, "Request[%s], TimeStamp OpenSSL status: |%s",
                bptr->data, *serial_id);
 
     // emit logs according the return value
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
     case TS_STATUS_GRANTED:
-        uts_logger(ct, LOG_DEBUG,
-                   "timestamp request granted (response serial '%s...')",
+        uts_logger(ct, LOG_DEBUG, "Request[%s], timestamp request granted",
                    *serial_id);
         ret = 200;
         break;
     case TS_STATUS_GRANTED_WITH_MODS:
         uts_logger(ct, LOG_NOTICE, "timestamp request granted with "
-                                   "modification (response serial '%s...')",
+                                   "modification",
                    *serial_id);
         ret = 200;
         break;
     case TS_STATUS_REJECTION:
-        uts_logger(ct, LOG_WARNING,
-                   "timestamp request rejected (response serial '%s...')",
+        uts_logger(ct, LOG_WARNING, "Request[%s], timestamp request rejected",
                    *serial_id);
         ret = 400;
         break;
     case TS_STATUS_WAITING:
-        uts_logger(ct, LOG_NOTICE,
-                   "timestamp request waiting (response serial '%s...')",
+        uts_logger(ct, LOG_NOTICE, "Request[%s], timestamp request waiting",
                    *serial_id);
         ret = 400;
         break;
     case TS_STATUS_REVOCATION_WARNING:
-        uts_logger(
-            ct, LOG_WARNING,
-            "timestamp request revocation warning (response serial '%s...')",
-            *serial_id);
+        uts_logger(ct, LOG_WARNING,
+                   "Request[%s], timestamp request revocation warning",
+                   *serial_id);
         ret = 200;
         break;
     case TS_STATUS_REVOCATION_NOTIFICATION:
-        uts_logger(ct, LOG_NOTICE, "timestamp request revovation notification "
-                                   "(response serial '%s...')",
+        uts_logger(ct, LOG_NOTICE,
+                   "Request[%s], timestamp request revovation notification",
                    *serial_id);
         ret = 500;
         break;
     default:
-        uts_logger(ct, LOG_ERR,
-                   "unknown error code '%d' (response serial '%s...')", status,
+        uts_logger(ct, LOG_ERR, "Request[%s], unknown error code '%d'", status,
                    *serial_id);
         ret = 500;
     }
