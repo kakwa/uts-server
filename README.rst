@@ -104,15 +104,15 @@ Main configuration section (mostly http configuration).
 | ssl_protocol_version        | Sets the minimal accepted version of SSL/TLS protocol               | 3                                    |
 |                             | according to the table:                                             |                                      |
 |                             |                                                                     |                                      |
-|                             | SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2 -> 0                                 |                                      |
+|                             | - SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2 -> 0                               |                                      |
 |                             |                                                                     |                                      |
-|                             | SSL3+TLS1.0+TLS1.1+TLS1.2      -> 1                                 |                                      |
+|                             | - SSL3+TLS1.0+TLS1.1+TLS1.2      -> 1                               |                                      |
 |                             |                                                                     |                                      |
-|                             | TLS1.0+TLS1.1+TLS1.2           -> 2                                 |                                      |
+|                             | - TLS1.0+TLS1.1+TLS1.2           -> 2                               |                                      |
 |                             |                                                                     |                                      |
-|                             | TLS1.1+TLS1.2                  -> 3                                 |                                      |
+|                             | - TLS1.1+TLS1.2                  -> 3                               |                                      |
 |                             |                                                                     |                                      |
-|                             | TLS1.2                         -> 4                                 |                                      |
+|                             | - TLS1.2                         -> 4                               |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_short_trust             | Enables the use of short lived certificates                         | no                                   |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
