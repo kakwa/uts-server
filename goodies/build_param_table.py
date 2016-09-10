@@ -37,7 +37,6 @@ with open(tsq_path) as f:
             docs[cur_section]['vars'][var] = {'desc': text_buf, 'val': ex_val}
             text_buf = ""
 
-#print docs
 max_var = 0
 max_desc = 0
 max_val = 0
@@ -60,14 +59,18 @@ def print_line(var, desc, val):
         ' |')
 
 
+print('Configuration Parameters')
+print('=' * len('Configuration Parameters'))
+ 
+
 for section in sorted(docs):
-    print(section)
-    print('~' * len(section))
+    print('Section [ ' + section + ' ]')
+    print('-' * len('Section [ ' + section + ' ]'))
     print('')
     print(docs[section]['text'])
     print('')
     print('+-' + '-' * max_var + '-+-' + '-' * max_desc + '-+-' + '-' * max_val + '-+')
-    print_line('param', 'description', 'example value')
+    print_line('Parameter', 'Description', 'Example Value')
     print('+=' + '=' * max_var + '=+=' + '=' * max_desc + '=+=' + '=' * max_val + '=+')
     for var in sorted(docs[section]['vars']):
         if docs[section]['vars'][var]:
@@ -84,3 +87,9 @@ for section in sorted(docs):
                     print_line('', re.sub('\*', '\\*', line), '')
         print('+-' + '-' * max_var + '-+-' + '-' * max_desc + '-+-' + '-' * max_val + '-+')
     print('')
+print('Full Configuration File')
+print('=' * len('Full Configuration File'))
+print('')
+print('.. literalinclude:: ../conf/uts-server.cnf')
+print('    :language: ini')
+ 
