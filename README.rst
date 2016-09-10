@@ -67,54 +67,54 @@ Main configuration section (mostly http configuration).
 +=============================+=====================================================================+======================================+
 | access_control_allow_origin | Comma separated list of IP subnets to accept/deny                   | -0.0.0.0/0,+192.168/16               |
 |                             |                                                                     |                                      |
-|                             |   Ex: -0.0.0.0/0,+192.168.0.0/16                                    |                                      |
-|                             |   (deny all accesses, only allow 192.168.0.0/16 subnet)             |                                      |
+|                             | Ex: -0.0.0.0/0,+192.168.0.0/16                                      |                                      |
+|                             | (deny all accesses, only allow 192.168.0.0/16 subnet)               |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | enable_keep_alive           | Allows clients to reuse TCP connection for subsequent               | no                                   |
-|                             |   HTTP requests, which improves performance.                        |                                      |
+|                             | HTTP requests, which improves performance.                          |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | listening_ports             | Comma-separated list of ips:ports to listen on.                     | 127.0.0.1:2020                       |
-|                             |   If the port is SSL, a letter s must be appended.                  |                                      |
-|                             |   Ex: listening_ports = 80,443s                                     |                                      |
+|                             | If the port is SSL, a letter s must be appended.                    |                                      |
+|                             | Ex: listening_ports = 80,443s                                       |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | log_level                   | Loglevel (debug, info, notice, warn, err, emerg, crit)              | info                                 |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | num_threads                 | Number of worker threads.                                           | 50                                   |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | request_timeout_ms          | Timeout for network read and network write operations.              | 30000                                |
-|                             |   In milliseconds.                                                  |                                      |
+|                             | In milliseconds.                                                    |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | run_as_user                 | Switch to given user credentials after startup.                     | uts-server                           |
-|                             |   Required to run on privileged ports as non root user.             |                                      |
+|                             | Required to run on privileged ports as non root user.               |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_ca_file                 | Path to a .pem file containing trusted certificates.                | /etc/uts-server/ca.pem               |
-|                             |   The file may contain more than one certificate.                   |                                      |
+|                             | The file may contain more than one certificate.                     |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_ca_path                 | Name of a directory containing trusted CA certificates.             | /etc/ssl/ca/                         |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_certificate             | Path to the SSL certificate file .                                  | /etc/uts-server/cert.pem             |
-|                             |   PEM format must contain private key and certificate.              |                                      |
+|                             | PEM format must contain private key and certificate.                |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_cipher_list             | See https://www.openssl.org/docs/manmaster/apps/ciphers.html        | ALL:!eNULL                           |
-|                             |   for more detailed                                                 |                                      |
+|                             | for more detailed                                                   |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_default_verify_paths    | Loads default trusted certificates                                  | yes                                  |
-|                             |   locations set at openssl compile time.                            |                                      |
+|                             | locations set at openssl compile time.                              |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_protocol_version        | Sets the minimal accepted version of SSL/TLS protocol               | 3                                    |
-|                             |   according to the table:                                           |                                      |
+|                             | according to the table:                                             |                                      |
 |                             |                                                                     |                                      |
-|                             |   SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2 -> 0                               |                                      |
-|                             |   SSL3+TLS1.0+TLS1.1+TLS1.2      -> 1                               |                                      |
-|                             |   TLS1.0+TLS1.1+TLS1.2           -> 2                               |                                      |
-|                             |   TLS1.1+TLS1.2                  -> 3                               |                                      |
-|                             |   TLS1.2                         -> 4                               |                                      |
+|                             | SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2 -> 0                                 |                                      |
+|                             | SSL3+TLS1.0+TLS1.1+TLS1.2      -> 1                                 |                                      |
+|                             | TLS1.0+TLS1.1+TLS1.2           -> 2                                 |                                      |
+|                             | TLS1.1+TLS1.2                  -> 3                                 |                                      |
+|                             | TLS1.2                         -> 4                                 |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_short_trust             | Enables the use of short lived certificates                         | no                                   |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_verify_depth            | Sets maximum depth of certificate chain.                            | 9                                    |
-|                             |   If client's certificate chain is longer                           |                                      |
-|                             |   than the depth set here connection is refused.                    |                                      |
+|                             | If client's certificate chain is longer                             |                                      |
+|                             | than the depth set here connection is refused.                      |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_verify_peer             | Enable client's certificate verification by the server.             | yes                                  |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
@@ -122,15 +122,15 @@ Main configuration section (mostly http configuration).
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | throttle                    | Limit download speed for clients.                                   | \*=0                                 |
 |                             |                                                                     |                                      |
-|                             |   throttle is a comma-separated list of key=value pairs:            |                                      |
-|                             |   - *            -> limit speed for all connections                 |                                      |
-|                             |   - x.x.x.x/mask ->  limit speed for specified subnet               |                                      |
+|                             | throttle is a comma-separated list of key=value pairs:              |                                      |
+|                             | - \*            -> limit speed for all connections                  |                                      |
+|                             | - x.x.x.x/mask ->  limit speed for specified subnet                 |                                      |
 |                             |                                                                     |                                      |
-|                             |   The value is a floating-point number of bytes per second,         |                                      |
-|                             |   optionally followed by a k or m character                         |                                      |
-|                             |   meaning kilobytes and megabytes respectively.                     |                                      |
-|                             |   A limit of 0 means unlimited rate.                                |                                      |
-|                             |   Ex: throttle = \*=1k,10.10.0.0/16=10m,10.20.0.0/16=0              |                                      |
+|                             | The value is a floating-point number of bytes per second,           |                                      |
+|                             | optionally followed by a k or m character                           |                                      |
+|                             | meaning kilobytes and megabytes respectively.                       |                                      |
+|                             | A limit of 0 means unlimited rate.                                  |                                      |
+|                             | Ex: throttle = \*=1k,10.10.0.0/16=10m,10.20.0.0/16=0                |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 
 oids
@@ -193,6 +193,7 @@ Example of timestamp section configuration.
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | tsa_name                    | Must the TSA name be included in the reply? (optional, default: no) | yes                                  |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
+
 
 Building
 --------
