@@ -105,9 +105,13 @@ Main configuration section (mostly http configuration).
 |                             | according to the table:                                             |                                      |
 |                             |                                                                     |                                      |
 |                             | SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2 -> 0                                 |                                      |
+|                             |                                                                     |                                      |
 |                             | SSL3+TLS1.0+TLS1.1+TLS1.2      -> 1                                 |                                      |
+|                             |                                                                     |                                      |
 |                             | TLS1.0+TLS1.1+TLS1.2           -> 2                                 |                                      |
+|                             |                                                                     |                                      |
 |                             | TLS1.1+TLS1.2                  -> 3                                 |                                      |
+|                             |                                                                     |                                      |
 |                             | TLS1.2                         -> 4                                 |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_short_trust             | Enables the use of short lived certificates                         | no                                   |
@@ -122,14 +126,18 @@ Main configuration section (mostly http configuration).
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | throttle                    | Limit download speed for clients.                                   | \*=0                                 |
 |                             |                                                                     |                                      |
-|                             | throttle is a comma-separated list of key=value pairs:              |                                      |
+|                             | Throttle is a comma-separated list of key=value pairs:              |                                      |
+|                             |                                                                     |                                      |
 |                             | - \*            -> limit speed for all connections                  |                                      |
+|                             |                                                                     |                                      |
 |                             | - x.x.x.x/mask ->  limit speed for specified subnet                 |                                      |
 |                             |                                                                     |                                      |
 |                             | The value is a floating-point number of bytes per second,           |                                      |
 |                             | optionally followed by a k or m character                           |                                      |
 |                             | meaning kilobytes and megabytes respectively.                       |                                      |
+|                             |                                                                     |                                      |
 |                             | A limit of 0 means unlimited rate.                                  |                                      |
+|                             |                                                                     |                                      |
 |                             | Ex: throttle = \*=1k,10.10.0.0/16=10m,10.20.0.0/16=0                |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 
@@ -193,7 +201,6 @@ Example of timestamp section configuration.
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | tsa_name                    | Must the TSA name be included in the reply? (optional, default: no) | yes                                  |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
-
 
 Building
 --------
