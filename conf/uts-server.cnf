@@ -21,22 +21,28 @@ enable_keep_alive = no
 num_threads = 50
 
 # Switch to given user credentials after startup.
-# Required to run on privileged ports and not be run as root.
+# Required to run on privileged ports as non root user.
 #run_as_user = uts-server
 
-# Limit download speed for clients. throttle is a comma-separated list of key=value pairs:
+# Limit download speed for clients. 
+#
+# throttle is a comma-separated list of key=value pairs:
 # - *            -> limit speed for all connections
 # - x.x.x.x/mask ->  limit speed for specified subnet
 #
-# The value is a floating-point number of bytes per second, optionally followed by a k or m character
-# meaning kilobytes and megabytes respectively. A limit of 0 means unlimited rate.
+# The value is a floating-point number of bytes per second, 
+# optionally followed by a k or m character
+# meaning kilobytes and megabytes respectively.
+# A limit of 0 means unlimited rate.
 # Ex: throttle = *=1k,10.10.0.0/16=10m,10.20.0.0/16=0
 throttle = *=0
 
-# Timeout for network read and network write operations, in milliseconds.
+# Timeout for network read and network write operations.
+# In milliseconds.
 request_timeout_ms = 30000
 
-# Path to the SSL certificate file (PEM format containing private key and certificate).
+# Path to the SSL certificate file .
+# PEM format must contain private key and certificate.
 #ssl_certificate = /etc/uts-server/cert.pem
 
 # Enable client's certificate verification by the server.
@@ -45,25 +51,31 @@ request_timeout_ms = 30000
 # Name of a directory containing trusted CA certificates.
 #ssl_ca_path = /etc/ssl/ca/
 
-# Path to a .pem file containing trusted certificates. The file may contain more than one certificate.
+# Path to a .pem file containing trusted certificates.
+# The file may contain more than one certificate.
 #ssl_ca_file = /etc/uts-server/ca.pem
 
 # Sets maximum depth of certificate chain.
-# If client's certificate chain is longer than the depth set here connection is refused.
+# If client's certificate chain is longer
+# than the depth set here connection is refused.
 #ssl_verify_depth = 9
 
-# Loads default trusted certificates locations set at openssl compile time.
+# Loads default trusted certificates 
+# locations set at openssl compile time.
 #ssl_default_verify_paths = yes
 
-# See https://www.openssl.org/docs/manmaster/apps/ciphers.html for more detailed
+# See https://www.openssl.org/docs/manmaster/apps/ciphers.html 
+# for more detailed
 #ssl_cipher_list = ALL:!eNULL
 
-# Sets the minimal accepted version of SSL/TLS protocol according to the table:
-# SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2  0
-# SSL3+TLS1.0+TLS1.1+TLS1.2       1
-# TLS1.0+TLS1.1+TLS1.2            2
-# TLS1.1+TLS1.2                   3
-# TLS1.2                          4
+# Sets the minimal accepted version of SSL/TLS protocol
+# according to the table:
+#
+# SSL2+SSL3+TLS1.0+TLS1.1+TLS1.2 -> 0
+# SSL3+TLS1.0+TLS1.1+TLS1.2      -> 1
+# TLS1.0+TLS1.1+TLS1.2           -> 2
+# TLS1.1+TLS1.2                  -> 3
+# TLS1.2                         -> 4
 #ssl_protocol_version = 3
 
 # Enables the use of short lived certificates
@@ -71,7 +83,8 @@ request_timeout_ms = 30000
 
 # Comma separated list of IP subnets to accept/deny
 #
-# Ex: -0.0.0.0/0,+192.168.0.0/16 (deny all accesses, only allow 192.168.0.0/16 subnet)
+# Ex: -0.0.0.0/0,+192.168.0.0/16 
+# (deny all accesses, only allow 192.168.0.0/16 subnet)
 #access_control_allow_origin = -0.0.0.0/0,+192.168/16
 
 # Enable TCP_NODELAY socket option on client connections.
