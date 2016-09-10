@@ -27,7 +27,7 @@ with open(tsq_path) as f:
         if m:
             text = m.group(1)
             if text_buf:
-                text_buf += '\n  '
+                text_buf += '\n'
             text_buf += text
 
         m = re.search('^#?([^\s]*)\s*=\s*(.*)', line)
@@ -75,8 +75,12 @@ for section in sorted(docs):
             for line in docs[section]['vars'][var]['desc'].split('\n'):
                 if first:
                     first = False
-                    print_line(var, line, docs[section]['vars'][var]['val'])
+                    print_line(
+                        re.sub('\*', '\\*', var),
+                        re.sub('\*', '\\*', line),
+                        re.sub('\*', '\\*', docs[section]['vars'][var]['val']),
+                    )
                 else:
-                    print_line('', line, '')
+                    print_line('', re.sub('\*', '\\*', line), '')
         print('+-' + '-' * max_var + '-+-' + '-' * max_desc + '-+-' + '-' * max_val + '-+')
     print('')
