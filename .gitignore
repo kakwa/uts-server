@@ -57,3 +57,6 @@ vendor/
 
 # vim swap file
 *.swp
+
+# rst doc stuff
+_build/
