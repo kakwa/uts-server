@@ -20,7 +20,7 @@ num_threads = 10
 
 # Switch to given user credentials after startup.
 # Required to run on privileged ports and not be run as root.
-# run_as_user = uts-server
+#run_as_user = uts-server
 
 # Limit download speed for clients. throttle is a comma-separated list of key=value pairs:
 # *                   limit speed for all connections
