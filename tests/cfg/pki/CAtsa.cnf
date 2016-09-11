@@ -62,17 +62,17 @@ x509_extensions	= v3_ca	# The extentions to add to the self signed cert
 string_mask = nombstr
 
 [ ts_ca_dn ]
-countryName			= HU
-stateOrProvinceName		= Budapest
-localityName			= Budapest
-organizationName		= Gov-CA Ltd.
+countryName			= FR
+stateOrProvinceName		= Paris
+localityName			= Paris
+organizationName		= UTS-SERVER test
 commonName			= ca1
 
 [ ts_cert_dn ]
-countryName			= HU
-stateOrProvinceName		= Budapest
-localityName			= Buda
-organizationName		= Hun-TSA Ltd.
+countryName			= FR
+stateOrProvinceName		= Paris
+localityName			= Paris
+organizationName		= UTS-SERVER test
 commonName			= tsa$ENV::INDEX
 
 [ tsa_cert ]
