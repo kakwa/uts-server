@@ -275,6 +275,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     chdir(conf_wd);
     int ret = 1;
     int http_counter = 0;
+    int cust_counter = 0;
     int numthreads = 42;
 
     NCONF_free(ct->conf);
@@ -339,7 +340,16 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
                 numthreads = atoi(value);
             break;
             ;
-        case TSA_OPTIONS:
+        case PATH_HTTP_OPTIONS:
+            if (value != NULL) {
+                char *ptr = NULL;
+                ptr = realpath(value, NULL);
+                ct->http_options[http_counter] = name;
+                http_counter++;
+                ct->http_options[http_counter] = ptr;
+                http_counter++;
+                ct->cust_conf[cust_counter] = ptr;
+            }
             break;
             ;
         }
@@ -371,6 +381,9 @@ end:
 void free_uts_context(rfc3161_context *ct) {
     for (int i = 0; i < ct->numthreads; i++) {
         TS_RESP_CTX_free(ct->ts_ctx_pool[i].ts_ctx);
+    }
+    for (int i = 0; i < 20; i++) {
+        free(ct->cust_conf[i]);
     }
     free(ct->ts_ctx_pool);
     NCONF_free(ct->conf);
