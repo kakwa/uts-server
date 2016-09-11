@@ -358,7 +358,7 @@ end:
 // It's less painful to manage than an incremental serial stored in a file
 // and a 150 bits size is more than enough to prevent collision.
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
-    unsigned char data[150] = {0};
+    unsigned char data[20] = {0};
     RAND_bytes(data, sizeof(data));
     // data[0] &= 0x7F;
 
