@@ -33,6 +33,28 @@ static char *rand_string(char *str, size_t size) {
     return str;
 }
 
+static char *sdup(const char *str) {
+    size_t len;
+    char *p;
+
+    len = strlen(str) + 1;
+    if ((p = (char *)malloc(len)) != NULL) {
+        memcpy(p, str, len);
+    }
+    return p;
+}
+
+static int log_civetweb(const struct mg_connection *conn, const char *message) {
+    const struct mg_context *ctx = mg_get_context(conn);
+    struct tuser_data *ud = (struct tuser_data *)mg_get_user_data(ctx);
+
+    if (ud->first_message == NULL) {
+        ud->first_message = sdup(message);
+    }
+
+    return 0;
+}
+
 void log_request_debug(const struct mg_request_info *request_info,
                        char *request_id, rfc3161_context *context) {
     if (LOG_DEBUG > context->loglevel && !context->stdout_dbg)
@@ -224,6 +246,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     memset(&callbacks, 0, sizeof(callbacks));
 
     memset(&user_data, 0, sizeof(user_data));
+    callbacks.log_message = &log_civetweb;
 
     // Start the web server.
     ctx = mg_start(&callbacks, &user_data, ct->http_options);
@@ -236,7 +259,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
         }
         // getchar();
     } else {
-        uts_logger(ct, LOG_CRIT, "Failed to start uts-server: %s",
+        uts_logger(ct, LOG_ERR, "Failed to start uts-server: %s",
                    ((user_data.first_message == NULL)
                         ? "unknown reason"
                         : user_data.first_message));
