@@ -28,7 +28,7 @@ create_tsa_cert () {
     export INDEX
     EXT=$2
     TSDNSECT=ts_cert_dn
-    export TSDNSECT   
+    export TSDNSECT
 
     openssl req -new \
         -out tsa_req${INDEX}.pem -keyout tsa_key${INDEX}.pem
@@ -41,13 +41,34 @@ echo Using extension $EXT
     test $? != 0 && error
 }
 
+create_cert () {
+
+    INDEX=$1
+    export INDEX
+    TSDNSECT=ts_cert_dn
+    export TSDNSECT
+
+    openssl req -new \
+        -out tsa_req${INDEX}.pem -keyout ssl_key${INDEX}.pem
+    test $? != 0 && error
+    openssl x509 -req \
+        -in tsa_req${INDEX}.pem -out ssl_cert${INDEX}.pem \
+        -CA tsaca.pem -CAkey tsacakey.pem -CAcreateserial \
+        -extensions server_cert
+    test $? != 0 && error
+    cat ssl_key${INDEX}.pem ssl_cert${INDEX}.pem >ssl_keycerts${INDEX}.pem
+}
+
 echo "Creating CA for TSA tests..."
 create_ca
 
 echo "Creating tsa_cert1.pem TSA server cert..."
 create_tsa_cert 1 tsa_cert
 
-echo "Creating tsa_cert2.pem non-TSA server cert..."
+echo "Creating tsa_cert2.pem TSA server cert..."
 create_tsa_cert 2 tsa_cert
+
+echo "Creating ssl_keycerts1.pem for ssl"
+create_cert 1
 
 exit 0
