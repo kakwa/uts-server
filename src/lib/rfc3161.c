@@ -279,7 +279,7 @@ end:
 
     // log the full serial as a debug message
     uts_logger(ct, LOG_DEBUG, "Request[%s], timestamp full serial: %s",
-               serial_hex, *serial_id);
+               *serial_id, serial_hex);
 
     free(serial_hex);
 
@@ -290,7 +290,7 @@ end:
     }
     // log the full responce status, info and failure info
     uts_logger(ct, LOG_DEBUG, "Request[%s], TimeStamp OpenSSL status: |%s",
-               bptr->data, *serial_id);
+               *serial_id, bptr->data);
 
     // emit logs according the return value
     // and set the return code
