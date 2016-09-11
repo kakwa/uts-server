@@ -74,10 +74,10 @@ void log_request(const struct mg_request_info *request_info, char *request_id,
     const char *content_type = NULL;
 
     for (int i = 0; i < request_info->num_headers; i++) {
-        if (strcmp(request_info->http_headers[i].name, "User-Agent") == 0) {
+        if (strcasecmp(request_info->http_headers[i].name, "User-Agent") == 0) {
             user_agent = request_info->http_headers[i].value;
         }
-        if (strcmp(request_info->http_headers[i].name, "Content-Type") == 0) {
+        if (strcasecmp(request_info->http_headers[i].name, "Content-Type") == 0) {
             content_type = request_info->http_headers[i].value;
         }
     }
@@ -122,8 +122,8 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     for (int i = 0; i < request_info->num_headers; i++) {
         const char *h_name = request_info->http_headers[i].name;
         const char *h_value = request_info->http_headers[i].value;
-        if (strcmp(h_name, "Content-Type") == 0 &&
-            strcmp(h_value, "application/timestamp-query") == 0)
+        if (strcasecmp(h_name, "Content-Type") == 0 &&
+            strcasecmp(h_value, "application/timestamp-query") == 0)
             is_tsq = 1;
     }
 
