@@ -52,3 +52,12 @@ Quick Start
 
     # Display the time-stamp content.
     $ openssl ts -reply -in README.rst.tsr -text
+
+Powered by
+----------
+    
+.. image:: https://raw.githubusercontent.com/openssl/web/master/img/openssl-64.png
+    :target: https://www.openssl.org/
+
+.. image:: https://github.com/civetweb/civetweb/blob/658c8d48b3bcdb34338dae1b83167a8d7836e356/resources/civetweb_32x32@2.png?raw=true
+    :target: https://github.com/civetweb/civetweb
