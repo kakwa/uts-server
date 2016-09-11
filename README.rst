@@ -34,15 +34,21 @@ Quick Start
 
 .. sourcecode:: bash
 
-    # building with civetweb embedded (will recover civetweb from github)
+    # Building with civetweb embedded (will recover civetweb from github).
     $ cmake . -DBUNDLE_CIVETWEB=ON
     $ make
     
-    # create some test certificates
+    # Create some test certificates.
     $ ./tests/cfg/pki/create_tsa_certs
     
-    # launching the timestamp server with test configuration in debug mode
+    # Launching the time-stamp server with test configuration in debug mode.
     $ ./uts-server -c tests/cfg/uts-server.cnf -D
     
-    # in another shell, launching a timestamp script on the README.md file
-    $ ./goodies/timestamp-file.sh -i README.md -u http://localhost:2020 -r -O "-cert";
+    # In another shell, launching a time-stamp script on the README.md file.
+    $ ./goodies/timestamp-file.sh -i README.rst -u http://localhost:2020 -r -O "-cert";
+
+    # Verify the time-stamp.
+    $ openssl ts -verify -in README.rst.tsr -data README.rst -CAfile ./tests/cfg/pki/tsaca.pem
+
+    # Display the time-stamp content.
+    $ openssl ts -reply -in README.rst.tsr -text
