@@ -1,4 +1,4 @@
-# Section for declarinG OID mapping. Just add <name> = <OID> pairs.
+# Section for declaring OID mapping. Just add <name> = <OID> pairs.
 [ oids ]
 
 tsa_policy1 = 1.2.3.4.1
@@ -8,7 +8,7 @@ tsa_policy3 = 1.2.3.4.5.7
 # Main configuration section (mostly http configuration).
 [ main ]
 
-# Comma-separated list of ips:ports to listen on.
+# Comma-separated list of IP:port tuples to listen on.
 # If the port is SSL, a letter s must be appended.
 #
 # Ex: listening_ports = 80,443s
@@ -66,7 +66,7 @@ request_timeout_ms = 30000
 #ssl_verify_depth = 9
 
 # Loads default trusted certificates 
-# locations set at openssl compile time.
+# locations set at OpenSSL compile time.
 #ssl_default_verify_paths = yes
 
 # See https://www.openssl.org/docs/manmaster/apps/ciphers.html 
@@ -108,7 +108,7 @@ log_level = info
 # Name of the TSA section to use as default.
 default_tsa = tsa_config1
 
-# Example of timestamp section configuration.
+# Example of Time-Stamp section configuration.
 [ tsa_config1 ]
 
 # TSA root directory.
@@ -135,10 +135,10 @@ other_policies = tsa_policy2, tsa_policy3
 # Acceptable message digests. (mandatory)
 digests = md5, sha1
 
-# Timestamp accuracy. (optional)
+# Time-Stamp accuracy. (optional)
 accuracy = secs:1, millisecs:500, microsecs:100
 
-# Number of decimals for timestamp. (optional)
+# Number of decimals for Time-Stamp. (optional)
 clock_precision_digits = 0
 
 # Is ordering defined for timestamps? (optional, default: no)

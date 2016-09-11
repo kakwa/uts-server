@@ -16,7 +16,7 @@ Main configuration section (mostly http configuration).
 | enable_keep_alive           | Allows clients to reuse TCP connection for subsequent               | no                                   |
 |                             | HTTP requests, which improves performance.                          |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
-| listening_ports             | Comma-separated list of ips:ports to listen on.                     | 127.0.0.1:2020                       |
+| listening_ports             | Comma-separated list of IP:port tuples to listen on.                | 127.0.0.1:2020                       |
 |                             | If the port is SSL, a letter s must be appended.                    |                                      |
 |                             |                                                                     |                                      |
 |                             | Ex: listening_ports = 80,443s                                       |                                      |
@@ -43,7 +43,7 @@ Main configuration section (mostly http configuration).
 |                             | for more detailed                                                   |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_default_verify_paths    | Loads default trusted certificates                                  | yes                                  |
-|                             | locations set at openssl compile time.                              |                                      |
+|                             | locations set at OpenSSL compile time.                              |                                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | ssl_protocol_version        | Sets the minimal accepted version of SSL/TLS protocol               | 3                                    |
 |                             | according to the table:                                             |                                      |
@@ -88,7 +88,7 @@ Main configuration section (mostly http configuration).
 Section [ oids ]
 ----------------
 
-Section for declarinG OID mapping. Just add <name> = <OID> pairs.
+Section for declaring OID mapping. Just add <name> = <OID> pairs.
 
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | Parameter                   | Description                                                         | Example Value                        |
@@ -114,16 +114,16 @@ Section defining which TSA section to use.
 Section [ tsa_config1 ]
 -----------------------
 
-Example of timestamp section configuration.
+Example of Time-Stamp section configuration.
 
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | Parameter                   | Description                                                         | Example Value                        |
 +=============================+=====================================================================+======================================+
-| accuracy                    | Timestamp accuracy. (optional)                                      | secs:1, millisecs:500, microsecs:100 |
+| accuracy                    | Time-Stamp accuracy. (optional)                                     | secs:1, millisecs:500, microsecs:100 |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | certs                       | Certificate chain to include in reply. (optional)                   | $dir/cacert.pem                      |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
-| clock_precision_digits      | Number of decimals for timestamp. (optional)                        | 0                                    |
+| clock_precision_digits      | Number of decimals for Time-Stamp. (optional)                       | 0                                    |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | crypto_device               | OpenSSL engine to use for signing.                                  | builtin                              |
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
