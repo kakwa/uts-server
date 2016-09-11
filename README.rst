@@ -8,7 +8,7 @@ uts-server
     :target: http://uts-server.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
 
-Micro Time-Stamp server (RFC 3161) written in C
+Micro `RFC 3161 Time-Stamp <https://www.ietf.org/rfc/rfc3161.txt>`_ server written in C.
 
 ----
 
