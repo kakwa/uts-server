@@ -16,6 +16,10 @@
 #include <time.h>
 #include "http.h"
 
+struct tuser_data {
+    char *first_message;
+};
+
 static char *rand_string(char *str, size_t size) {
     const char charset[] = "1234567890ABCDEF";
     if (size) {
@@ -77,7 +81,8 @@ void log_request(const struct mg_request_info *request_info, char *request_id,
         if (strcasecmp(request_info->http_headers[i].name, "User-Agent") == 0) {
             user_agent = request_info->http_headers[i].value;
         }
-        if (strcasecmp(request_info->http_headers[i].name, "Content-Type") == 0) {
+        if (strcasecmp(request_info->http_headers[i].name, "Content-Type") ==
+            0) {
             content_type = request_info->http_headers[i].value;
         }
     }
@@ -205,6 +210,7 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
 int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
+    struct tuser_data user_data;
 
     rfc3161_context *ct = (rfc3161_context *)calloc(1, sizeof(rfc3161_context));
     ct->stdout_dbg = stdout_dbg;
@@ -217,15 +223,24 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     // NULL.
     memset(&callbacks, 0, sizeof(callbacks));
 
-    // Start the web server.
-    ctx = mg_start(&callbacks, NULL, ct->http_options);
-    mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
+    memset(&user_data, 0, sizeof(user_data));
 
-    // Wait until some signals are received
-    while (g_uts_sig == 0) {
-        sleep(1);
+    // Start the web server.
+    ctx = mg_start(&callbacks, &user_data, ct->http_options);
+    if (ctx != NULL) {
+        mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
+
+        // Wait until some signals are received
+        while (g_uts_sig == 0) {
+            sleep(1);
+        }
+        // getchar();
+    } else {
+        uts_logger(ct, LOG_CRIT, "Failed to start uts-server: %s",
+                   ((user_data.first_message == NULL)
+                        ? "unknown reason"
+                        : user_data.first_message));
     }
-    // getchar();
 
     // Stop the server.
     mg_stop(ctx);
