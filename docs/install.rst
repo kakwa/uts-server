@@ -6,8 +6,8 @@ Runtime dependencies
 
 List of dependencies uts-server relies on to run:
 
-* OpenSSL (https://github.com/openssl/openssl)
-* civetweb (https://github.com/civetweb/civetweb)
+* `OpenSSL <https://github.com/openssl/openssl>`_.
+* `civetweb <https://github.com/civetweb/civetweb>`_.
 
 Build dependencies
 ------------------
