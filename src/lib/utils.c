@@ -136,6 +136,7 @@ void skeleton_daemon() {
     // openlog("uts-server", LOG_PID, LOG_DAEMON);
 }
 
+// log a binary blob as hexadecimal
 void log_hex(rfc3161_context *ct, int priority, char *id,
              unsigned char *content, int content_length) {
     if (priority > ct->loglevel && !ct->stdout_dbg)
@@ -154,22 +155,26 @@ void log_hex(rfc3161_context *ct, int priority, char *id,
     free(out);
 }
 
+// logger function
 void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     // ignore all messages less critical than the loglevel
     // except if the debug flag is set
     if (priority > ct->loglevel && !ct->stdout_dbg)
         return;
+
+    // build the out log message
     FILE *stream;
     char *out;
     size_t len;
     stream = open_memstream(&out, &len);
     va_list args;
-
     va_start(args, fmt);
     vfprintf(stream, fmt, args);
     va_end(args);
     fflush(stream);
     fclose(stream);
+
+    // if in debugging mode, also log to stdout
     if (ct->stdout_dbg) {
         switch (priority) {
         case LOG_EMERG:
@@ -209,6 +214,7 @@ void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     free(out);
 }
 
+// OpenSSL file openner (use for opening the configuration file
 static BIO *bio_open_default(rfc3161_context *ct, const char *filename,
                              int format) {
     BIO *ret;
@@ -229,6 +235,7 @@ static BIO *bio_open_default(rfc3161_context *ct, const char *filename,
     return NULL;
 }
 
+// loading the configuration file and parsing it using the OpenSSL parser
 static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
     long errorline = -1;
     BIO *in;
@@ -260,13 +267,18 @@ static CONF *load_config_file(rfc3161_context *ct, const char *filename) {
     return NULL;
 }
 
+// initialize the rfc3161_context according to the conf_file content
 int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
+    // chdir in configuration file directory
+    // (some parameters like certificates can be declared
+    // relatively to the configuration file).
     chdir(conf_wd);
     int ret = 1;
     int http_counter = 0;
     int numthreads = 42;
 
     NCONF_free(ct->conf);
+    // load the configuration file
     ct->conf = load_config_file(ct, conf_file);
     if (ct->conf == NULL)
         goto end;
@@ -297,6 +309,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
             ;
         }
     }
+    // parse the options to get the civetweb options and a few other things
     for (int i = 0; i < RFC3161_OPTIONS_LEN; i++) {
         int type = rfc3161_options[i].type;
         const char *name = rfc3161_options[i].name;
@@ -311,6 +324,8 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         uts_logger(ct, LOG_DEBUG, "configuration param['%s'] = '%s'", name,
                    value);
         switch (type) {
+        // if it's an http (civetweb) option, put it in the http_options buffer
+        // like civetweb is expected it.
         case HTTP_OPTIONS:
             if (value != NULL) {
                 ct->http_options[http_counter] = name;
@@ -318,6 +333,8 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
                 ct->http_options[http_counter] = value;
                 http_counter++;
             }
+            // recover the num_threads parameter as it's used to
+            // initialize the TS_RESP_CTX pool
             if (strcmp(name, "num_threads") == 0)
                 numthreads = atoi(value);
             break;
@@ -331,6 +348,9 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
 
     if (!add_oid_section(ct, ct->conf))
         ret = 0;
+    // initialize the TS_RESP_CTX pool
+    // as TS_RESP_CTX is not thread safe,
+    // creates 'num_threads' TS_RESP_CTX (one per thread)
     ct->ts_ctx_pool = calloc(numthreads, sizeof(ts_resp_ctx_wrapper));
     ct->numthreads = numthreads;
     for (int i = 0; i < numthreads; i++) {
@@ -339,6 +359,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         if (ct->ts_ctx_pool[i].ts_ctx == NULL)
             ret = 0;
     }
+    // like any good daemon, return to '/' once the configuration is loaded
     chdir("/");
     return ret;
 

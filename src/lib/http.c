@@ -146,6 +146,9 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
 
     bool is_tsq = 0;
 
+    // go through every headers to find Content-Type
+    // and check if it's set to "application/timestamp-query"
+    // if it's the case, set is_tsq (is time-stamp query) to True
     for (int i = 0; i < request_info->num_headers; i++) {
         const char *h_name = request_info->http_headers[i].name;
         const char *h_value = request_info->http_headers[i].value;
@@ -159,13 +162,22 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
 
     char *serial_id = NULL;
 
-    // Send HTTP reply to the client
+    // Send HTTP reply to the client.
+    //
+    // If it's a time-stamp query.
     if (is_tsq) {
+        // Recover query content from http request.
         char *query = calloc(request_info->content_length, sizeof(char));
         int query_len = mg_read(conn, query, request_info->content_length);
 
+        // Log the query as DEBUG log in hexadecimal format
         log_hex(ct, LOG_DEBUG, "query hexdump content", (unsigned char *)query,
                 request_info->content_length);
+        // Get an OpenSSL TS_RESP_CTX (wrapped inside ts_resp_ctx_wrapper
+        // structure).
+        // get_ctxw recovers the first unused TS_RESP_CTX
+        // in the ct->ts_ctx_pool pool of TS_RESP_CTX.
+        // (TS_RESP_CTX are not thread safe)
         ts_resp_ctx_wrapper *ctx_w = get_ctxw(ct);
         if (ctx_w == NULL) {
             resp_code = 500;
@@ -173,56 +185,60 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
                        "Unable to get an OpenSSL ts_context in the pool");
 
         } else {
+            // create the response
             resp_code = create_response(ct, query, query_len, ctx_w->ts_ctx,
                                         &content_length, &content, &serial_id);
+            // free the TS_RESP_CTX used
             ctx_w->available = 1;
         }
+        // respond according to create_response return code
         switch (resp_code) {
         case 200:
-            mg_printf(conn,
-                      "HTTP/1.1 200 OK\r\n"
-                      "Content-Type: application/timestamp-reply\r\n"
-                      "Content-Length: %d\r\n" // Always set Content-Length
-                      "\r\n",
+            mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+                            "Content-Type: application/timestamp-reply\r\n"
+                            "Content-Length: %d\r\n"
+                            "\r\n",
                       (int)content_length);
             mg_write(conn, content, content_length);
             log_hex(ct, LOG_DEBUG, "response hexdump content", content,
                     content_length);
             break;
         case 400:
-            mg_printf(conn,
-                      "HTTP/1.1 400 Bad Request\r\n"
-                      "Content-Type: text/plain\r\n"
-                      "Content-Length: 12\r\n" // Always set Content-Length
-                      "\r\n"
-                      "client error");
+            mg_printf(conn, "HTTP/1.1 400 Bad Request\r\n"
+                            "Content-Type: text/plain\r\n"
+                            "Content-Length: 12\r\n"
+                            "\r\n"
+                            "client error");
             break;
         default:
-            mg_printf(conn,
-                      "HTTP/1.1 500 Internal Server Error\r\n"
-                      "Content-Type: text/plain\r\n"
-                      "Content-Length: 17\r\n" // Always set Content-Length
-                      "\r\n"
-                      "uts-server error");
+            mg_printf(conn, "HTTP/1.1 500 Internal Server Error\r\n"
+                            "Content-Type: text/plain\r\n"
+                            "Content-Length: 17\r\n"
+                            "\r\n"
+                            "uts-server error");
         }
         free(query);
         free(content);
     } else {
+        // default reply if we don't have a time-stamp request
         resp_code = 200;
-        mg_printf(conn,
-                  "HTTP/1.1 200 OK\r\n"
-                  "Content-Type: text/plain\r\n"
-                  "Content-Length: 46\r\n" // Always set Content-Length
-                  "\r\n"
-                  "uts-server, a simple RFC 3161 timestamp server");
+        mg_printf(conn, "HTTP/1.1 200 OK\r\n"
+                        "Content-Type: text/plain\r\n"
+                        "Content-Length: 46\r\n"
+                        "\r\n"
+                        "uts-server, a simple RFC 3161 timestamp server");
     }
+    // initialize a serial_id if not created by create_response
     if (serial_id == NULL) {
         serial_id = calloc(9, sizeof(char));
         serial_id = rand_string(serial_id, 8);
     }
 
+    // some debugging logs
     log_request_debug(request_info, serial_id, ct);
+    // end of some timer stuff
     diff = clock() - start;
+    // log the request
     log_request(request_info, serial_id, ct, resp_code,
                 (diff * 1000000 / CLOCKS_PER_SEC));
     free(serial_id);
