@@ -66,6 +66,7 @@ int add_oid_section(rfc3161_context *ct, CONF *conf) {
     return 1;
 }
 
+// initialize OpenSSL global black magic...
 void init_ssl() {
     SSL_load_error_strings();
     ERR_load_BIO_strings();
@@ -73,6 +74,7 @@ void init_ssl() {
     ERR_load_TS_strings();
 }
 
+// free OpenSSL global black magic...
 void free_ssl() {
     CONF_modules_unload(1);
     EVP_cleanup();
@@ -84,28 +86,41 @@ void free_ssl() {
     OBJ_cleanup();
 }
 
-// recover a ts wrapper
+// Recover a ts wrapper from a pool of TS_RESP_CTX.
+// Used because TS_RESP_CTX is not thread safe.
 ts_resp_ctx_wrapper *get_ctxw(rfc3161_context *ct) {
     ts_resp_ctx_wrapper *ret = NULL;
+    // itarate on the 'numthreads' TS_RESP_CTX we have in the pool
+    // we have as much as TS_RESP_CTX as parallele handlers
     for (int i = 0; i < ct->numthreads; i++) {
+        // wait until we have exclusive access to read and maybe
+        // write the ts_resp_ctx_wrapper structure.
         pthread_mutex_lock(&ct->ts_ctx_pool[i].lock);
+        // if the TS_RESP_CTX is available,
+        // take it and mark it as reserved (available = 0)
         if (ct->ts_ctx_pool[i].available) {
             ct->ts_ctx_pool[i].available = 0;
             ret = &(ct->ts_ctx_pool[i]);
+            // unlock the the ts_resp_ctx_wrapper
             pthread_mutex_unlock(&ct->ts_ctx_pool[i].lock);
+            // return the ts_resp_ctx_wrapper
             return ret;
         }
+        // unlock in case the ts_resp_ctx_wrapper was not available
         pthread_mutex_unlock(&ct->ts_ctx_pool[i].lock);
     }
+    // default return if no TS_RESP_CTX wa available
     return ret;
 }
 
+// create a TS_RESP_CTX (OpenSSL Time-Stamp Response Context)
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
     unsigned long err_code;
     unsigned long err_code_prev = 0;
     TS_RESP_CTX *resp_ctx = NULL;
 
+    // recover the section defining the default tsa
     if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
                    "default_tsa", "tsa");
@@ -115,6 +130,7 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
         uts_logger(ct, LOG_ERR, "failed to initialize tsa context");
         goto end;
     }
+    // recover and set various parameters
     TS_RESP_CTX_set_serial_cb(resp_ctx, serial_cb, NULL);
     if (!TS_CONF_set_crypto_device(conf, section, NULL)) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
@@ -189,6 +205,7 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     }
     return resp_ctx;
 end:
+    // log the OpenSSL errors if any in case of error
     while ((err_code = ERR_get_error())) {
         if (err_code_prev != err_code) {
             uts_logger(ct, LOG_DEBUG, "OpenSSL exception: '%s'",
@@ -199,6 +216,7 @@ end:
         }
         err_code_prev = err_code;
     }
+    // free the TS_RESP_CTX if initialization has faile
     TS_RESP_CTX_free(resp_ctx);
     return NULL;
 }
@@ -215,10 +233,13 @@ int create_response(rfc3161_context *ct, char *query, int query_len,
     unsigned long err_code;
     unsigned long err_code_prev = 0;
 
+    // create the input bio for OpenSSL containing the query
     if ((query_bio = BIO_new_mem_buf(query, query_len)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to parse query");
         goto end;
     }
+
+    // generate the response
     if ((ts_response = TS_RESP_create_response(resp_ctx, query_bio)) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to create ts response");
         goto end;
@@ -252,6 +273,7 @@ end:
         serial_hex = calloc(SERIAL_ID_SIZE, sizeof(char));
         strncpy(serial_hex, " NO ID   ", SERIAL_ID_SIZE + 2);
     }
+
     // get a short version of the serial (150 bits in hexa is a bit long)
     strncpy(*serial_id, serial_hex, SERIAL_ID_SIZE);
 
@@ -271,6 +293,7 @@ end:
                bptr->data, *serial_id);
 
     // emit logs according the return value
+    // and set the return code
     long status = ASN1_INTEGER_get(ts_response->status_info->status);
     switch (status) {
     case TS_STATUS_GRANTED:
@@ -312,7 +335,7 @@ end:
         ret = 500;
     }
 
-    // log the openssl errors
+    // log the OpenSSL errors if any
     while ((err_code = ERR_get_error())) {
         if (err_code_prev != err_code) {
             ERR_load_TS_strings();
@@ -331,6 +354,9 @@ end:
     return ret;
 }
 
+// Build a random serial for each request.
+// It's less painful to manage than an incremental serial stored in a file
+// and a 150 bits size is more than enough to prevent collision.
 static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
     unsigned char data[150] = {0};
     RAND_bytes(data, sizeof(data));
