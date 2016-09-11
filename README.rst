@@ -1,5 +1,9 @@
-uts-server
+uts-server 
 ==========
+
+.. image:: https://github.com/kakwa/uts-server/blob/master/docs/assets/logo_64.png?raw=true
+
+|
 
 .. image:: https://travis-ci.org/kakwa/uts-server.svg?branch=master
     :target: https://travis-ci.org/kakwa/uts-server
