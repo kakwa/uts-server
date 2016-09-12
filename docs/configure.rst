@@ -103,18 +103,7 @@ Section for declaring OID mapping. Just add <name> = <OID> pairs.
 Section [ tsa ]
 ---------------
 
-Section defining which TSA section to use.
-
-+-----------------------------+---------------------------------------------------------------------+--------------------------------------+
-| Parameter                   | Description                                                         | Example Value                        |
-+=============================+=====================================================================+======================================+
-| default_tsa                 | Name of the TSA section to use as default.                          | tsa_config1                          |
-+-----------------------------+---------------------------------------------------------------------+--------------------------------------+
-
-Section [ tsa_config1 ]
------------------------
-
-Example of Time-Stamp section configuration.
+TSA configuration parameters.
 
 +-----------------------------+---------------------------------------------------------------------+--------------------------------------+
 | Parameter                   | Description                                                         | Example Value                        |

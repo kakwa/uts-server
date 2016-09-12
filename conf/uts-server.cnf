@@ -102,7 +102,7 @@ tcp_nodelay = 0
 # Loglevel (debug, info, notice, warn, err, emerg, crit)
 log_level = info
 
-# TSA configuration parameters
+# TSA configuration parameters.
 [ tsa ]
 
 # TSA root directory.
