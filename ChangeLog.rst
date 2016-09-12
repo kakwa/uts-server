@@ -4,6 +4,13 @@ Changelogs
 dev
 ---
 
+0.1.0
+-----
+
+* [impr] adding various goodies (init scripts)
+* [impr] safer crypto algorithm in configuration file
+* [impr] removing useless default_tsa parameter in configuration file
+
 0.0.3
 -----
 
