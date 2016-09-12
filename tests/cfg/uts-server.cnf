@@ -81,13 +81,6 @@ log_level = info
 ####################################################################
 [ tsa ]
 
-# The default TSA section.
-default_tsa = tsa_config1
-
-[ tsa_config1 ]
-
-# These are used by the TSA reply generation only.
-
 # TSA root directory
 dir		= ./pki
 

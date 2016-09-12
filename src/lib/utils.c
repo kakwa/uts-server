@@ -362,7 +362,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     ct->ts_ctx_pool = calloc(numthreads, sizeof(ts_resp_ctx_wrapper));
     ct->numthreads = numthreads;
     for (int i = 0; i < numthreads; i++) {
-        ct->ts_ctx_pool[i].ts_ctx = create_tsctx(ct, ct->conf, NULL, NULL);
+        ct->ts_ctx_pool[i].ts_ctx = create_tsctx(ct, ct->conf, TSA_SECTION, NULL);
         ct->ts_ctx_pool[i].available = 1;
         if (ct->ts_ctx_pool[i].ts_ctx == NULL)
             ret = 0;

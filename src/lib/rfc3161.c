@@ -120,11 +120,11 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     TS_RESP_CTX *resp_ctx = NULL;
 
     // recover the section defining the default tsa
-    if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
-        uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
-                   "default_tsa", "tsa");
-        goto end;
-    }
+    //if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
+    //    uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
+    //               "default_tsa", "tsa");
+    //    goto end;
+    //}
     if ((resp_ctx = TS_RESP_CTX_new()) == NULL) {
         uts_logger(ct, LOG_ERR, "failed to initialize tsa context");
         goto end;

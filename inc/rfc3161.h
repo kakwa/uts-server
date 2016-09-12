@@ -14,6 +14,7 @@
 
 /* Name of config entry that defines the OID file. */
 #define OID_SECTION "oids"
+#define TSA_SECTION "tsa"
 
 // number of char we get to log for the serial
 #define SERIAL_ID_SIZE 8
