@@ -23,11 +23,6 @@ Micro `RFC 3161 Time-Stamp <https://www.ietf.org/rfc/rfc3161.txt>`_ server writt
 
 ----
 
-Status
-------
-
-Alpha
-
 License
 -------
 
