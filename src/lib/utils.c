@@ -340,6 +340,8 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
                 numthreads = atoi(value);
             break;
             ;
+        // if it's a path, resolve the full path first
+        // and put it in the http_options buffer
         case PATH_HTTP_OPTIONS:
             if (value != NULL) {
                 char *ptr = NULL;
@@ -349,6 +351,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
                 ct->http_options[http_counter] = ptr;
                 http_counter++;
                 ct->cust_conf[cust_counter] = ptr;
+                cust_counter++;
             }
             break;
             ;
