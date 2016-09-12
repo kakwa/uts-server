@@ -4,6 +4,11 @@ Changelogs
 dev
 ---
 
+0.0.3
+-----
+
+* [fix ] memleak on configuration parameters loading
+
 0.0.2
 -----
 
