@@ -23,28 +23,6 @@
 #include <syslog.h>
 #include "utils.h"
 
-#define OID_SECTION "oids"
-
-// number of char we get to log for the serial
-#define SERIAL_ID_SIZE 8
-
-/* Reply related functions. */
-static int reply_command(CONF *conf, char *section, char *engine, char *query,
-                         char *passin, char *inkey, const EVP_MD *md,
-                         char *signer, char *chain, const char *policy,
-                         char *in, int token_in, char *out, int token_out,
-                         int text);
-static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data);
-
-#define B_FORMAT_TEXT 0x8000
-#define FORMAT_UNDEF 0
-#define FORMAT_TEXT (1 | B_FORMAT_TEXT) /* Generic text */
-#define FORMAT_ASN1 4                   /* ASN.1/DER */
-
-/*
- * Reply-related method definitions.
- */
-
 int add_oid_section(rfc3161_context *ct, CONF *conf) {
     char *p;
     STACK_OF(CONF_VALUE) * sktmp;
@@ -111,6 +89,27 @@ ts_resp_ctx_wrapper *get_ctxw(rfc3161_context *ct) {
     }
     // default return if no TS_RESP_CTX wa available
     return ret;
+}
+
+// Build a random serial for each request.
+// It's less painful to manage than an incremental serial stored in a file
+// and a 150 bits size is more than enough to prevent collision.
+static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
+    unsigned char data[20] = {0};
+    RAND_bytes(data, sizeof(data));
+    // data[0] &= 0x7F;
+
+    // build big number from our bytes
+    BIGNUM *bn = BN_new();
+    BN_bin2bn(data, sizeof(data), bn);
+
+    // build the ASN1_INTEGER from our BIGNUM
+    ASN1_INTEGER *asnInt = ASN1_INTEGER_new();
+    BN_to_ASN1_INTEGER(bn, asnInt);
+
+    // cleanup
+    BN_free(bn);
+    return asnInt;
 }
 
 // create a TS_RESP_CTX (OpenSSL Time-Stamp Response Context)
@@ -352,25 +351,4 @@ end:
     BIO_free_all(status_bio);
     TS_RESP_free(ts_response);
     return ret;
-}
-
-// Build a random serial for each request.
-// It's less painful to manage than an incremental serial stored in a file
-// and a 150 bits size is more than enough to prevent collision.
-static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
-    unsigned char data[20] = {0};
-    RAND_bytes(data, sizeof(data));
-    // data[0] &= 0x7F;
-
-    // build big number from our bytes
-    BIGNUM *bn = BN_new();
-    BN_bin2bn(data, sizeof(data), bn);
-
-    // build the ASN1_INTEGER from our BIGNUM
-    ASN1_INTEGER *asnInt = ASN1_INTEGER_new();
-    BN_to_ASN1_INTEGER(bn, asnInt);
-
-    // cleanup
-    BN_free(bn);
-    return asnInt;
 }

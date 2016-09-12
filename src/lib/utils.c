@@ -14,10 +14,13 @@
 #include <fcntl.h>
 #include "utils.h"
 
-typedef struct _code {
-    char *c_name;
-    int c_val;
-} CODE;
+static void signal_handler_general(int sig_num) {
+    g_uts_sig = sig_num;
+}
+
+static void signal_handler_up(int sig_num) {
+    g_uts_sig_up = sig_num;
+}
 
 CODE prioritynames[] = {{"alert", LOG_ALERT},
                         {"crit", LOG_CRIT},
@@ -31,14 +34,6 @@ CODE prioritynames[] = {{"alert", LOG_ALERT},
                         {"warn", LOG_WARNING},
                         {"warning", LOG_WARNING},
                         {NULL, -1}};
-
-static void signal_handler_general(int sig_num) {
-    g_uts_sig = sig_num;
-}
-
-static void signal_handler_up(int sig_num) {
-    g_uts_sig_up = sig_num;
-}
 
 int init_pid(char *pidfile_path) {
     // if pidfile_path is null, the user did not request one
@@ -381,6 +376,7 @@ end:
     return 0;
 }
 
+// free the rfc3161_context structure
 void free_uts_context(rfc3161_context *ct) {
     for (int i = 0; i < ct->numthreads; i++) {
         TS_RESP_CTX_free(ct->ts_ctx_pool[i].ts_ctx);

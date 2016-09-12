@@ -1,8 +1,3 @@
-/*
- *    "This product includes software developed by the OpenSSL Project
- *     *    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,10 +10,6 @@
 #include <unistd.h>
 #include <time.h>
 #include "http.h"
-
-struct tuser_data {
-    char *first_message;
-};
 
 static char *rand_string(char *str, size_t size) {
     const char charset[] = "1234567890ABCDEF";
@@ -83,12 +74,6 @@ void log_request_debug(const struct mg_request_info *request_info,
                request_id, request_info->content_length);
     uts_logger(context, LOG_DEBUG, "Request[%s], remote_port: %d", request_id,
                request_info->remote_port);
-    //    uts_logger(context, LOG_DEBUG, "Request[%d], user_data: %s",
-    //    request_id,
-    //               request_info->user_data);
-    //    uts_logger(context, LOG_DEBUG, "Request[%d], conn_data: %s",
-    //    request_id,
-    //               request_info->conn_data);
 }
 
 void log_request(const struct mg_request_info *request_info, char *request_id,
