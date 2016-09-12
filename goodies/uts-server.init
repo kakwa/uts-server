@@ -1,0 +1,99 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:        uts-server
+# Required-Start:    $remote_fs $network $syslog
+# Required-Stop:    $remote_fs $network $syslog
+# Default-Start:    2 3 4 5
+# Default-Stop:        
+# Short-Description:    uts-server
+### END INIT INFO
+
+PIDFILE=/var/run/uts-server/uts-server.pid
+CONF=/etc/uts-server/uts-server.ini
+USER=uts-server
+GROUP=uts-server
+BIN=/usr/bin/uts-server
+OPTS="-d -c $CONF -p $PIDFILE"
+
+. /lib/lsb/init-functions
+
+if [ -f /etc/default/uts-server ]; then
+    . /etc/default/uts-server
+fi
+
+start_uts-server(){
+    log_daemon_msg "Starting uts-server" "uts-server" || true
+    pidofproc -p $PIDFILE $BIN >/dev/null
+    status="$?"
+    if [ $status -eq 0 ]
+    then
+        log_end_msg 1 
+        log_failure_msg \
+        "uts-server already started"
+        return 1
+    fi
+    mkdir -p `dirname $PIDFILE` -m 750
+    chown $USER:$GROUP `dirname $PIDFILE`
+    if start-stop-daemon -c $USER:$GROUP --start \
+        --quiet --pidfile $PIDFILE \
+        --oknodo --exec $BIN -- $OPTS
+    then
+        log_end_msg 0 || true
+        return 0
+    else
+        log_end_msg 1 || true
+        return 1
+    fi
+
+}
+
+stop_uts-server(){
+    log_daemon_msg "Stopping uts-server" "uts-server" || true
+    if start-stop-daemon --stop --quiet \
+        --pidfile $PIDFILE
+    then
+        log_end_msg 0 || true
+        return 0
+    else
+        log_end_msg 1 || true
+        return 1
+    fi
+}
+
+wait_stop(){
+    c=0
+    while pidofproc -p $PIDFILE $BIN >/dev/null && [ $c -lt 10 ]
+    do
+        sleep 0.5
+        c=$(( $c + 1 ))
+    done
+}
+
+case "$1" in
+  start)
+    start_uts-server
+    exit $?
+    ;;
+  stop)
+    stop_uts-server
+    exit $?
+    ;;
+  restart)
+    stop_uts-server
+    wait_stop
+    start_uts-server
+    exit $?
+    ;;
+  status)
+    status_of_proc -p $PIDFILE $BIN "uts-server" \
+        && exit 0 || exit $?
+    ;;
+  *)
+    log_action_msg \
+    "Usage: /etc/init.d/uts-server {start|stop|restart|status}" \
+    || true
+    exit 1
+esac
+
+exit 0
