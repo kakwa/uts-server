@@ -1,0 +1,9 @@
+OPTIONS="-d -c /etc/uts-server/uts-server.cfg"
+
+# if run on unprivileged port
+USER="uts-server"
+
+# if run on privileged port
+# (please, set run_as_user param 
+# in configiration file to a non root user)
+#USER="root"
