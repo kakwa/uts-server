@@ -69,9 +69,10 @@ request_timeout_ms = 30000
 # locations set at OpenSSL compile time.
 #ssl_default_verify_paths = yes
 
+# List of enabled ciphers for ssl.
 # See https://www.openssl.org/docs/manmaster/apps/ciphers.html 
-# for more detailed
-#ssl_cipher_list = ALL:!eNULL
+# or 'man ciphers' for more detailed.
+#ssl_cipher_list = ALL:!eNULL:!SSLv3
 
 # Sets the minimal accepted version of SSL/TLS protocol
 # according to the table:
@@ -127,7 +128,9 @@ default_policy = tsa_policy1
 other_policies = tsa_policy2, tsa_policy3
 
 # Acceptable message digests. (mandatory)
-digests = md5, sha1
+# See https://www.openssl.org/docs/manmaster/apps/dgst.html
+# or 'man dgst' to get the list of available digests
+digests = md5, sha1, sha224, sha256, sha384, sha512
 
 # Time-Stamp accuracy. (optional)
 accuracy = secs:1, millisecs:500, microsecs:100

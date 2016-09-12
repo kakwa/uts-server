@@ -109,7 +109,7 @@ other_policies	= tsa_policy2, tsa_policy3
 
 # Acceptable message digests
 # (mandatory)
-digests		= md5, sha1
+digests		= md5, sha1, sha224, sha256, sha384, sha512
 
 # (optional)
 accuracy	= secs:1, millisecs:500, microsecs:100
