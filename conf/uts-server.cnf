@@ -102,14 +102,8 @@ tcp_nodelay = 0
 # Loglevel (debug, info, notice, warn, err, emerg, crit)
 log_level = info
 
-# Section defining which TSA section to use.
+# TSA configuration parameters
 [ tsa ]
-
-# Name of the TSA section to use as default.
-default_tsa = tsa_config1
-
-# Example of Time-Stamp section configuration.
-[ tsa_config1 ]
 
 # TSA root directory.
 dir = /etc/uts-server/pki
