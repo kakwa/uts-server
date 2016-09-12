@@ -1,0 +1,17 @@
+[Unit]
+Description=UTS-Server RFC 3161 Time-Stamp Server
+After=network.target
+Wants=network.service
+
+[Service]
+Type=forking
+PIDFile=/var/run/uts-server/uts-server.pid
+User=$USER
+EnvironmentFile=/etc/sysconfig/uts-server
+ExecStart=/usr/bin/uts-server $OPTIONS -p /var/run/uts-server/uts-server.pid
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target
