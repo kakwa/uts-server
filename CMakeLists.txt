@@ -8,6 +8,8 @@ set(VERSION 0.1.0)
 option(DEBUG     "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -D_BSD_SOURCE -D_XOPEN_SOURCE=700")
+
 if(DEBUG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g")
     set(CMAKE_BUILD_TYPE Debug)
@@ -19,7 +21,7 @@ add_custom_target(tag
     git push origin ${VERSION}
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DUTS_VERSION='\"${VERSION}\"'")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUTS_VERSION='\"${VERSION}\"'")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
