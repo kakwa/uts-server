@@ -3,7 +3,7 @@ project (uts-server)
 include(ExternalProject)
 
 
-set(VERSION 0.1.0)
+set(VERSION 0.1.1)
 
 option(DEBUG     "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
