@@ -4,6 +4,9 @@ Changelogs
 dev
 ---
 
+* [fix ] correct compilation issues in older gcc/clang caused by missing -D_XOPEN_SOURCE, missing -std and missing headers
+* [impr] exit at the first TS_RESP_CTX (OpenSSL TS response context) initialization failed.
+
 0.1.0
 -----
 
