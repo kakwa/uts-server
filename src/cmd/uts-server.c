@@ -7,6 +7,8 @@
 #include <argp.h>
 #include <sys/syslog.h>
 #include <libgen.h>
+#include <limits.h>
+#include <linux/limits.h>
 #include "http.h"
 
 const char *argp_program_version = UTS_VERSION;
