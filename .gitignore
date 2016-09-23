@@ -60,3 +60,4 @@ vendor/
 
 # rst doc stuff
 _build/
+docs/configure.rst
