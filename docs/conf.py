@@ -173,3 +173,106 @@ html_file_suffix = ".html"
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'uts-server-docs'
+
+# Generate the configure.rst file from the default configuration file
+def gen_param_table(out_file='./configure.rst'):
+    tsq_path = os.path.join(os.path.dirname(__file__),'../conf/uts-server.cnf')
+
+    head = """
+Configuration Parameters
+========================
+\n
+"""
+
+    foot = """
+Full Configuration File
+=======================
+
+.. literalinclude:: ../conf/uts-server.cnf
+    :language: ini
+\n
+"""
+
+    docs = {}
+
+    text_buf = ""
+    cur_section = ""
+
+    out_file = open(out_file, "w")
+
+
+    with open(tsq_path) as f:
+        for line in f.readlines():
+            m = re.search('\[ (\w+) \]', line)
+            if m:
+                section = m.group(1)
+                docs[section] = {'text': text_buf, 'vars': {}}
+                cur_section = section
+                text_buf = ""
+
+            m = re.search('^#[\s](.*)', line)
+            if m:
+                text = m.group(1)
+                if text_buf:
+                    text_buf += '\n'
+                text_buf += text
+
+            m = re.search('^#?([^\s]*)\s*=\s*(.*)', line)
+            if m:
+                var = m.group(1)
+                ex_val = m.group(2)
+                docs[cur_section]['vars'][var] = {'desc': text_buf, 'val': ex_val}
+                text_buf = ""
+
+    max_var = 0
+    max_desc = 0
+    max_val = 0
+    max_section = 0
+
+    for section in docs:
+        max_section = max(len(docs[section]['text']), max_section)
+        for var in docs[section]['vars']:
+            if docs[section]['vars'][var]:
+                max_var = max(len(var), max_var)
+                for line in docs[section]['vars'][var]['desc'].split('\n'):
+                    max_desc = max(len(line), max_desc)
+                max_val = max(len(docs[section]['vars'][var]['val']), max_val)
+
+    def print_line(var, desc, val):
+        out_file.write(\
+             '| ' + var + ' ' * (max_var - len(var)) + \
+            ' | ' + desc + ' ' * (max_desc - len(desc)) + \
+            ' | ' + val + ' ' * (max_val - len(val)) + \
+            ' |\n')
+
+
+    out_file.write(head)
+
+    for section in sorted(docs):
+        out_file.write('Section [ ' + section + ' ]\n')
+        out_file.write('-' * len('Section [ ' + section + ' ]') + '\n')
+        out_file.write('\n')
+        out_file.write(docs[section]['text'] + '\n')
+        out_file.write('\n')
+        out_file.write('+-' + '-' * max_var + '-+-' + '-' * max_desc + '-+-' + '-' * max_val + '-+\n')
+        print_line('Parameter', 'Description', 'Example Value')
+        out_file.write('+=' + '=' * max_var + '=+=' + '=' * max_desc + '=+=' + '=' * max_val + '=+\n')
+        for var in sorted(docs[section]['vars']):
+            if docs[section]['vars'][var]:
+                first = True
+                for line in docs[section]['vars'][var]['desc'].split('\n'):
+                    if first:
+                        first = False
+                        print_line(
+                            re.sub('\*', '\\*', var),
+                            re.sub('\*', '\\*', line),
+                            re.sub('\*', '\\*', docs[section]['vars'][var]['val']),
+                        )
+                    else:
+                        print_line('', re.sub('\*', '\\*', line), '')
+            out_file.write('+-' + '-' * max_var + '-+-' + '-' * max_desc + '-+-' + '-' * max_val + '-+\n')
+        out_file.write('\n')
+    out_file.write(foot)
+    out_file.close()
+
+gen_param_table()
