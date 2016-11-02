@@ -1,11 +1,11 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h> /* for offsetof() macro */
-#include <string.h>
-#include <pthread.h>
 #include <civetweb.h>
 #include <openssl/ts.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stddef.h> /* for offsetof() macro */
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define HTTP_OPTIONS 1
 #define LOGLEVEL_OPTIONS 2

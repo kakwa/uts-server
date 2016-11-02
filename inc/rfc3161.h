@@ -1,16 +1,16 @@
-#include <openssl/opensslconf.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <sys/syslog.h>
+#include "context.h"
 #include <openssl/bio.h>
+#include <openssl/bn.h>
 #include <openssl/err.h>
+#include <openssl/opensslconf.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/ts.h>
-#include <openssl/bn.h>
-#include "context.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/syslog.h>
 
 /* Name of config entry that defines the OID file. */
 #define OID_SECTION "oids"

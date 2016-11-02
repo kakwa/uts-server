@@ -1,15 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <getopt.h>
+#include "http.h"
 #include <argp.h>
-#include <sys/syslog.h>
+#include <ctype.h>
+#include <getopt.h>
 #include <libgen.h>
 #include <limits.h>
 #include <linux/limits.h>
-#include "http.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/syslog.h>
+#include <unistd.h>
 
 const char *argp_program_version = UTS_VERSION;
 
