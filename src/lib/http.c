@@ -1,15 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <civetweb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <sys/syslog.h>
-#include <unistd.h>
-#include <time.h>
 #include "http.h"
+#include <civetweb.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string.h>
+#include <sys/syslog.h>
+#include <time.h>
+#include <unistd.h>
 
 static char *rand_string(char *str, size_t size) {
     const char charset[] = "1234567890ABCDEF";

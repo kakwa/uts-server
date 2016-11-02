@@ -1,18 +1,18 @@
+#include "utils.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <openssl/bio.h>
+#include <signal.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <syslog.h>
-#include <stdarg.h>
-#include <openssl/bio.h>
-#include <errno.h>
 #include <string.h>
-#include <syslog.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include "utils.h"
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <syslog.h>
+#include <syslog.h>
+#include <unistd.h>
 
 static void signal_handler_general(int sig_num) {
     g_uts_sig = sig_num;
@@ -22,18 +22,11 @@ static void signal_handler_up(int sig_num) {
     g_uts_sig_up = sig_num;
 }
 
-CODE prioritynames[] = {{"alert", LOG_ALERT},
-                        {"crit", LOG_CRIT},
-                        {"debug", LOG_DEBUG},
-                        {"emerg", LOG_EMERG},
-                        {"err", LOG_ERR},
-                        {"error", LOG_ERR},
-                        {"info", LOG_INFO},
-                        {"notice", LOG_NOTICE},
-                        {"panic", LOG_EMERG},
-                        {"warn", LOG_WARNING},
-                        {"warning", LOG_WARNING},
-                        {NULL, -1}};
+CODE prioritynames[] = {
+    {"alert", LOG_ALERT},  {"crit", LOG_CRIT},       {"debug", LOG_DEBUG},
+    {"emerg", LOG_EMERG},  {"err", LOG_ERR},         {"error", LOG_ERR},
+    {"info", LOG_INFO},    {"notice", LOG_NOTICE},   {"panic", LOG_EMERG},
+    {"warn", LOG_WARNING}, {"warning", LOG_WARNING}, {NULL, -1}};
 
 int init_pid(char *pidfile_path) {
     // if pidfile_path is null, the user did not request one
@@ -362,12 +355,13 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
     ct->ts_ctx_pool = calloc(numthreads, sizeof(ts_resp_ctx_wrapper));
     ct->numthreads = numthreads;
     for (int i = 0; i < numthreads; i++) {
-        ct->ts_ctx_pool[i].ts_ctx = create_tsctx(ct, ct->conf, TSA_SECTION, NULL);
+        ct->ts_ctx_pool[i].ts_ctx =
+            create_tsctx(ct, ct->conf, TSA_SECTION, NULL);
         ct->ts_ctx_pool[i].available = 1;
-        if (ct->ts_ctx_pool[i].ts_ctx == NULL){
+        if (ct->ts_ctx_pool[i].ts_ctx == NULL) {
             ret = 0;
-	    break;
-	}
+            break;
+        }
     }
     // like any good daemon, return to '/' once the configuration is loaded
     chdir("/");

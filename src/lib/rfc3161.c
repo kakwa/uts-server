@@ -3,25 +3,25 @@
  *     *    for use in the OpenSSL Toolkit (http://www.OpenSSL.org/)"
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "utils.h"
 #include <civetweb.h>
-#include <openssl/opensslconf.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <sys/syslog.h>
 #include <openssl/bio.h>
+#include <openssl/bn.h>
 #include <openssl/err.h>
-#include <openssl/ssl.h>
+#include <openssl/opensslconf.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
+#include <openssl/ssl.h>
 #include <openssl/ts.h>
-#include <openssl/bn.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string.h>
+#include <sys/syslog.h>
 #include <syslog.h>
-#include "utils.h"
 
 int add_oid_section(rfc3161_context *ct, CONF *conf) {
     char *p;
@@ -120,7 +120,7 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     TS_RESP_CTX *resp_ctx = NULL;
 
     // recover the section defining the default tsa
-    //if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
+    // if ((section = TS_CONF_get_tsa_section(conf, section)) == NULL) {
     //    uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
     //               "default_tsa", "tsa");
     //    goto end;
