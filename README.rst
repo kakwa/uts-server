@@ -28,6 +28,26 @@ License
 
 Released under the MIT Public License
 
+What is RFC 3161?
+-----------------
+
+An RFC 3161 time-stamp is basically a cryptographic signature with a date attached.
+
+Roughly, it works as follow:
+
+1. A client application sends an hash of the data it wants to time-stamp to a Time-Stamp authority server.
+2. The Time-Stamp authority server retrieves the current date, concatenates it with the hash and uses its private key to create the time-stamp (kind a like a signature).
+3. The Time-Stamp authority server return the generated time-stamp to the client application.
+
+Then a client can verify the piece of data with the time-stamp using the Certificate Authority of the time-stamp key pair (X509 certificates).
+
+It gives a cryptographic proof of a piece of data content, like a file, at a given time.
+
+Some use cases:
+
+* time-stamp log files at rotation time.
+* time-stamp file at upload to prove it was delivered in due time or not.
+
 Quick Start
 -----------
 
