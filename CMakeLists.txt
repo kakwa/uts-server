@@ -75,3 +75,8 @@ target_link_libraries(uts-server
 INSTALL(TARGETS uts-server
     RUNTIME DESTINATION bin
 )
+
+
+if(BUNDLE_CIVETWEB)
+    add_dependencies(uts-server civetweb)
+endif(BUNDLE_CIVETWEB)
