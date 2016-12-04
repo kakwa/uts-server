@@ -306,8 +306,8 @@ end:
     uts_logger(ct, LOG_DEBUG, "Request[%s], TimeStamp OpenSSL status: |%s",
                *serial_id, bptr->data);
 
-    // emit logs according the return value
-    // and set the return code
+// emit logs according the return value
+// and set the return code
 #ifdef OPENSSL_API_1_1
     long status = ASN1_INTEGER_get(
         TS_STATUS_INFO_get0_status(TS_RESP_get_status_info(ts_response)));
