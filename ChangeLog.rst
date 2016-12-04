@@ -4,6 +4,11 @@ Changelogs
 dev
 ---
 
+0.1.2
+-----
+
+* [fix ] adding support for OpenSSL 1.1 (with compatibility with 1.0)
+
 0.1.1
 -----
 
