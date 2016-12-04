@@ -3,6 +3,7 @@
 #include <openssl/bn.h>
 #include <openssl/err.h>
 #include <openssl/opensslconf.h>
+#include <openssl/opensslv.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
 #include <openssl/ts.h>
@@ -11,12 +12,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/syslog.h>
-#include <openssl/opensslv.h>
 
 #if OPENSSL_VERSION_NUMBER < 0x10000000L
 #error OpenSSL version too old
 #endif
-#if OPENSSL_VERSION_NUMBER < 0x10100000L && OPENSSL_VERSION_NUMBER >= 0x10000000L
+#if OPENSSL_VERSION_NUMBER < 0x10100000L &&                                    \
+    OPENSSL_VERSION_NUMBER >= 0x10000000L
 #define OPENSSL_API_1_0
 #endif
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
