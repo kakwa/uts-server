@@ -260,6 +260,8 @@ end:
 
     char *serial_hex = NULL;
     *serial_id = calloc(SERIAL_ID_SIZE + 1, sizeof(char));
+
+#ifdef OPENSSL_API_1_1
     // if we have a proper response, we recover the serial to identify the logs
     if (TS_RESP_get_tst_info(ts_response) != NULL &&
         TS_TST_INFO_get_serial(TS_RESP_get_tst_info(ts_response)) != NULL) {
@@ -272,6 +274,19 @@ end:
         serial_hex = calloc(SERIAL_ID_SIZE, sizeof(char));
         strncpy(serial_hex, " NO ID   ", SERIAL_ID_SIZE + 2);
     }
+#endif
+#ifdef OPENSSL_API_1_0
+    if (ts_response->tst_info != NULL &&
+        ts_response->tst_info->serial != NULL) {
+        ASN1_INTEGER *serial = ts_response->tst_info->serial;
+        BIGNUM *serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
+        serial_hex = BN_bn2hex(serial_bn);
+        BN_free(serial_bn);
+    } else {
+        serial_hex = calloc(SERIAL_ID_SIZE, sizeof(char));
+        strncpy(serial_hex, " NO ID   ", SERIAL_ID_SIZE + 2);
+    }
+#endif
 
     // get a short version of the serial (150 bits in hexa is a bit long)
     strncpy(*serial_id, serial_hex, SERIAL_ID_SIZE);
@@ -293,8 +308,13 @@ end:
 
     // emit logs according the return value
     // and set the return code
+#ifdef OPENSSL_API_1_1
     long status = ASN1_INTEGER_get(
         TS_STATUS_INFO_get0_status(TS_RESP_get_status_info(ts_response)));
+#endif
+#ifdef OPENSSL_API_1_0
+    long status = ASN1_INTEGER_get(ts_response->status_info->status);
+#endif
     switch (status) {
     case TS_STATUS_GRANTED:
         uts_logger(ct, LOG_DEBUG, "Request[%s], timestamp request granted",
