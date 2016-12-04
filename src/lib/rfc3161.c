@@ -57,7 +57,6 @@ void free_ssl() {
     CONF_modules_unload(1);
     EVP_cleanup();
     // ENGINE_cleanup();
-    ERR_remove_state(0);
     CRYPTO_cleanup_all_ex_data();
     EVP_cleanup();
     ERR_free_strings();
@@ -256,15 +255,16 @@ end:
 
     // recover some status and error messages
     BUF_MEM *bptr;
-    TS_STATUS_INFO_print_bio(status_bio, ts_response->status_info);
+    TS_STATUS_INFO_print_bio(status_bio, TS_RESP_get_status_info(ts_response));
     BIO_get_mem_ptr(status_bio, &bptr);
 
     char *serial_hex = NULL;
     *serial_id = calloc(SERIAL_ID_SIZE + 1, sizeof(char));
     // if we have a proper response, we recover the serial to identify the logs
-    if (ts_response->tst_info != NULL &&
-        ts_response->tst_info->serial != NULL) {
-        ASN1_INTEGER *serial = ts_response->tst_info->serial;
+    if (TS_RESP_get_tst_info(ts_response) != NULL &&
+        TS_TST_INFO_get_serial(TS_RESP_get_tst_info(ts_response)) != NULL) {
+        const ASN1_INTEGER *serial =
+            TS_TST_INFO_get_serial(TS_RESP_get_tst_info(ts_response));
         BIGNUM *serial_bn = ASN1_INTEGER_to_BN(serial, NULL);
         serial_hex = BN_bn2hex(serial_bn);
         BN_free(serial_bn);
@@ -293,7 +293,8 @@ end:
 
     // emit logs according the return value
     // and set the return code
-    long status = ASN1_INTEGER_get(ts_response->status_info->status);
+    long status = ASN1_INTEGER_get(
+        TS_STATUS_INFO_get0_status(TS_RESP_get_status_info(ts_response)));
     switch (status) {
     case TS_STATUS_GRANTED:
         uts_logger(ct, LOG_DEBUG, "Request[%s], timestamp request granted",
