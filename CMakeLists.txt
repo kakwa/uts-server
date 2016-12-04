@@ -30,6 +30,7 @@ if(BUNDLE_CIVETWEB)
     ExternalProject_Add( civetweb
        GIT_REPOSITORY https://github.com/civetweb/civetweb
        GIT_TAG v1.8
+       PATCH_COMMAND sed -i s/__DATE__/"110973"/ src/main.c
        INSTALL_DIR /usr/local
        CMAKE_ARGS .. -DCMAKE_INSTALL_PREFIX=/usr
         -DCIVETWEB_DISABLE_CGI=ON
