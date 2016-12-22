@@ -39,7 +39,7 @@ endif()
 if(BUNDLE_CIVETWEB)
     ExternalProject_Add( civetweb
        GIT_REPOSITORY https://github.com/kakwa/civetweb
-       PATCH_COMMAND sed -i s/__DATE__/"110973"/ src/main.c
+       PATCH_COMMAND sed -i s/__DATE__/"110973"/ src/main.c src/civetweb.c
        INSTALL_DIR /usr/local
        CMAKE_ARGS .. -DCMAKE_INSTALL_PREFIX=/usr
         -DCIVETWEB_DISABLE_CGI=ON
