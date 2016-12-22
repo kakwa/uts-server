@@ -25,11 +25,20 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DUTS_VERSION='\"${VERSION}\"'")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
+find_package(OpenSSL REQUIRED)
+MESSAGE(STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
+MESSAGE(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
+MESSAGE(STATUS "OpenSSL version: ${OPENSSL_VERSION}")
+
+if(${OPENSSL_VERSION} VERSION_GREATER 1.0.1)
+    set(OPENSSL_API_1_1 ON)
+else()
+    set(OPENSSL_API_1_1 OFF)
+endif()
 
 if(BUNDLE_CIVETWEB)
     ExternalProject_Add( civetweb
-       GIT_REPOSITORY https://github.com/civetweb/civetweb
-       GIT_TAG v1.8
+       GIT_REPOSITORY https://github.com/kakwa/civetweb
        PATCH_COMMAND sed -i s/__DATE__/"110973"/ src/main.c
        INSTALL_DIR /usr/local
        CMAKE_ARGS .. -DCMAKE_INSTALL_PREFIX=/usr
@@ -38,7 +47,11 @@ if(BUNDLE_CIVETWEB)
         -DBUILD_SHARED_LIBS=OFF
         -DCIVETWEB_DISABLE_CGI=ON
         -DCIVETWEB_SERVE_NO_FILES=ON
+        -DCIVETWEB_ENABLE_IPV6=ON
+        -DCIVETWEB_DISABLE_CACHING=ON
         -DBUILD_TESTING=OFF
+        -DCIVETWEB_SSL_OPENSSL_API_1_1=${OPENSSL_API_1_1}
+        -DCIVETWEB_ENABLE_SSL_DYNAMIC_LOADING=OFF
        INSTALL_COMMAND make install DESTDIR=${CMAKE_CURRENT_SOURCE_DIR}/vendor/
     )
     set(LIBCIVETWEB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/include")
@@ -47,10 +60,6 @@ if(BUNDLE_CIVETWEB)
 else(BUNDLE_CIVETWEB)
     find_package(libcivetweb REQUIRED)
 endif(BUNDLE_CIVETWEB)
-
-find_package(OpenSSL REQUIRED)
-MESSAGE(STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
-MESSAGE(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 
 MESSAGE( STATUS "Find Header Directory for libcivetweb: " ${LIBCIVETWEB_INCLUDE_DIR})
     MESSAGE( STATUS "Find Dynamic Library for libcivetweb:  " ${LIBCIVETWEB_LIBRARIES})
