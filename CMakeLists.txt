@@ -38,6 +38,7 @@ endif()
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     set(SED_FREEBSD "*.c")
+    find_package(argp REQUIRED)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
 if(BUNDLE_CIVETWEB)
@@ -60,7 +61,7 @@ if(BUNDLE_CIVETWEB)
     )
     set(LIBCIVETWEB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/include")
     set(LIBCIVETWEB_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/lib/libcivetweb.a")
-    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl -lpthread -lrt")
+    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread -lrt")
 else(BUNDLE_CIVETWEB)
     find_package(libcivetweb REQUIRED)
 endif(BUNDLE_CIVETWEB)
@@ -71,6 +72,7 @@ include_directories(
     ./inc/
     ${LIBCIVETWEB_INCLUDE_DIR}
     ${OPENSSL_INCLUDE_DIR}
+    ${ARGP_INCLUDE_DIR}
 )
 
 add_executable(uts-server
@@ -83,6 +85,7 @@ add_executable(uts-server
 target_link_libraries(uts-server
     ${OPENSSL_LIBRARIES}
     ${LIBCIVETWEB_LIBRARIES}
+    ${ARGP_LIBRARIES}
 )
 
 INSTALL(TARGETS uts-server
