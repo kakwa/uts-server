@@ -4,7 +4,11 @@
 #include <getopt.h>
 #include <libgen.h>
 #include <limits.h>
+#ifdef BSD
+#include <sys/syslimits.h>
+#else
 #include <linux/limits.h>
+#endif /* BSD */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -94,8 +98,11 @@ int main(int argc, char **argv) {
     // other uts-server files (ca, certs, etc) can be declared relatively to the
     // configuration file
     char *conf_wd = strdup(conf_fp);
+#ifdef BSD
+    conf_wd = dirname(conf_wd);
+#else
     dirname(conf_wd);
-
+#endif /* BSD */
     if (args.daemonize)
         skeleton_daemon();
 
