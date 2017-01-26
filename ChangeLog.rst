@@ -4,6 +4,11 @@ Changelogs
 dev
 ---
 
+* [impr] add support for FreeBSD
+
+0.1.3
+-----
+
 0.1.2
 -----
 
