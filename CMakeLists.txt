@@ -39,6 +39,7 @@ endif()
 IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     set(SED_FREEBSD "*.c")
     find_package(argp REQUIRED)
+    add_definitions(-DBSD)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
 if(BUNDLE_CIVETWEB)
