@@ -37,7 +37,7 @@ else()
 endif()
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    set(SED_FREEBSD "*.c")
+    set(SED_FREEBSD "*.c.bak")
     find_package(argp REQUIRED)
     add_definitions(-DBSD)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
