@@ -1,13 +1,15 @@
 Changelogs
 ==========
 
-dev
----
+0.1.4
+-----
 
-* [impr] add support for FreeBSD
+* [impr] more portable code
 
 0.1.3
 -----
+
+* [impr] add support for FreeBSD
 
 0.1.2
 -----
