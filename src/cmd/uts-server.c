@@ -11,7 +11,6 @@
 #endif /* BSD */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/syslog.h>
 #include <unistd.h>
 
@@ -97,12 +96,9 @@ int main(int argc, char **argv) {
     // get the directory containing the configuration file
     // other uts-server files (ca, certs, etc) can be declared relatively to the
     // configuration file
-    char *conf_wd = strdup(conf_fp);
-#ifdef BSD
-    conf_wd = dirname(conf_wd);
-#else
-    dirname(conf_wd);
-#endif /* BSD */
+    char *tmp_wd = strdup(conf_fp);
+    char *conf_wd = dirname(tmp_wd);
+
     if (args.daemonize)
         skeleton_daemon();
 
@@ -124,6 +120,7 @@ int main(int argc, char **argv) {
 
     syslog(LOG_NOTICE, "uts-server daemon terminated.");
     free(conf_wd);
+    free(tmp_wd);
     closelog();
 
     return ret;
