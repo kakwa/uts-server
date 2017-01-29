@@ -10,6 +10,7 @@ option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
 
 option(STATIC "static linked binary" OFF)
 option(LINKDL "dynamicaly link dl" OFF)
+option(LINKDL "dynamicaly link gcc_s" OFF)
 
 IF(STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -23,6 +24,10 @@ ENDIF(STATIC)
 IF(LINK_DL)
     set(DL_LIBRARIES 'dl')
 ENDIF(LINK_DL)
+
+IF(LINK_GCC_S)
+    set(GCC_S_LIBRARIES 'gcc_s')
+ENDIF(LINK_GCC_S)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700")
 
@@ -104,6 +109,7 @@ target_link_libraries(uts-server
     ${LIBCIVETWEB_LIBRARIES}
     ${ARGP_LIBRARIES}
     ${DL_LIBRARIES}
+    ${GCC_S_LIBRARIES}
 )
 
 INSTALL(TARGETS uts-server
