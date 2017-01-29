@@ -10,7 +10,7 @@ option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
 
 option(STATIC "static linked binary" OFF)
 option(LINKDL "dynamicaly link dl" OFF)
-option(LINKDL "dynamicaly link gcc_s" OFF)
+option(LINK_GCC_S "dynamicaly link gcc_s" OFF)
 
 IF(STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
