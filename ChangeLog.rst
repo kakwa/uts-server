@@ -1,6 +1,11 @@
 Changelogs
 ==========
 
+0.1.6
+-----
+
+* [fix ] option declaration for LINK_GCC_S
+
 0.1.5
 -----
 
