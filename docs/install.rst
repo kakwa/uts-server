@@ -40,3 +40,9 @@ uts-server is compiled using cmake:
     # Compile statically
     $ cmake . -DSTATIC=ON
     $ make
+
+    # Sometimes it might be necessary to link against glibc/dl.
+    # In that case, the resulting binary is only partially static,
+    # but it's not possible to do better than that.
+    $ cmake . -DSTATIC=ON -DLINK_DL=ON
+    $ make
