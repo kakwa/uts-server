@@ -1,6 +1,11 @@
 Changelogs
 ==========
 
+0.1.5
+-----
+
+* [impr] add support for a static build
+
 0.1.4
 -----
 
