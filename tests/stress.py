@@ -14,8 +14,8 @@ with open(tsq_path) as f:
 counter=0
 old_time = time.time()
 while True:
-    h1 = httplib.HTTPConnection('localhost:2020')
-    #h1 = httplib.HTTPSConnection('localhost:2020', context=ssl._create_unverified_context())
+    #h1 = httplib.HTTPConnection('localhost:2020')
+    h1 = httplib.HTTPSConnection('freebsd.kakwa.fr:2020', context=ssl._create_unverified_context())
     h1.request('POST', '/', body, {"Content-Type": "application/timestamp-query"}) 
     response = h1.getresponse()
     h1.close()

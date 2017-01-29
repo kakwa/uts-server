@@ -3,13 +3,13 @@ project (uts-server)
 include(ExternalProject)
 
 
-set(VERSION 0.1.5)
+set(VERSION 0.1.6)
 
 option(DEBUG     "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
 
 option(STATIC "static linked binary" OFF)
-option(LINKDL "dynamicaly link dl" OFF)
+option(LINK_DL "dynamicaly link dl" OFF)
 option(LINK_GCC_S "dynamicaly link gcc_s" OFF)
 
 IF(STATIC)
