@@ -36,3 +36,7 @@ uts-server is compiled using cmake:
     # Compile with debug flags
     $ cmake . -DDEBUG=ON
     $ make
+
+    # Compile statically
+    $ cmake . -DSTATIC=ON
+    $ make
