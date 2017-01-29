@@ -8,6 +8,17 @@ set(VERSION 0.1.4)
 option(DEBUG     "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
 
+option(STATIC "static linked binary" OFF)
+
+IF(STATIC)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    set(BUILD_SHARED_LIBRARIES OFF)
+    set(CMAKE_EXE_LINKER_FLAGS "-static")
+    set(OPENSSL_USE_STATIC_LIBS ON)
+    set(ARGP_USE_STATIC_LIBS ON)
+    set(CIVETWEB_USE_STATIC_LIBS ON)
+ENDIF(STATIC)
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700")
 
 if(DEBUG)
