@@ -48,12 +48,17 @@ Some use cases:
 * time-stamp log files at rotation time.
 * time-stamp file at upload to prove it was delivered in due time or not.
 
-Quick Start
------------
+Quick (and dirty) Testing
+-------------------------
+
+Here a few steps to quickly trying out uts-server, for production setup, please compile civetweb externally and create proper CA and certificates:
 
 .. sourcecode:: bash
 
     # Building with civetweb embedded (will recover civetweb from github).
+    # Note: the BUNDLE_CIVETWEB option is only here for fast testing purpose
+    # The recommended way to deploy uts-server in production is to build civetweb
+    # separatly and to link against it.
     $ cmake . -DBUNDLE_CIVETWEB=ON
     $ make
     
