@@ -2,15 +2,14 @@ cmake_minimum_required (VERSION 2.6)
 project (uts-server)
 include(ExternalProject)
 
-
 set(VERSION 0.1.6)
 
-option(DEBUG     "compile with debug symbol"    OFF)
-option(BUNDLE_CIVETWEB     "bundle civetweb with uts-server"    OFF)
-
-option(STATIC "static linked binary" OFF)
-option(LINK_DL "dynamicaly link dl" OFF)
-option(LINK_GCC_S "dynamicaly link gcc_s" OFF)
+option(DEBUG              "compile with debug symbol"    OFF)
+option(BUNDLE_CIVETWEB    "bundle civetweb with uts-server"    OFF)
+option(STATIC             "static linked binary" OFF)
+option(LINK_DL            "dynamicaly link dl" OFF)
+option(LINK_GCC_S         "dynamicaly link gcc_s" OFF)
+option(CIVETWEB_CUST_ARGS "Custom args for civetweb (if civetweb is bundled)" "")
 
 IF(STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -78,7 +77,9 @@ if(BUNDLE_CIVETWEB)
         -DCIVETWEB_DISABLE_CACHING=ON
         -DBUILD_TESTING=OFF
         -DCIVETWEB_SSL_OPENSSL_API_1_1=${OPENSSL_API_1_1}
+        -DOPENSSL_USE_STATIC_LIBS=${OPENSSL_USE_STATIC_LIBS}
         -DCIVETWEB_ENABLE_SSL_DYNAMIC_LOADING=OFF
+        ${CIVETWEB_CUST_ARGS}
        INSTALL_COMMAND make install DESTDIR=${CMAKE_CURRENT_SOURCE_DIR}/vendor/
     )
     set(LIBCIVETWEB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/include")
@@ -115,7 +116,6 @@ target_link_libraries(uts-server
 INSTALL(TARGETS uts-server
     RUNTIME DESTINATION bin
 )
-
 
 if(BUNDLE_CIVETWEB)
     add_dependencies(uts-server civetweb)
