@@ -1,12 +1,16 @@
 Changelogs
 ==========
 
+0.1.7
+-----
+
+* [doc ] add warnings to explicitely state the BUNDLE_CIVETWEB option as test/dev only
+* [impr] add option for easily linking lib pthread (mainly for static linking)
+
 0.1.6
 -----
 
 * [fix ] option declaration for LINK_GCC_S
-* [doc ] add warnings to explicitely state the BUNDLE_CIVETWEB option as test/dev only
-* [impr] add option for easily linking lib pthread (mainly for static linking)
 
 0.1.5
 -----
