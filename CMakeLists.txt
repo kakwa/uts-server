@@ -10,11 +10,11 @@ option(STATIC             "static linked binary" OFF)
 option(LINK_DL            "dynamicaly link dl" OFF)
 option(LINK_GCC_S         "dynamicaly link gcc_s" OFF)
 option(CIVETWEB_CUST_ARGS "Custom args for civetweb (if civetweb is bundled)" "")
+option(LINK_PTHREAD       "dynamicaly link pthread" OFF)
 
 IF(STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-    set(BUILD_SHARED_LIBRARIES OFF)
-    set(CMAKE_EXE_LINKER_FLAGS "-static")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     set(OPENSSL_USE_STATIC_LIBS ON)
     set(ARGP_USE_STATIC_LIBS ON)
     set(CIVETWEB_USE_STATIC_LIBS ON)
@@ -27,6 +27,10 @@ ENDIF(LINK_DL)
 IF(LINK_GCC_S)
     set(GCC_S_LIBRARIES 'gcc_s')
 ENDIF(LINK_GCC_S)
+
+IF(LINK_PTHREAD)
+    set(PTHREAD_LIBRARIES 'pthread')
+ENDIF(LINK_PTHREAD)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700")
 
@@ -111,6 +115,7 @@ target_link_libraries(uts-server
     ${ARGP_LIBRARIES}
     ${DL_LIBRARIES}
     ${GCC_S_LIBRARIES}
+    ${PTHREAD_LIBRARIES}
 )
 
 INSTALL(TARGETS uts-server

@@ -41,9 +41,9 @@ uts-server is compiled using cmake:
 
     # Compile statically
     # (in some cases, it might be necessary to still
-    # link some libraries like dl or gcc_s, if necessary,
-    # add -DDL_LINK=ON and/or -DGCC_S_LINK=ON)
-    $ cmake . -DSTATIC=ON # -DDL_LINK=ON -DGCC_S_LINK=ON
+    # link some libraries like dl or gcc_s or pthread, if necessary,
+    # add -DDL_LINK=ON and/or -DGCC_S_LINK=ON -DPTHREAD_LINK=ON)
+    $ cmake . -DSTATIC=ON # -DDL_LINK=ON -DGCC_S_LINK=ON -DPTHREAD_LINK=ON
     $ make
 
 .. warning::
