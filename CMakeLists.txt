@@ -72,7 +72,6 @@ if(BUNDLE_CIVETWEB)
        PATCH_COMMAND sed -i ${SED_FREEBSD} s/__DATE__/"110973"/ src/main.c src/civetweb.c
        INSTALL_DIR /usr/local
        CMAKE_ARGS .. -DCMAKE_INSTALL_PREFIX=/usr
-        -DCIVETWEB_DISABLE_CGI=ON
         -DCIVETWEB_ENABLE_CXX=OFF
         -DBUILD_SHARED_LIBS=OFF
         -DCIVETWEB_DISABLE_CGI=ON
