@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project (uts-server)
 include(ExternalProject)
 
-set(VERSION 0.1.6)
+set(VERSION 0.1.7)
 
 option(DEBUG              "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB    "bundle civetweb with uts-server"    OFF)
