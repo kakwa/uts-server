@@ -63,19 +63,18 @@ else()
 endif()
 endif()
 
+
 IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     set(SED_FREEBSD "*.c.bak")
     find_package(argp REQUIRED)
     add_definitions(-DBSD)
-    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread -lrt")
+    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lrt")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
     find_package(argp REQUIRED)
     add_definitions(-DBSD)
-    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
-
 
 
 if(BUNDLE_CIVETWEB)
@@ -99,6 +98,7 @@ if(BUNDLE_CIVETWEB)
     )
     set(LIBCIVETWEB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/include")
     set(LIBCIVETWEB_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/lib/libcivetweb.a")
+    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread")
 else(BUNDLE_CIVETWEB)
     find_package(libcivetweb REQUIRED)
 endif(BUNDLE_CIVETWEB)
