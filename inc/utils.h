@@ -16,6 +16,7 @@ void log_hex(rfc3161_context *ct, int priority, char *id,
 int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd);
 static char *rand_string(char *str, size_t size);
 void free_uts_context(rfc3161_context *ct);
+const char *null_undef(const char * in);
 
 // some global variable to handle signals
 int g_uts_sig_up;
