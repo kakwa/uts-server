@@ -54,20 +54,20 @@ void log_request_debug(const struct mg_request_info *request_info,
     for (int i = 0; i < request_info->num_headers; i++) {
         uts_logger(context, LOG_DEBUG, "Request[%s], Header[%s]: %s",
                    request_id, request_info->http_headers[i].name,
-                   request_info->http_headers[i].value);
+                   null_undef(request_info->http_headers[i].value));
     }
     uts_logger(context, LOG_DEBUG, "Request[%s], request_method: %s",
-               request_id, request_info->request_method);
+               request_id, null_undef(request_info->request_method));
     uts_logger(context, LOG_DEBUG, "Request[%s], request_uri: %s", request_id,
-               request_info->request_uri);
+               null_undef(request_info->request_uri));
     uts_logger(context, LOG_DEBUG, "Request[%s], local_uri: %s", request_id,
-               request_info->local_uri);
+               null_undef(request_info->local_uri));
     uts_logger(context, LOG_DEBUG, "Request[%s], http_version: %s", request_id,
-               request_info->http_version);
+               null_undef(request_info->http_version));
     uts_logger(context, LOG_DEBUG, "Request[%s], query_string: %s", request_id,
-               request_info->query_string);
+               null_undef(request_info->query_string));
     uts_logger(context, LOG_DEBUG, "Request[%s], remote_addr: %s", request_id,
-               request_info->remote_addr);
+               null_undef(request_info->remote_addr));
     uts_logger(context, LOG_DEBUG, "Request[%s], is_ssl: %d", request_id,
                request_info->is_ssl);
     uts_logger(context, LOG_DEBUG, "Request[%s], content_length: %d",
@@ -97,9 +97,10 @@ void log_request(const struct mg_request_info *request_info, char *request_id,
     uts_logger(context, LOG_INFO, "Request[%s], remote_addr[%s] ssl[%d] "
                                   "uri[%s] http_resp_code[%d] duration[%d us] "
                                   "user-agent[%s] content-type[%s]",
-               request_id, request_info->remote_addr, request_info->is_ssl,
-               request_info->local_uri, response_code, timer, user_agent,
-               content_type);
+               request_id, null_undef(request_info->remote_addr),
+               request_info->is_ssl, null_undef(request_info->local_uri),
+               response_code, timer, null_undef(user_agent),
+               null_undef(content_type));
 }
 
 // This function will be called by civetweb on every new request.
