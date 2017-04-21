@@ -1,6 +1,11 @@
 Changelogs
 ==========
 
+0.1.8
+
+* [impr] add OpenBSD support
+* [impr] add LibreSSL support
+
 0.1.7
 -----
 
