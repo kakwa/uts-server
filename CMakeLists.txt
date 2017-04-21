@@ -55,12 +55,16 @@ MESSAGE(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 MESSAGE(STATUS "OpenSSL version: ${OPENSSL_VERSION}")
 MESSAGE(STATUS "OS Detected: ${CMAKE_SYSTEM_NAME}")
 
+
+find_package(LibreSSL)
+MESSAGE(STATUS "LibreSSL Detected: ${IS_LIBRESSL}")
+
 if(NOT(DEFINED OPENSSL_API_1_1))
-if(${OPENSSL_VERSION} VERSION_GREATER 1.0.99)
-    set(OPENSSL_API_1_1 ON)
-else()
-    set(OPENSSL_API_1_1 OFF)
-endif()
+    if(${OPENSSL_VERSION} VERSION_GREATER 1.0.99 AND NOT(${IS_LIBRESSL}))
+        set(OPENSSL_API_1_1 ON)
+    else()
+        set(OPENSSL_API_1_1 OFF)
+    endif()
 endif()
 
 
