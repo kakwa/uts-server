@@ -53,18 +53,30 @@ find_package(OpenSSL REQUIRED)
 MESSAGE(STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
 MESSAGE(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 MESSAGE(STATUS "OpenSSL version: ${OPENSSL_VERSION}")
+MESSAGE(STATUS "OS Detected: ${CMAKE_SYSTEM_NAME}")
 
+if(NOT(DEFINED OPENSSL_API_1_1))
 if(${OPENSSL_VERSION} VERSION_GREATER 1.0.99)
     set(OPENSSL_API_1_1 ON)
 else()
     set(OPENSSL_API_1_1 OFF)
+endif()
 endif()
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
     set(SED_FREEBSD "*.c.bak")
     find_package(argp REQUIRED)
     add_definitions(-DBSD)
+    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread -lrt")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
+    find_package(argp REQUIRED)
+    add_definitions(-DBSD)
+    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
+
+
 
 if(BUNDLE_CIVETWEB)
     ExternalProject_Add( civetweb
@@ -87,7 +99,6 @@ if(BUNDLE_CIVETWEB)
     )
     set(LIBCIVETWEB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/include")
     set(LIBCIVETWEB_LIBRARIES "${CMAKE_CURRENT_SOURCE_DIR}/vendor/usr/lib/libcivetweb.a")
-    set (CMAKE_C_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -lpthread -lrt")
 else(BUNDLE_CIVETWEB)
     find_package(libcivetweb REQUIRED)
 endif(BUNDLE_CIVETWEB)
