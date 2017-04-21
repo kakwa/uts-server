@@ -2,7 +2,7 @@
 # FindLibreSSL
 # ------------
 #
-# Detect if OpenSSL is in fact LibreSSL, and recovers libressl version.
+# Detect if OpenSSL is in fact LibreSSL, and recovers LibreSSL version.
 # 
 # Requires running FindOpenSSL previously
 #
@@ -13,9 +13,10 @@
 # This is set to ``$major.$minor.$revision$patch`` (e.g. ``2.3.1f``).
 #
 # ``IS_LIBRESSL``
-# Boolean, set to true if LibreSSL
+# Boolean, set to TRUE if LibreSSL, FALSE otherwise
 #
 
+# just copy/pasted from OpenSSL module with a few substitutions
 if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
   file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" libressl_version_str
        REGEX "^#[\t ]*define[\t ]+LIBRESSL_VERSION_NUMBER[\t ]+0x([0-9a-fA-F])+.*")
@@ -49,8 +50,8 @@ if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
     endif ()
 
     set(LIBRESSL_VERSION "${LIBRESSL_VERSION_MAJOR}.${LIBRESSL_VERSION_MINOR}.${LIBRESSL_VERSION_FIX}${LIBRESSL_VERSION_PATCH_STRING}")
-    set(IS_LIBRESSL ON)
+    set(IS_LIBRESSL TRUE)
   else ()
-    set(IS_LIBRESSL OFF)
+    set(IS_LIBRESSL FALSE)
   endif ()
 endif ()
