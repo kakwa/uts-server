@@ -16,12 +16,27 @@
 #if OPENSSL_VERSION_NUMBER < 0x10000000L
 #error OpenSSL version too old
 #endif
+
+/* LibreSSL is really annoying
+ * the OPENSSL_VERSION_NUMBER #define in opensslv.h
+ * is 0x20000000L but the API is that of openssl 1.0.
+ * That breaks version matching to determine which API
+ * to use.
+ * So, special case here for LibreSSL...
+ * (why didn't you just keep 0x100000L LibreSSL?)
+ */
+#ifdef LIBRESSL_VERSION_NUMBER
+// for now, LibreSSL is 1.0 API only
+#define OPENSSL_API_1_0
+#else
+// for OpenSSL, we must differenciate between 1.0 and 1.1
 #if OPENSSL_VERSION_NUMBER < 0x10100000L &&                                    \
     OPENSSL_VERSION_NUMBER >= 0x10000000L
 #define OPENSSL_API_1_0
 #endif
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
 #define OPENSSL_API_1_1
+#endif
 #endif
 
 /* Name of config entry that defines the OID file. */

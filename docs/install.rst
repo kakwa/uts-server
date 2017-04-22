@@ -8,6 +8,7 @@ List of dependencies uts-server relies on to run:
 
 * `OpenSSL <https://github.com/openssl/openssl>`_.
 * `civetweb <https://github.com/civetweb/civetweb>`_.
+* on none GNU LibC, `argp-standalone <https://www.lysator.liu.se/~nisse/misc/argp-standalone-1.3.tar.gz>`
 
 Build dependencies
 ------------------
@@ -58,3 +59,60 @@ uts-server is compiled using cmake:
     * having an external download in a build process is a bad idea
     * recovering the master branch ensures that the build may break randomly
     * a build proccess should be reproductible which is not the case with this option
+
+OS specific tips
+================
+
+Debian
+------
+
+The installation requires installing the following packages:
+
+.. sourcecode:: bash
+
+    # build dependencies
+    $ apt-get install libssl-dev cmake clang
+
+CentOS/RHEL
+-----------
+
+The installation requires installing the following packages:
+
+.. sourcecode:: bash
+
+    # build dependencies
+    $ yum insall cmake gcc gcc-c++ openssl-devel
+
+FreeBSD
+-------
+
+The installation requires installing the following packages:
+
+.. sourcecode:: bash
+
+    # build dependencies
+    $ pkg add argp-standalone cmake
+
+OpenBSD
+-------
+
+The installation requires installing the following packages:
+
+.. sourcecode:: bash
+
+    # build dependencies
+    $ pkg_add gcc g++ argp-standalone cmake
+
+    # for the test scripts
+    $ pkg_add python curl
+
+To build you must egcc and eg++ (not the old 4.2 gcc in the base system)
+
+.. sourcecode:: bash
+
+    # set compilers
+    $ export CC=/usr/local/bin/egcc
+    $ export CXX=/usr/local/bin/ec++
+
+    # then build normally
+    $ cmake . -DBUNDLE_CIVETWEB=ON && make

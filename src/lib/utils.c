@@ -202,6 +202,12 @@ void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     free(out);
 }
 
+const char *null_undef(const char * in){
+    if(in == NULL)
+        return "<undef>";
+    return in;
+}
+
 // OpenSSL file openner (use for opening the configuration file
 static BIO *bio_open_default(rfc3161_context *ct, const char *filename,
                              int format) {
@@ -281,7 +287,7 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         if (value == NULL) {
             uts_logger(ct, LOG_NOTICE,
                        "configuration param['%s'] not set, using default: '%s'",
-                       name, default_value);
+                       name, null_undef(default_value));
             value = default_value;
         }
         switch (type) {
@@ -307,11 +313,11 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         if (value == NULL) {
             uts_logger(ct, LOG_NOTICE,
                        "configuration param['%s'] not set, using default: '%s'",
-                       name, default_value);
+                       name, null_undef(default_value));
             value = default_value;
         }
         uts_logger(ct, LOG_DEBUG, "configuration param['%s'] = '%s'", name,
-                   value);
+                   null_undef(value));
         switch (type) {
         // if it's an http (civetweb) option, put it in the http_options buffer
         // like civetweb is expected it.
