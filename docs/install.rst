@@ -8,7 +8,7 @@ List of dependencies uts-server relies on to run:
 
 * `OpenSSL <https://github.com/openssl/openssl>`_.
 * `civetweb <https://github.com/civetweb/civetweb>`_.
-* on none GNU LibC, `argp-standalone <https://www.lysator.liu.se/~nisse/misc/argp-standalone-1.3.tar.gz>`
+* on none GNU LibC, `argp-standalone <https://www.lysator.liu.se/~nisse/misc/argp-standalone-1.3.tar.gz>`_
 
 Build dependencies
 ------------------
