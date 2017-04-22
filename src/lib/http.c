@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <string.h>
+#include <strings.h>
 #include <sys/syslog.h>
 #include <time.h>
 #include <unistd.h>
