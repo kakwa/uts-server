@@ -202,8 +202,8 @@ void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     free(out);
 }
 
-const char *null_undef(const char * in){
-    if(in == NULL)
+const char *null_undef(const char *in) {
+    if (in == NULL)
         return "<undef>";
     return in;
 }
