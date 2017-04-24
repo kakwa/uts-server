@@ -1,7 +1,7 @@
 pipeline {
   agent any
   stages {
-    stage('') {
+    stage('error') {
       steps {
         parallel(
           "OpenBSD": {
@@ -13,6 +13,10 @@ pipeline {
             
           },
           "CentOS 7": {
+            git 'https://github.com/kakwa/uts-server'
+            
+          },
+          "Debian 8": {
             git 'https://github.com/kakwa/uts-server'
             
           }
