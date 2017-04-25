@@ -6,10 +6,6 @@ pipeline {
         parallel(
           "OpenBSD 6.1": {
 	    node('openbsd-6.1') {
-                environment {
-                    CC = '/usr/local/bin/egcc'
-                    CXX ='/usr/local/bin/ec++'
-                }
                 git 'https://github.com/kakwa/uts-server'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
                 sh 'make'
