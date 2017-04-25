@@ -4,25 +4,25 @@ pipeline {
     stage('error') {
       steps {
         parallel(
-          "OpenBSD": {
+          "openbsd-6.1": {
             git 'https://github.com/kakwa/uts-server'
             sh 'cmake . -DBUNDLE_CIVETWEB=ON'
             sh 'make'
             
           },
-          "FreeBSD": {
+          "freebsd-11": {
             git 'https://github.com/kakwa/uts-server'
             sh 'cmake . -DBUNDLE_CIVETWEB=ON'
             sh 'make'
             
           },
-          "CentOS 7": {
+          "centos-7": {
             git 'https://github.com/kakwa/uts-server'
             sh 'cmake . -DBUNDLE_CIVETWEB=ON'
             sh 'make'
             
           },
-          "Debian 8": {
+          "debian-8": {
             git 'https://github.com/kakwa/uts-server'
             sh 'cmake . -DBUNDLE_CIVETWEB=ON'
             sh 'make'
