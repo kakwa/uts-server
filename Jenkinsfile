@@ -1,32 +1,36 @@
 pipeline {
-  agent any
+  agent none
   stages {
-    stage('error') {
+    stage('Compile') {
       steps {
         parallel(
-          "openbsd-6.1": {
-            git 'https://github.com/kakwa/uts-server'
-            sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-            sh 'make'
-            
+          "OpenBSD 6.1": {
+	    node('openbsd-6.1') {
+                git 'https://github.com/kakwa/uts-server'
+                sh 'cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'make'
+            } 
           },
-          "freebsd-11": {
-            git 'https://github.com/kakwa/uts-server'
-            sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-            sh 'make'
-            
+          "FreeBSD 11": {
+	    node('freebsd-11') {
+                git 'https://github.com/kakwa/uts-server'
+                sh 'cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'make'
+            } 
           },
-          "centos-7": {
-            git 'https://github.com/kakwa/uts-server'
-            sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-            sh 'make'
-            
+          "CentOS 7": {
+	    node('centos-7') {
+                git 'https://github.com/kakwa/uts-server'
+                sh 'cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'make'
+            } 
           },
-          "debian-8": {
-            git 'https://github.com/kakwa/uts-server'
-            sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-            sh 'make'
-            
+          "Debian 8": {
+	    node('debian-8') {
+                git 'https://github.com/kakwa/uts-server'
+                sh 'cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'make'
+            } 
           }
         )
       }
