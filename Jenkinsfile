@@ -7,7 +7,7 @@ pipeline {
           "OpenBSD 6.1": {
 	    node('openbsd-6.1') {
                 git 'https://github.com/kakwa/uts-server'
-                sh 'cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'CC=/usr/local/bin/egcc CXX=/usr/local/bin/ec++ cmake . -DBUNDLE_CIVETWEB=ON'
                 sh 'make'
             } 
           },
