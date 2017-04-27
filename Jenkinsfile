@@ -9,7 +9,9 @@ pipeline {
 		sh 'git config --global user.name "jenkins@kakwa.fr"'
         	sh 'git config --global user.email "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
-                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON && make'
+                sh 'git clean -fdx'
+                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'make'
             } 
           },
           "FreeBSD 11": {
@@ -17,6 +19,7 @@ pipeline {
 		sh 'git config --global user.email "jenkins@kakwa.fr"'
 		sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
+                sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
                 sh 'make'
             } 
@@ -26,6 +29,7 @@ pipeline {
 		sh 'git config --global user.email "jenkins@kakwa.fr"'
 		sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
+                sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
                 sh 'make'
             } 
@@ -35,6 +39,7 @@ pipeline {
 		sh 'git config --global user.email "jenkins@kakwa.fr"'
 		sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
+                sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
                 sh 'make'
             } 
