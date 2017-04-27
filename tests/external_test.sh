@@ -12,10 +12,13 @@ fi
 export TMPDIR='./tests/cfg/'
 CFG=`mktemp`
 
-clean_clean_exit(){
-    rm - $CFG
-    clean_exit $1
+clean_exit(){
+    rm -- "$CFG"
+    kill `cat ./uts-server.pid` >/dev/null 2>&1
+    rm -- "./uts-server.pid"
+    exit $1
 }
+
 sed "s/2020/$PORT/" tests/cfg/uts-server.cnf >$CFG
 
 $TO ./uts-server -c $CFG -D -p ./uts-server.pid &
@@ -37,3 +40,5 @@ sleep 1
 ./goodies/timestamp-file.sh -i README.rst -u https://localhost:$PORT -r -O "-cert" -C '-k' || clean_exit 1
 
 kill `cat ./uts-server.pid`
+
+clean_exit 0
