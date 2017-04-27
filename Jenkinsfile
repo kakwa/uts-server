@@ -30,8 +30,8 @@ pipeline {
 		sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
-                sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'make'
+                sh 'export CXX=/usr/bin/clang++; export CC=/usr/bin/clang; cmake . -DBUNDLE_CIVETWEB=ON'
+                sh 'export CXX=/usr/bin/clang++; export CC=/usr/bin/clang; make'
             } 
           },
           "Debian 8": {
