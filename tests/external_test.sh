@@ -9,8 +9,14 @@ sleep 1
 
 kill `cat ./uts-server.pid`
 
+if which timeout >/dev/null 2>&1
+then
+    TO="timeout 120"
+else
+    TO=""
+fi
 
-timeout 120 ./uts-server -c tests/cfg/uts-server-ssl.cnf -D -p ./uts-server.pid &
+$TO ./uts-server -c tests/cfg/uts-server-ssl.cnf -D -p ./uts-server.pid &
 
 sleep 1
 ./goodies/timestamp-file.sh -i README.rst -u https://localhost:2020 -r -O "-cert" -C '-k' || exit 1
