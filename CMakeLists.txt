@@ -6,6 +6,7 @@ set(VERSION 0.1.8)
 
 option(DEBUG              "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB    "bundle civetweb with uts-server"    OFF)
+option(CIVETWEB_GITURL    "url of civetweb git repository"    "https://github.com/kakwa/civetweb")
 option(STATIC             "static linked binary" OFF)
 option(LINK_DL            "link dl" OFF)
 option(LINK_GCC_S         "link gcc_s" OFF)
@@ -84,7 +85,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
 
 if(BUNDLE_CIVETWEB)
     ExternalProject_Add( civetweb
-       GIT_REPOSITORY https://github.com/kakwa/civetweb
+       GIT_REPOSITORY ${CIVETWEB_GITURL}
        PATCH_COMMAND sed -i ${SED_FREEBSD} s/__DATE__/"110973"/ src/main.c src/civetweb.c
        INSTALL_DIR /usr/local
        CMAKE_ARGS .. -DCMAKE_INSTALL_PREFIX=/usr
