@@ -11,7 +11,7 @@ pipeline {
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; make'
+                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; make -j4'
             } 
           },
           "FreeBSD 11": {
@@ -21,7 +21,7 @@ pipeline {
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'make'
+                sh 'make -j4'
             } 
           },
           "CentOS 7": {
@@ -31,7 +31,7 @@ pipeline {
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'export CXX=/usr/bin/clang++; export CC=/usr/bin/clang; cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'export CXX=/usr/bin/clang++; export CC=/usr/bin/clang; make'
+                sh 'export CXX=/usr/bin/clang++; export CC=/usr/bin/clang; make -j4'
             } 
           },
           "Debian 8": {
@@ -41,7 +41,7 @@ pipeline {
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'make'
+                sh 'make -j4'
             } 
           }
         )
