@@ -9,8 +9,7 @@ pipeline {
 		sh 'git config --global user.name "jenkins@kakwa.fr"'
         	sh 'git config --global user.email "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
-                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'make'
+                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON && make'
             } 
           },
           "FreeBSD 11": {
