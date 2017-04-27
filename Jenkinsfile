@@ -5,9 +5,9 @@ pipeline {
       steps {
         parallel(
           "OpenBSD 6.1": {
-	    node('openbsd-6.1') {
-		sh 'git config --global user.name "jenkins@kakwa.fr"'
-        	sh 'git config --global user.email "jenkins@kakwa.fr"'
+	            node('openbsd-6.1') {
+		        sh 'git config --global user.name "jenkins@kakwa.fr"'
+                sh 'git config --global user.email "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON'
@@ -17,9 +17,9 @@ pipeline {
             } 
           },
           "FreeBSD 11": {
-	    node('freebsd-11') {
-		sh 'git config --global user.email "jenkins@kakwa.fr"'
-		sh 'git config --global user.name "jenkins@kakwa.fr"'
+	            node('freebsd-11') {
+		        sh 'git config --global user.email "jenkins@kakwa.fr"'
+		        sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
@@ -29,9 +29,9 @@ pipeline {
             } 
           },
           "CentOS 7": {
-	    node('centos-7') {
-		sh 'git config --global user.email "jenkins@kakwa.fr"'
-		sh 'git config --global user.name "jenkins@kakwa.fr"'
+	            node('centos-7') {
+		        sh 'git config --global user.email "jenkins@kakwa.fr"'
+		        sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'export CXX=/usr/bin/clang++; export CC=/usr/bin/clang; cmake . -DBUNDLE_CIVETWEB=ON'
@@ -41,9 +41,9 @@ pipeline {
             } 
           },
           "Debian 8": {
-	    node('debian-8') {
-		sh 'git config --global user.email "jenkins@kakwa.fr"'
-		sh 'git config --global user.name "jenkins@kakwa.fr"'
+	            node('debian-8') {
+		        sh 'git config --global user.email "jenkins@kakwa.fr"'
+		        sh 'git config --global user.name "jenkins@kakwa.fr"'
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'cmake . -DBUNDLE_CIVETWEB=ON'
@@ -55,5 +55,9 @@ pipeline {
         )
       }
     }
+  }
+  environment {
+    GIT_SSL_NO_VERIFY = 'true'
+    CIVETWEB_GITURL = 'https://gogs.kakwa.fr/kakwa/civetweb/'
   }
 }
