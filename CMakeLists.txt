@@ -6,12 +6,17 @@ set(VERSION 0.1.8)
 
 option(DEBUG              "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB    "bundle civetweb with uts-server"    OFF)
-option(CIVETWEB_GITURL    "url of civetweb git repository"    "https://github.com/kakwa/civetweb")
 option(STATIC             "static linked binary" OFF)
 option(LINK_DL            "link dl" OFF)
 option(LINK_GCC_S         "link gcc_s" OFF)
 option(CIVETWEB_CUST_ARGS "Custom args for civetweb (if civetweb is bundled)" "")
 option(LINK_PTHREAD       "link pthread" OFF)
+
+IF("$ENV{CIVETWEB_GITURL}" STREQUAL "")
+    set(CIVETWEB_GITURL    "https://github.com/kakwa/civetweb")
+ELSE()
+    set(CIVETWEB_GITURL    "$ENV{CIVETWEB_GITURL}")
+ENDIF()
 
 IF(STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -84,6 +89,7 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
 
 
 if(BUNDLE_CIVETWEB)
+    MESSAGE(STATUS "Building Civetweb From: ${CIVETWEB_GITURL}")
     ExternalProject_Add( civetweb
        GIT_REPOSITORY ${CIVETWEB_GITURL}
        PATCH_COMMAND sed -i ${SED_FREEBSD} s/__DATE__/"110973"/ src/main.c src/civetweb.c
