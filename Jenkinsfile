@@ -56,8 +56,4 @@ pipeline {
       }
     }
   }
-  environment {
-    GIT_SSL_NO_VERIFY = 'true'
-    CIVETWEB_GITURL = 'https://gogs.kakwa.fr/kakwa/civetweb/'
-  }
 }
