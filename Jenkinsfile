@@ -11,7 +11,7 @@ pipeline {
                 git 'https://github.com/kakwa/uts-server'
                 sh 'git clean -fdx'
                 sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; cmake . -DBUNDLE_CIVETWEB=ON'
-                sh 'make'
+                sh 'export CC=/usr/local/bin/egcc;export CXX=/usr/local/bin/ec++; make'
             } 
           },
           "FreeBSD 11": {
