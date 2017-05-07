@@ -11,7 +11,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <syslog.h>
-#include <syslog.h>
 #include <unistd.h>
 
 static void signal_handler_general(int sig_num) {
