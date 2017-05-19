@@ -85,4 +85,3 @@ Powered by
 
 .. image:: https://github.com/civetweb/civetweb/blob/658c8d48b3bcdb34338dae1b83167a8d7836e356/resources/civetweb_32x32@2.png?raw=true
     :target: https://github.com/civetweb/civetweb
-
