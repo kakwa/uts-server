@@ -12,6 +12,10 @@ uts-server
     :target: http://uts-server.readthedocs.org/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://jenkins.kakwalab.ovh/buildStatus/icon?job=kakwa/uts-server/master
+    :target: https://jenkins.kakwalab.ovh/blue/organizations/jenkins/kakwa%2Futs-server/branches/
+    :alt: Jenkins Status
+
 Micro `RFC 3161 Time-Stamp <https://www.ietf.org/rfc/rfc3161.txt>`_ server written in C.
 
 ----
