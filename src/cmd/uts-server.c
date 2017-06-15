@@ -119,7 +119,6 @@ int main(int argc, char **argv) {
     }
 
     syslog(LOG_NOTICE, "uts-server daemon terminated.");
-    free(conf_wd);
     free(tmp_wd);
     closelog();
 
