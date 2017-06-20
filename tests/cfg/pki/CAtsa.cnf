@@ -1,86 +1,17 @@
-
-#
-# This config is used by the Time Stamp Authority tests.
-#
-
-RANDFILE		= ./.rnd
-
-# Extra OBJECT IDENTIFIER info:
-oid_section		= new_oids
-
-TSDNSECT		= ts_cert_dn
-INDEX			= 1
-
-[ new_oids ]
-
-# Policies used by the TSA tests.
-tsa_policy1 = 1.2.3.4.1
-tsa_policy2 = 1.2.3.4.5.6
-tsa_policy3 = 1.2.3.4.5.7
-
 #----------------------------------------------------------------------
-[ ca ]
-default_ca	= CA_default		# The default ca section
-
-[ CA_default ]
-
-dir		= ./demoCA
-certs		= $dir/certs		# Where the issued certs are kept
-database	= $dir/index.txt	# database index file.
-new_certs_dir	= $dir/newcerts		# default place for new certs.
-
-certificate	= $dir/cacert.pem 	# The CA certificate
-serial		= $dir/serial 		# The current serial number
-private_key	= $dir/private/cakey.pem# The private key
-RANDFILE	= $dir/private/.rand	# private random number file
-
-default_days	= 365			# how long to certify for
-default_md	= sha1			# which md to use.
-preserve	= no			# keep passed DN ordering
-
-policy		= policy_match
-
-# For the CA policy
-[ policy_match ]
-countryName		= supplied
-stateOrProvinceName	= supplied
-organizationName	= supplied
-organizationalUnitName	= optional
-commonName		= supplied
-emailAddress		= optional
-
+#
+# Properties needed for a Time-Stamp Authority (TSA) certificates
+#
 #----------------------------------------------------------------------
-[ req ]
-default_bits		= 4096
-default_md		= sha1
-distinguished_name	= $ENV::TSDNSECT
-encrypt_rsa_key		= no
-prompt 			= no
-# attributes		= req_attributes
-x509_extensions	= v3_ca	# The extentions to add to the self signed cert
 
-string_mask = nombstr
-
-[ ts_ca_dn ]
-countryName			= FR
-stateOrProvinceName		= Paris
-localityName			= Paris
-organizationName		= UTS-SERVER test
-commonName			= ca1
-
-[ ts_cert_dn ]
-countryName			= FR
-stateOrProvinceName		= Paris
-localityName			= Paris
-organizationName		= UTS-SERVER test
-commonName			= tsa$ENV::INDEX
-
+# Extensions required to a TSA certificate
 [ tsa_cert ]
 
-# TSA server cert is not a CA cert.
+# TSA server cert is not a CA cert, disabling CA role
 basicConstraints=CA:FALSE
 
-# The following key usage flags are needed for TSA server certificates.
+# The following key usage flags are mandatory for TSA server certificates.
+# This parameters set the main specificities of a TSA certificate
 keyUsage = nonRepudiation, digitalSignature
 extendedKeyUsage = critical,timeStamping
 
@@ -88,76 +19,39 @@ extendedKeyUsage = critical,timeStamping
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer:always
 
-[ non_tsa_cert ]
 
-# This is not a CA cert and not a TSA cert, either (timeStamping usage missing)
-basicConstraints=CA:FALSE
+#----------------------------------------------------------------------
+#
+# Other Properties for the CA and non-tsa certificates
+#
+#----------------------------------------------------------------------
 
-# The following key usage flags are needed for TSA server certificates.
-keyUsage = nonRepudiation, digitalSignature
-# timeStamping is not supported by this certificate
-# extendedKeyUsage = critical,timeStamping
+# Common properties of all the certificates/CA (CN, OU, etc...)
+[ dn_section ]
+countryName			= FR
+stateOrProvinceName		= Paris
+localityName			= Paris
+organizationName		= UTS-SERVER test
 
-# PKIX recommendations harmless if included in all certificates.
-subjectKeyIdentifier=hash
-authorityKeyIdentifier=keyid,issuer:always
+# CN is passed through environment variable "CN"
+commonName			= $ENV::CN
 
-[ v3_req ]
 
-# Extensions to add to a certificate request
-basicConstraints = CA:FALSE
-keyUsage = nonRepudiation, digitalSignature
+# OpenSSL parameters for certificate requests generation
+[ req ]
+default_bits		= 4096
+default_md		= sha512
+distinguished_name	= dn_section
+encrypt_rsa_key		= no
+prompt 			= no
+# The extentions to add to the self signed cert
+x509_extensions	= v3_ca
 
-[ v3_ca ]
 
 # Extensions for a typical CA
+[ v3_ca ]
 
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid:always,issuer:always
 basicConstraints = critical,CA:true
 keyUsage = cRLSign, keyCertSign
-
-#----------------------------------------------------------------------
-[ tsa ]
-
-default_tsa = tsa_config1	# the default TSA section
-
-[ tsa_config1 ]
-
-# These are used by the TSA reply generation only.
-dir		= .			# TSA root directory
-serial		= $dir/tsa_serial	# The current serial number (mandatory)
-signer_cert	= $dir/tsa_cert1.pem 	# The TSA signing certificate
-					# (optional)
-certs		= $dir/tsaca.pem	# Certificate chain to include in reply
-					# (optional)
-signer_key	= $dir/tsa_key1.pem	# The TSA private key (optional)
-
-default_policy	= tsa_policy1		# Policy if request did not specify it
-					# (optional)
-other_policies	= tsa_policy2, tsa_policy3	# acceptable policies (optional)
-digests		= md5, sha1		# Acceptable message digests (mandatory)
-accuracy	= secs:1, millisecs:500, microsecs:100	# (optional)
-ordering		= yes	# Is ordering defined for timestamps?
-				# (optional, default: no)
-tsa_name		= yes	# Must the TSA name be included in the reply?
-				# (optional, default: no)
-ess_cert_id_chain	= yes	# Must the ESS cert id chain be included?
-				# (optional, default: no)
-
-[ tsa_config2 ]
-
-# This configuration uses a certificate which doesn't have timeStamping usage.
-# These are used by the TSA reply generation only.
-dir		= .			# TSA root directory
-serial		= $dir/tsa_serial	# The current serial number (mandatory)
-signer_cert	= $dir/tsa_cert2.pem 	# The TSA signing certificate
-					# (optional)
-certs		= $dir/demoCA/cacert.pem# Certificate chain to include in reply
-					# (optional)
-signer_key	= $dir/tsa_key2.pem	# The TSA private key (optional)
-
-default_policy	= tsa_policy1		# Policy if request did not specify it
-					# (optional)
-other_policies	= tsa_policy2, tsa_policy3	# acceptable policies (optional)
-digests		= md5, sha1		# Acceptable message digests (mandatory)

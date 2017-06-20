@@ -6,7 +6,6 @@ export OPENSSL_CONF="./CAtsa.cnf"
 cd `dirname $0`
 
 error () {
-
     echo "TSA test failed!" >&2
     exit 1
 }
@@ -15,25 +14,22 @@ error () {
 create_ca () {
 
     echo "Creating a new CA for the TSA tests..."
-    TSDNSECT=ts_ca_dn
-    export TSDNSECT   
+    export CN="UTS-SERVER CA"
     openssl req -new -x509 -nodes \
         -out tsaca.pem -keyout tsacakey.pem
     test $? != 0 && error
 }
 
 create_tsa_cert () {
-
-    INDEX=$1
-    export INDEX
-    EXT=$2
-    TSDNSECT=ts_cert_dn
-    export TSDNSECT
+    EXT=$3
+    INDEX=$2
+    CN=$1; export CN
 
     openssl req -new \
         -out tsa_req${INDEX}.pem -keyout tsa_key${INDEX}.pem
     test $? != 0 && error
-echo Using extension $EXT
+
+    echo Using extension $EXT
     openssl x509 -req \
         -in tsa_req${INDEX}.pem -out tsa_cert${INDEX}.pem \
         -CA tsaca.pem -CAkey tsacakey.pem -CAcreateserial \
@@ -43,7 +39,7 @@ echo Using extension $EXT
 
 create_cert () {
 
-    INDEX=$1
+    INDEX=$2
     export INDEX
     TSDNSECT=ts_cert_dn
     export TSDNSECT
@@ -63,12 +59,12 @@ echo "Creating CA for TSA tests..."
 create_ca
 
 echo "Creating tsa_cert1.pem TSA server cert..."
-create_tsa_cert 1 tsa_cert
+create_tsa_cert "TSA CERT 1" 1 tsa_cert
 
 echo "Creating tsa_cert2.pem TSA server cert..."
-create_tsa_cert 2 tsa_cert
+create_tsa_cert "TSA CERT 2" 2 tsa_cert
 
 echo "Creating ssl_keycerts1.pem for ssl"
-create_cert 1
+create_cert "uts-server.example.org" 1
 
 exit 0
