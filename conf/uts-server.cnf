@@ -103,6 +103,21 @@ tcp_nodelay = 0
 # Loglevel (debug, info, notice, warn, err, emerg, crit)
 log_level = info
 
+# PKCS 11 configuration parameters (Optional, only useful with PKCS 11 device)
+#[ pkcs11 ]
+
+# PKCS 11 .so PKCS 11 OpenSSL engine path
+#engine = /path/engine/pkcs11.so
+
+# PKCS 11 .so module path
+#module = /path/to/pkcs11module.so
+
+# PKCS 11 key uri
+#key_uri = pkcs11:token=libp11-test;id=%01%02%03%04;object=server-key;type=private;pin-value=1234
+
+# PKCS 11 cert uri
+#cert_uri = pkcs11:token=libp11-test;id=%01%02%03%04;object=server-key;type=public;pin-value=1234
+
 # TSA configuration parameters.
 [ tsa ]
 

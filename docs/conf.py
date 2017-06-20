@@ -203,7 +203,7 @@ Full Configuration File
 
     with open(tsq_path) as f:
         for line in f.readlines():
-            m = re.search('\[ (\w+) \]', line)
+            m = re.search('#?\[ (\w+) \]', line)
             if m:
                 section = m.group(1)
                 docs[section] = {'text': text_buf, 'vars': {}}
