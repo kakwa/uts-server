@@ -4,6 +4,9 @@
 #
 #----------------------------------------------------------------------
 
+DN_SECTION=dn_ca
+CN=DEFAULT
+
 # Extensions required to a TSA certificate
 [ tsa_cert ]
 
@@ -26,27 +29,22 @@ authorityKeyIdentifier=keyid,issuer:always
 #
 #----------------------------------------------------------------------
 
-# Common properties of all the certificates/CA (CN, OU, etc...)
-[ dn_section ]
-countryName			= FR
-stateOrProvinceName		= Paris
-localityName			= Paris
-organizationName		= UTS-SERVER test
-
-# CN is passed through environment variable "CN"
-commonName			= $ENV::CN
-
-
 # OpenSSL parameters for certificate requests generation
 [ req ]
 default_bits		= 4096
 default_md		= sha512
-distinguished_name	= dn_section
+distinguished_name	= $ENV::DN_SECTION
 encrypt_rsa_key		= no
 prompt 			= no
 # The extentions to add to the self signed cert
 x509_extensions	= v3_ca
 
+# Common properties of the CA
+[ dn_ca ]
+countryName			= FR
+stateOrProvinceName		= Paris
+localityName			= Paris
+organizationName		= UTS-SERVER CA
 
 # Extensions for a typical CA
 [ v3_ca ]
@@ -55,3 +53,12 @@ subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid:always,issuer:always
 basicConstraints = critical,CA:true
 keyUsage = cRLSign, keyCertSign
+
+# Common properties of all the certificates (CN, OU, etc...)
+[ dn_cert ]
+countryName			= FR
+stateOrProvinceName		= Paris
+localityName			= Paris
+organizationName		= UTS-SERVER test
+# CN is passed through environment variable "CN"
+commonName			= $ENV::CN

@@ -12,9 +12,11 @@ error () {
 
 
 create_ca () {
-
     echo "Creating a new CA for the TSA tests..."
-    export CN="UTS-SERVER CA"
+    CN="UTS-SERVER CA"
+    DN_SECTION="dn_ca"
+    export CN
+    export DN_SECTION
     openssl req -new -x509 -nodes \
         -out tsaca.pem -keyout tsacakey.pem
     test $? != 0 && error
@@ -24,6 +26,7 @@ create_tsa_cert () {
     EXT=$3
     INDEX=$2
     CN=$1; export CN
+    DN_SECTION="dn_cert";export DN_SECTION
 
     openssl req -new \
         -out tsa_req${INDEX}.pem -keyout tsa_key${INDEX}.pem
@@ -41,8 +44,7 @@ create_cert () {
 
     INDEX=$2
     export INDEX
-    TSDNSECT=ts_cert_dn
-    export TSDNSECT
+    DN_SECTION="dn_cert";export DN_SECTION
 
     openssl req -new \
         -out tsa_req${INDEX}.pem -keyout ssl_key${INDEX}.pem
