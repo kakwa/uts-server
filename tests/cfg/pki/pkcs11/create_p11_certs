@@ -57,16 +57,32 @@ create_cert () {
     cat ssl_key${INDEX}.pem ssl_cert${INDEX}.pem >ssl_keycerts${INDEX}.pem
 }
 
-echo "Creating CA for TSA tests..."
-create_ca
+export SOFTHSM2_CONF=`pwd`/softhsm2.conf
 
-echo "Creating tsa_cert1.pem TSA server cert..."
-create_tsa_cert "TSA CERT 1" 1 tsa_cert
+cp softhsm2.conf.in softhsm2.conf
 
-echo "Creating tsa_cert2.pem TSA server cert..."
-create_tsa_cert "TSA CERT 2" 2 tsa_cert
+SOFTHSM_DIR=`pwd`/hsm
 
-echo "Creating ssl_keycerts1.pem for ssl"
-create_cert "uts-server.example.org" 1
+[ -d $SOFTHSM_DIR ] && rm -rf "$SOFTHSM_DIR"
+mkdir -p $SOFTHSM_DIR
+
+sed -i "s|@SOFTHSM_DIR@|$SOFTHSM_DIR|" $SOFTHSM2_CONF
+
+softhsm2-util --init-token --slot 0 --label "UTS-SERVER TEST" --so-pin 01020304 --pin 40302010
+softhsm2-util --init-token --slot 1 --label "UTS-SERVER TEST" --so-pin 01020304 --pin 40302010
+
+
+echo "export SOFTHSM2_CONF=$SOFTHSM2_CONF"
+#echo "Creating CA for TSA tests..."
+#create_ca
+#
+#echo "Creating tsa_cert1.pem TSA server cert..."
+#create_tsa_cert "TSA CERT 1" 1 tsa_cert
+#
+#echo "Creating tsa_cert2.pem TSA server cert..."
+#create_tsa_cert "TSA CERT 2" 2 tsa_cert
+#
+#echo "Creating ssl_keycerts1.pem for ssl"
+#create_cert "uts-server.example.org" 1
 
 exit 0
