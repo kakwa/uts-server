@@ -1,0 +1,88 @@
+#!/bin/sh
+
+
+export OPENSSL_CONF="./CAtsa.cnf"
+
+cd `dirname $0`
+
+error () {
+    echo "TSA test failed!" >&2
+    exit 1
+}
+
+
+create_ca () {
+    echo "Creating a new CA for the TSA tests..."
+    CN="UTS-SERVER CA"
+    DN_SECTION="dn_ca"
+    export CN
+    export DN_SECTION
+    openssl req -new -x509 -nodes \
+        -out tsaca.pem -keyout tsacakey.pem
+    test $? != 0 && error
+}
+
+create_tsa_cert () {
+    EXT=$3
+    INDEX=$2
+    CN=$1; export CN
+    DN_SECTION="dn_cert";export DN_SECTION
+
+    openssl req -new \
+        -out tsa_req${INDEX}.pem -keyout tsa_key${INDEX}.pem
+    test $? != 0 && error
+
+    echo Using extension $EXT
+    openssl x509 -req \
+        -in tsa_req${INDEX}.pem -out tsa_cert${INDEX}.pem \
+        -CA tsaca.pem -CAkey tsacakey.pem -CAcreateserial \
+        -extfile $OPENSSL_CONF -extensions $EXT
+    test $? != 0 && error
+}
+
+create_cert () {
+
+    INDEX=$2
+    export INDEX
+    DN_SECTION="dn_cert";export DN_SECTION
+
+    openssl req -new \
+        -out tsa_req${INDEX}.pem -keyout ssl_key${INDEX}.pem
+    test $? != 0 && error
+    openssl x509 -req \
+        -in tsa_req${INDEX}.pem -out ssl_cert${INDEX}.pem \
+        -CA tsaca.pem -CAkey tsacakey.pem -CAcreateserial \
+        -extensions server_cert
+    test $? != 0 && error
+    cat ssl_key${INDEX}.pem ssl_cert${INDEX}.pem >ssl_keycerts${INDEX}.pem
+}
+
+export SOFTHSM2_CONF=`pwd`/softhsm2.conf
+
+cp softhsm2.conf.in softhsm2.conf
+
+SOFTHSM_DIR=`pwd`/hsm
+
+[ -d $SOFTHSM_DIR ] && rm -rf "$SOFTHSM_DIR"
+mkdir -p $SOFTHSM_DIR
+
+sed -i "s|@SOFTHSM_DIR@|$SOFTHSM_DIR|" $SOFTHSM2_CONF
+
+softhsm2-util --init-token --slot 0 --label "UTS-SERVER TEST" --so-pin 01020304 --pin 40302010
+softhsm2-util --init-token --slot 1 --label "UTS-SERVER TEST" --so-pin 01020304 --pin 40302010
+
+
+echo "export SOFTHSM2_CONF=$SOFTHSM2_CONF"
+#echo "Creating CA for TSA tests..."
+#create_ca
+#
+#echo "Creating tsa_cert1.pem TSA server cert..."
+#create_tsa_cert "TSA CERT 1" 1 tsa_cert
+#
+#echo "Creating tsa_cert2.pem TSA server cert..."
+#create_tsa_cert "TSA CERT 2" 2 tsa_cert
+#
+#echo "Creating ssl_keycerts1.pem for ssl"
+#create_cert "uts-server.example.org" 1
+
+exit 0
