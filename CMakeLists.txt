@@ -10,7 +10,7 @@ else ()
   set (CMAKE_C_STANDARD 99)
 endif ()
 
-set(VERSION 0.1.8)
+set(VERSION 0.1.9)
 
 option(DEBUG              "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB    "bundle civetweb with uts-server"    OFF)

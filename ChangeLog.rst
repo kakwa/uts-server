@@ -1,6 +1,11 @@
 Changelogs
 ==========
 
+0.1.9
+-----
+
+* [fix ] add explicit C standard (C99), fixes compilation with olders gcc/cmake
+
 0.1.8
 -----
 
