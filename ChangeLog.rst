@@ -1,13 +1,18 @@
 Changelogs
 ==========
 
-0.1.9
+0.1.10
 -----
 
 * [fix ] point to upstream civetweb (forked civetweb now removed)
 * [fix ] disable some compiler warnings to allow civetweb compilation
 * [impr] add possibility to specify which tag used for civetweb bundling
 * [impr] use same compiler for uts-server and civetweb when bundling
+
+0.1.9
+-----
+
+* [fix ] add explicit C standard (C99), fixes compilation with olders gcc/cmake
 
 0.1.8
 -----
