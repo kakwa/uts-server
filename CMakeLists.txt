@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.6)
 project (uts-server)
 include(ExternalProject)
 
-set(VERSION 0.1.8)
+set(VERSION 0.1.9)
 
 option(DEBUG              "compile with debug symbol"    OFF)
 option(BUNDLE_CIVETWEB    "bundle civetweb with uts-server"    OFF)
@@ -13,10 +13,18 @@ option(CIVETWEB_CUST_ARGS "Custom args for civetweb (if civetweb is bundled)" ""
 option(LINK_PTHREAD       "link pthread" OFF)
 
 IF("$ENV{CIVETWEB_GITURL}" STREQUAL "")
-    set(CIVETWEB_GITURL    "https://github.com/kakwa/civetweb")
+    set(CIVETWEB_GITURL    "https://github.com/civetweb/civetweb")
 ELSE()
     set(CIVETWEB_GITURL    "$ENV{CIVETWEB_GITURL}")
 ENDIF()
+
+IF("$ENV{CIVETWEB_GITTAG}" STREQUAL "")
+    set(CIVETWEB_GITTAG    "v1.10")
+ELSE()
+    set(CIVETWEB_GITTAG    "$ENV{CIVETWEB_GITTAG}")
+ENDIF()
+
+
 
 IF(STATIC)
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
@@ -92,9 +100,13 @@ if(BUNDLE_CIVETWEB)
     MESSAGE(STATUS "Building Civetweb From: ${CIVETWEB_GITURL}")
     ExternalProject_Add( civetweb
        GIT_REPOSITORY ${CIVETWEB_GITURL}
+       GIT_TAG ${CIVETWEB_GITTAG}
        PATCH_COMMAND sed -i ${SED_FREEBSD} s/__DATE__/"110973"/ src/main.c src/civetweb.c
        INSTALL_DIR /usr/local
        CMAKE_ARGS .. -DCMAKE_INSTALL_PREFIX=/usr
+        -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+        -DCMAKE_C_FLAGS="-Wno-incompatible-pointer-types"
         -DCIVETWEB_ENABLE_CXX=OFF
         -DBUILD_SHARED_LIBS=OFF
         -DCIVETWEB_DISABLE_CGI=ON
@@ -105,6 +117,7 @@ if(BUNDLE_CIVETWEB)
         -DCIVETWEB_SSL_OPENSSL_API_1_1=${OPENSSL_API_1_1}
         -DOPENSSL_USE_STATIC_LIBS=${OPENSSL_USE_STATIC_LIBS}
         -DCIVETWEB_ENABLE_SSL_DYNAMIC_LOADING=OFF
+        -DCIVETWEB_ALLOW_WARNINGS=ON
         ${CIVETWEB_CUST_ARGS}
        INSTALL_COMMAND make install DESTDIR=${CMAKE_CURRENT_SOURCE_DIR}/vendor/
     )
