@@ -5,7 +5,7 @@ Changelogs
 -----
 
 * [fix ] point to upstream civetweb (forked civetweb now removed)
-* [fix ] disable some compiler warnings to allow civetweb compilation
+* [fix ] using dynamic openssl loading for civetweb when bundling 
 * [impr] add possibility to specify which tag used for civetweb bundling
 * [impr] use same compiler for uts-server and civetweb when bundling
 
