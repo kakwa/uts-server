@@ -32,6 +32,8 @@ kill `cat ./uts-server.pid`
 
 sed "s/2020/$PORT/" tests/cfg/uts-server-ssl.cnf >$CFG
 
+sleep 1
+
 $TO ./uts-server -c $CFG -D -p ./uts-server.pid &
 
 sleep 1
