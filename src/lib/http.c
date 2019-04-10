@@ -92,9 +92,10 @@ void log_request(const struct mg_request_info *request_info, char *request_id,
         }
     }
 
-    uts_logger(context, LOG_INFO, "Request[%s], remote_addr[%s] ssl[%d] "
-                                  "uri[%s] http_resp_code[%d] duration[%d us] "
-                                  "user-agent[%s] content-type[%s]",
+    uts_logger(context, LOG_INFO,
+               "Request[%s], remote_addr[%s] ssl[%d] "
+               "uri[%s] http_resp_code[%d] duration[%d us] "
+               "user-agent[%s] content-type[%s]",
                request_id, null_undef(request_info->remote_addr),
                request_info->is_ssl, null_undef(request_info->local_uri),
                response_code, timer, null_undef(user_agent),
@@ -178,10 +179,11 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
         // respond according to create_response return code
         switch (resp_code) {
         case 200:
-            mg_printf(conn, "HTTP/1.1 200 OK\r\n"
-                            "Content-Type: application/timestamp-reply\r\n"
-                            "Content-Length: %d\r\n"
-                            "\r\n",
+            mg_printf(conn,
+                      "HTTP/1.1 200 OK\r\n"
+                      "Content-Type: application/timestamp-reply\r\n"
+                      "Content-Length: %d\r\n"
+                      "\r\n",
                       (int)content_length);
             mg_write(conn, content, content_length);
             log_hex(ct, LOG_DEBUG, "response hexdump content", content,
@@ -240,6 +242,10 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     init_ssl();
     if (!set_params(ct, conffile, conf_wd))
         return EXIT_FAILURE;
+
+    // Disable stdout buffering if logging to stdout
+    if (ct->stdout_logging || ct->stdout_dbg)
+        setbuf(stdout, NULL);
 
     // Prepare callbacks structure. We have only one callback, the rest are
     // NULL.

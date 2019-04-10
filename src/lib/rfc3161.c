@@ -319,8 +319,9 @@ end:
         ret = 200;
         break;
     case TS_STATUS_GRANTED_WITH_MODS:
-        uts_logger(ct, LOG_NOTICE, "timestamp request granted with "
-                                   "modification",
+        uts_logger(ct, LOG_NOTICE,
+                   "timestamp request granted with "
+                   "modification",
                    *serial_id);
         ret = 200;
         break;

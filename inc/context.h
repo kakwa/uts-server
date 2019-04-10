@@ -9,8 +9,9 @@
 
 #define HTTP_OPTIONS 1
 #define LOGLEVEL_OPTIONS 2
-#define TSA_OPTIONS 3
-#define PATH_HTTP_OPTIONS 4
+#define LOGHANDLER_OPTIONS 3
+#define TSA_OPTIONS 4
+#define PATH_HTTP_OPTIONS 5
 #define MAIN_CONF_SECTION "main"
 
 #define RFC3161_OPTIONS_LEN                                                    \
@@ -26,6 +27,10 @@ typedef struct {
     uint64_t query_counter;
     // flag for debugging
     bool stdout_dbg;
+    // flag for logging to stdout
+    bool stdout_logging;
+    // flag for logging to stdout
+    bool syslog_logging;
     // log level
     int loglevel;
     // number of threads
@@ -64,6 +69,8 @@ static struct rfc3161_option rfc3161_options[] = {
     {"access_control_allow_origin", HTTP_OPTIONS, "*"},
     {"tcp_nodelay", HTTP_OPTIONS, "0"},
     {"log_level", LOGLEVEL_OPTIONS, "info"},
+    {"log_to_syslog", LOGHANDLER_OPTIONS, "yes"},
+    {"log_to_stdout", LOGHANDLER_OPTIONS, "no"},
     {"ssl_certificate", PATH_HTTP_OPTIONS, NULL},
     {"ssl_ca_path", PATH_HTTP_OPTIONS, NULL},
     {"ssl_ca_file", PATH_HTTP_OPTIONS, NULL},

@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 #include <syslog.h>
 #include <unistd.h>
@@ -162,7 +161,7 @@ void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
     fclose(stream);
 
     // if in debugging mode, also log to stdout
-    if (ct->stdout_dbg) {
+    if (ct->stdout_logging || ct->stdout_dbg) {
         switch (priority) {
         case LOG_EMERG:
             printf("LOG_EMER   : %s\n", out);
@@ -197,7 +196,8 @@ void uts_logger(rfc3161_context *ct, int priority, char *fmt, ...) {
             ;
         }
     }
-    syslog(priority, "%s", out);
+    if (ct->syslog_logging)
+        syslog(priority, "%s", out);
     free(out);
 }
 
@@ -301,6 +301,21 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
             }
             break;
             ;
+        case LOGHANDLER_OPTIONS:
+            if (strcmp(name, "log_to_syslog") == 0) {
+                if (strcmp(value, "yes"))
+                    ct->syslog_logging = 0;
+                else
+                    ct->syslog_logging = 1;
+            }
+            if (strcmp(name, "log_to_stdout") == 0) {
+                if (strcmp(value, "yes"))
+                    ct->stdout_logging = 0;
+                else
+                    ct->stdout_logging = 1;
+            }
+            break;
+            ;
         }
     }
     // parse the options to get the civetweb options and a few other things
@@ -318,8 +333,8 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
         uts_logger(ct, LOG_DEBUG, "configuration param['%s'] = '%s'", name,
                    null_undef(value));
         switch (type) {
-        // if it's an http (civetweb) option, put it in the http_options buffer
-        // like civetweb is expected it.
+        // if it's an http (civetweb) option, put it in the http_options
+        // buffer like civetweb is expected it.
         case HTTP_OPTIONS:
             if (value != NULL) {
                 ct->http_options[http_counter] = name;
