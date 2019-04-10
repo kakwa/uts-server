@@ -101,6 +101,8 @@ int main(int argc, char **argv) {
 
     if (args.daemonize)
         skeleton_daemon();
+    else
+        set_sig_handler();
 
     syslog(LOG_NOTICE,
            "uts-server daemon starting with conf '%s' from working dir '%s'",

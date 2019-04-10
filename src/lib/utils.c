@@ -67,6 +67,17 @@ int write_pid(char *pidfile_path) {
     return 1;
 }
 
+void set_sig_handler() {
+    g_uts_sig_up = 0;
+    g_uts_sig = 0;
+    /* Catch, ignore and handle signals */
+    // TODO: Implement a working signal handler */
+    signal(SIGTERM, signal_handler_general);
+    signal(SIGINT, signal_handler_general);
+    signal(SIGHUP, signal_handler_up);
+    signal(SIGCHLD, SIG_IGN);
+}
+
 void skeleton_daemon() {
     pid_t pid;
 
@@ -85,14 +96,7 @@ void skeleton_daemon() {
     if (setsid() < 0)
         exit(EXIT_FAILURE);
 
-    g_uts_sig_up = 0;
-    g_uts_sig = 0;
-    /* Catch, ignore and handle signals */
-    // TODO: Implement a working signal handler */
-    signal(SIGTERM, signal_handler_general);
-    signal(SIGINT, signal_handler_general);
-    signal(SIGHUP, signal_handler_up);
-    signal(SIGCHLD, SIG_IGN);
+    set_sig_handler();
 
     /* Fork off for the second time*/
     pid = fork();

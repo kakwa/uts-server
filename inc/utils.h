@@ -7,6 +7,7 @@ typedef struct _code {
 
 static void signal_handler_general(int sig_num);
 static void signal_handler_up(int sig_num);
+void set_sig_handler();
 void skeleton_daemon();
 int init_pid(char *pidfile_path);
 int write_pid(char *pidfile_path);
