@@ -78,6 +78,12 @@ tcp_nodelay = 0
 # debug, info, notice, warn, err, emerg, crit
 log_level = info
 
+# Enable logging to syslog (default: yes)
+log_to_syslog = no
+
+# Enable logging to stdout (default: no)
+#log_to_stdout = yes
+
 ####################################################################
 [ tsa ]
 
