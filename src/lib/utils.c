@@ -387,6 +387,9 @@ int set_params(rfc3161_context *ct, char *conf_file, char *conf_wd) {
             break;
         }
     }
+
+    ct->ca_file = calloc(PATH_MAX, sizeof(char));
+    realpath(NCONF_get_string(ct->conf, TSA_SECTION, "certs"), ct->ca_file);
     // like any good daemon, return to '/' once the configuration is loaded
     chdir("/");
     return ret;
@@ -405,6 +408,7 @@ void free_uts_context(rfc3161_context *ct) {
         free(ct->cust_conf[i]);
     }
     free(ct->ts_ctx_pool);
+    free(ct->ca_file);
     NCONF_free(ct->conf);
     free(ct);
 }

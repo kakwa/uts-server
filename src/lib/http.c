@@ -102,22 +102,6 @@ void log_request(const struct mg_request_info *request_info, char *request_id,
                null_undef(content_type));
 }
 
-// This function will be called by civetweb on every new request.
-static int begin_request_handler(struct mg_connection *conn) {
-    const struct mg_request_info *request_info = mg_get_request_info(conn);
-
-    mg_printf(conn,
-              "HTTP/1.1 200 OK\r\n"
-              "Content-Type: text/plain\r\n"
-              "Content-Length: 46\r\n" // Always set Content-Length
-              "\r\n"
-              "uts-server, a simple RFC 3161 timestamp server");
-
-    // Returning non-zero tells civetweb that our function has replied to
-    // the client, and civetweb should not send client any more data.
-    return 1;
-}
-
 int rfc3161_handler(struct mg_connection *conn, void *context) {
     // some timer stuff
     clock_t start = clock(), diff;
@@ -208,11 +192,7 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     } else {
         // default reply if we don't have a time-stamp request
         resp_code = 200;
-        mg_printf(conn, "HTTP/1.1 200 OK\r\n"
-                        "Content-Type: text/plain\r\n"
-                        "Content-Length: 46\r\n"
-                        "\r\n"
-                        "uts-server, a simple RFC 3161 timestamp server");
+        mg_printf(conn, STATIC_PAGE);
     }
     // initialize a serial_id if not created by create_response
     if (serial_id == NULL) {
@@ -228,6 +208,37 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
     log_request(request_info, serial_id, ct, resp_code,
                 (diff * 1000000 / CLOCKS_PER_SEC));
     free(serial_id);
+    return 1;
+}
+
+int ca_serve_handler(struct mg_connection *conn, void *context) {
+    /* In this handler, we ignore the req_info and send the file "filename". */
+    const struct mg_request_info *request_info = mg_get_request_info(conn);
+    clock_t start = clock(), diff;
+    rfc3161_context *ct = (rfc3161_context *)context;
+    const char *filename = ct->ca_file;
+    if (strlen(filename) == 0){
+        uts_logger(context, LOG_NOTICE, "'certs' param in '[ tsa ]' section not filed");
+        mg_send_http_error(conn, 404, "CA file not available");
+        diff = clock() - start;
+        log_request(request_info, "CA_DL  ", ct, 404,
+                    (diff * 1000000 / CLOCKS_PER_SEC));
+	return 1;
+    }
+    if (access(filename, F_OK) != -1) {
+        mg_send_file(conn, filename);
+        const struct mg_response_info *ri = mg_get_response_info(conn);
+        diff = clock() - start;
+        log_request(request_info, "CA_DL  ", ct, 200,
+                    (diff * 1000000 / CLOCKS_PER_SEC));
+
+    } else {
+        uts_logger(context, LOG_NOTICE, "CA file '%s' not available", filename);
+        mg_send_http_error(conn, 404, "CA file not available");
+        diff = clock() - start;
+        log_request(request_info, "CA_DL  ", ct, 404,
+                    (diff * 1000000 / CLOCKS_PER_SEC));
+    }
     return 1;
 }
 
@@ -250,7 +261,6 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     // Prepare callbacks structure. We have only one callback, the rest are
     // NULL.
     memset(&callbacks, 0, sizeof(callbacks));
-
     memset(&user_data, 0, sizeof(user_data));
     callbacks.log_message = &log_civetweb;
 
@@ -258,12 +268,12 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     ctx = mg_start(&callbacks, &user_data, ct->http_options);
     if (ctx != NULL) {
         mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
+        mg_set_request_handler(ctx, "/ca.pem", ca_serve_handler, (void *)ct);
 
         // Wait until some signals are received
         while (g_uts_sig == 0) {
             sleep(1);
         }
-        // getchar();
     } else {
         uts_logger(ct, LOG_ERR, "Failed to start uts-server: %s",
                    ((user_data.first_message == NULL)

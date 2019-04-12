@@ -12,7 +12,11 @@
 #define LOGHANDLER_OPTIONS 3
 #define TSA_OPTIONS 4
 #define PATH_HTTP_OPTIONS 5
+
+/* name of the configuration file section */
 #define MAIN_CONF_SECTION "main"
+#define OID_SECTION "oids"
+#define TSA_SECTION "tsa"
 
 #define RFC3161_OPTIONS_LEN                                                    \
     sizeof(rfc3161_options) / sizeof(struct rfc3161_option)
@@ -42,6 +46,7 @@ typedef struct {
     // just to track for freeing later
     CONF *conf;
     char *cust_conf[20];
+    char *ca_file;
 } rfc3161_context;
 
 // definition of structure to describe
