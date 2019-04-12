@@ -217,13 +217,14 @@ int ca_serve_handler(struct mg_connection *conn, void *context) {
     clock_t start = clock(), diff;
     rfc3161_context *ct = (rfc3161_context *)context;
     const char *filename = ct->ca_file;
-    if (strlen(filename) == 0){
-        uts_logger(context, LOG_NOTICE, "'certs' param in '[ tsa ]' section not filed");
+    if (strlen(filename) == 0) {
+        uts_logger(context, LOG_NOTICE,
+                   "'certs' param in '[ tsa ]' section not filed");
         mg_send_http_error(conn, 404, "CA file not available");
         diff = clock() - start;
         log_request(request_info, "CA_DL  ", ct, 404,
                     (diff * 1000000 / CLOCKS_PER_SEC));
-	return 1;
+        return 1;
     }
     if (access(filename, F_OK) != -1) {
         mg_send_file(conn, filename);
@@ -237,6 +238,39 @@ int ca_serve_handler(struct mg_connection *conn, void *context) {
         mg_send_http_error(conn, 404, "CA file not available");
         diff = clock() - start;
         log_request(request_info, "CA_DL  ", ct, 404,
+                    (diff * 1000000 / CLOCKS_PER_SEC));
+    }
+    return 1;
+}
+
+int cert_serve_handler(struct mg_connection *conn, void *context) {
+    /* In this handler, we ignore the req_info and send the file "filename". */
+    const struct mg_request_info *request_info = mg_get_request_info(conn);
+    clock_t start = clock(), diff;
+    rfc3161_context *ct = (rfc3161_context *)context;
+    const char *filename = ct->cert_file;
+    if (strlen(filename) == 0) {
+        uts_logger(context, LOG_NOTICE,
+                   "'signer_cert' param in '[ tsa ]' section not filed");
+        mg_send_http_error(conn, 404, "CA file not available");
+        diff = clock() - start;
+        log_request(request_info, "CERT_DL", ct, 404,
+                    (diff * 1000000 / CLOCKS_PER_SEC));
+        return 1;
+    }
+    if (access(filename, F_OK) != -1) {
+        mg_send_file(conn, filename);
+        const struct mg_response_info *ri = mg_get_response_info(conn);
+        diff = clock() - start;
+        log_request(request_info, "CERT_DL", ct, 200,
+                    (diff * 1000000 / CLOCKS_PER_SEC));
+
+    } else {
+        uts_logger(context, LOG_NOTICE,
+                   "signer certificate file '%s' not available", filename);
+        mg_send_http_error(conn, 404, "CA file not available");
+        diff = clock() - start;
+        log_request(request_info, "CERT_DL", ct, 404,
                     (diff * 1000000 / CLOCKS_PER_SEC));
     }
     return 1;
@@ -269,6 +303,8 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     if (ctx != NULL) {
         mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
         mg_set_request_handler(ctx, "/ca.pem", ca_serve_handler, (void *)ct);
+        mg_set_request_handler(ctx, "/tsa_cert.pem", cert_serve_handler,
+                               (void *)ct);
 
         // Wait until some signals are received
         while (g_uts_sig == 0) {

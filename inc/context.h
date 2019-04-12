@@ -47,6 +47,7 @@ typedef struct {
     CONF *conf;
     char *cust_conf[20];
     char *ca_file;
+    char *cert_file;
 } rfc3161_context;
 
 // definition of structure to describe

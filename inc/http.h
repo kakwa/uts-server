@@ -10,12 +10,12 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg);
 #define STATIC_PAGE                                                               \
     "HTTP/1.1 200 OK\r\n"                                                         \
     "Content-Type: text/html\r\n"                                                 \
-    "Content-Length: 2509\r\n"                                                    \
+    "Content-Length: 2774\r\n"                                                    \
     "\r\n"                                                                        \
     "<html>"                                                                      \
     "<head>"                                                                      \
     "  <meta charset=\"utf-8\">"                                                  \
-    "  <title></title>"                                                           \
+    "  <title>uts-server</title>"                                                 \
     "  <meta name=\"author\" content=\"Pierre-Francois Carpentier\">"             \
     "  <meta name=\"description\" content=\"uts-server\">"                        \
     "<style>"                                                                     \
@@ -38,7 +38,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg);
     "  border: 2px solid #000000;"                                                \
     "  margin: 20px;"                                                             \
     "  padding: 10px;"                                                            \
-    "  width: 80%;"                                                               \
+    "  width: 90%;"                                                               \
     "  background: #404040;"                                                      \
     "  color: #e6e6e6;"                                                           \
     "  margin-left: auto;"                                                        \
@@ -57,14 +57,19 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg);
     "  border-radius: 2px;"                                                       \
     "  padding: 10px 24px;"                                                       \
     "  margin: 0 auto;"                                                           \
-    "  display: block;"                                                           \
+    "  display: inline;"                                                          \
     "  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, "      \
     "0, 0.19);"                                                                   \
+    "  margin: 0 auto;"                                                           \
     "}"                                                                           \
     ".desc {"                                                                     \
     "  text-decoration: underline;"                                               \
     "  text-align: center;"                                                       \
     "  font-size: 20px;"                                                          \
+    "  margin-top: 20px"                                                          \
+    "}"                                                                           \
+    ".center {"                                                                   \
+    "  text-align: center;"                                                       \
     "}"                                                                           \
     ".footer {"                                                                   \
     "  position: fixed;"                                                          \
@@ -79,7 +84,6 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg);
     ".var {"                                                                      \
     "  color: #99ccff;"                                                           \
     "}"                                                                           \
-    "<span class=\"var\">January 30, 2011</span>"                                 \
     "</style>"                                                                    \
     "</head>"                                                                     \
     "<body>"                                                                      \
@@ -87,28 +91,32 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg);
     "  uts-server, a simple RFC 3161 timestamp server"                            \
     "</div>"                                                                      \
     "<div class=\"rcorners\">"                                                    \
-    "   For timestamping a file with OpenSSL and curl, run the following "        \
+    "  For timestamping a file with OpenSSL and curl, run the following "         \
     "commands"                                                                    \
-    "   (setting the $UTS_SERVER_URL, $FILE and $FILE_TIMESTAMP variables):"      \
-    "   <div class=\"code\">"                                                     \
-    "    openssl ts -query -data \"<span class=\"var\">$FILE</span>\" -out "      \
+    "  (setting the $UTS_SERVER_URL, $FILE and $FILE_TIMESTAMP variables):"       \
+    "  <div class=\"code\">"                                                      \
+    "   openssl ts -query -data \"<span class=\"var\">$FILE</span>\" -out "       \
     "\"ts_req.ts\";<br/>"                                                         \
-    "    curl \"<span class=\"var\">$UTS_SERVER_URL</span>\" -H "                 \
-    "\"Content-Type: application/timestamp-query\" \\<br/>"                       \
-    "    -f -g --data-binary \"@ts_req.ts\" -o \"<span "                          \
-    "class=\"var\">$FILE_TIMESTAMP</span>\""                                      \
-    "   </div>"                                                                   \
-    "   For verifying the timestamp with OpenSSL, download the CA, and run "      \
-    "the following command:"                                                      \
-    "   <div class=\"code\">"                                                     \
-    "       openssl ts -verify -in \"<span "                                      \
-    "class=\"var\">$FILE_TIMESTAMP</span>\" -data \"<span "                       \
-    "class=\"var\">$FILE</span>\" -CAfile ca.pem"                                 \
-    "   </div>"                                                                   \
-    "   <div class=\"centered\">"                                                 \
-    "   <a href=\"/ca.pem\" download><button class=\"button\">Dowload CA "        \
+    "   curl \"<span class=\"var\">$UTS_SERVER_URL</span>\" \\<br/>"              \
+    "   &nbsp;&nbsp;&nbsp;&nbsp; -H \"Content-Type: "                             \
+    "application/timestamp-query\" \\<br/>"                                       \
+    "   &nbsp;&nbsp;&nbsp;&nbsp; -f -g --data-binary \"@ts_req.ts\" -o "          \
+    "\"<span class=\"var\">$FILE_TIMESTAMP</span>\""                              \
+    "  </div>"                                                                    \
+    "  For verifying the timestamp with OpenSSL, download the CA and the "        \
+    "signer cert, and run the following command:"                                 \
+    "  <div class=\"code\">"                                                      \
+    "    openssl ts -verify -in \"<span "                                         \
+    "class=\"var\">$FILE_TIMESTAMP</span>\" \\<br/>"                              \
+    "    &nbsp;&nbsp;&nbsp;&nbsp; -data \"<span class=\"var\">$FILE</span>\" "    \
+    "-CAfile ca.pem -untrusted tsa_cert.pem"                                      \
+    "  </div>"                                                                    \
+    "  <div class=\"center\">"                                                    \
+    "    <a href=\"./ca.pem\" download><button class=\"button\">Dowload CA "      \
     "file</button></a>"                                                           \
-    "   </div>"                                                                   \
+    "    <a href=\"./tsa_cert.pem\" download><button "                            \
+    "class=\"button\">Dowload tsa cert file</button></a>"                         \
+    "  </div>"                                                                    \
     "</div>"                                                                      \
     "<div class=\"footer\">"                                                      \
     "  <div class=\"container\">"                                                 \
