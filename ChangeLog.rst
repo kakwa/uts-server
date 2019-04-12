@@ -1,8 +1,17 @@
 Changelogs
 ==========
 
-0.1.10
+0.2.0
 -----
+
+* [fix ] disable buffering when logging to stdout (it was causing issues when running in docker)
+* [impr] make the stdout logger an official logger (previously, it was only for debugging)
+* [impr] the 'log_to_syslog' and 'log_to_stdout' parameters to enable/disable logging to syslog/stdout
+* [impr] serve the CA and the signer certificate
+* [impr] better landing page with download links for the previous 2 files and some instructions
+
+0.1.10
+------
 
 * [fix ] point to upstream civetweb (forked civetweb now removed)
 * [fix ] using dynamic openssl loading for civetweb when bundling 
