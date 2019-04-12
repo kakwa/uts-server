@@ -23,7 +23,7 @@ Micro `RFC 3161 Time-Stamp <https://www.ietf.org/rfc/rfc3161.txt>`_ server writt
 :Doc:    `Uts-Server documentation on ReadTheDoc <http://uts-server.readthedocs.org/en/latest/>`_
 :Dev:    `Uts-Server source code on GitHub <https://github.com/kakwa/uts-server>`_
 :License: MIT
-:Author:  Pierre-Francois Carpentier - copyright © 2016
+:Author:  Pierre-Francois Carpentier - copyright © 2019
 
 ----
 
@@ -45,7 +45,7 @@ Roughly, it works as follow:
 
 Then a client can verify the piece of data with the time-stamp using the Certificate Authority of the time-stamp key pair (X509 certificates).
 
-It gives a cryptographic proof of a piece of data content, like a file, at a given time.
+It gives a cryptographic proof of a piece of data content, for example a file, at a given time.
 
 Some use cases:
 
@@ -55,7 +55,7 @@ Some use cases:
 Quick (and dirty) Testing
 -------------------------
 
-Here a few steps to quickly trying out uts-server, for production setup, please compile civetweb externally and create proper CA and certificates:
+Here a few steps to quickly try out uts-server, for production setup, please compile civetweb externally and create proper CA and certificates:
 
 .. sourcecode:: bash
 
