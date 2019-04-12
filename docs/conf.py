@@ -185,6 +185,31 @@ Configuration Parameters
 """
 
     foot = """
+.. warning::
+
+  The TSA signing certificate must have exactly one extended key usage assigned to it: **timeStamping**.
+
+  The extended key usage must also be **critical**, otherwise the certificate is going to be refused.
+
+  Here is a sample openssl.cfg configuration for creating such certificate:
+
+  .. sourcecode:: ini
+
+    [ tsa_cert ]
+
+    # TSA server cert is not a CA cert, disabling CA role
+    basicConstraints=CA:FALSE
+
+    # The following key usage flags are mandatory for TSA server certificates.
+    # This parameters set the main specificities of a TSA certificate
+    keyUsage = nonRepudiation, digitalSignature
+    extendedKeyUsage = critical,timeStamping
+
+    # PKIX recommendations harmless if included in all certificates.
+    subjectKeyIdentifier=hash
+    authorityKeyIdentifier=keyid,issuer:always
+
+
 Full Configuration File
 =======================
 
