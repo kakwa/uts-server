@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkakwa%2Futs-server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkakwa%2Futs-server?ref=badge_shield)
+
 uts-server 
 ==========
 
@@ -94,3 +96,7 @@ Powered by
 
 .. image:: https://github.com/civetweb/civetweb/blob/658c8d48b3bcdb34338dae1b83167a8d7836e356/resources/civetweb_32x32@2.png?raw=true
     :target: https://github.com/civetweb/civetweb
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkakwa%2Futs-server.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkakwa%2Futs-server?ref=badge_large)
