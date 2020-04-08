@@ -123,8 +123,8 @@ static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
  * HSMs, TPMs, etc. commonly driven through OpenSSL CLI via:
  * openssl <cmd> -keyform ENGINE -<key | sign | etc> "nickname_id_etc"
  */
-int TS_CONF_set_signer_key_wrap(CONF *conf, const char *section, TS_RESP_CTX *ctx)
-{
+static int ts_conf_set_signer_key_wrap(CONF *conf, const char *section,
+                                       TS_RESP_CTX *ctx) {
     int ret = 0;
     EVP_PKEY *key_obj = NULL;
     const char *key = NULL;
@@ -196,7 +196,7 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
         goto end;
     }
 #ifndef OPENSSL_NO_ENGINE
-    if (!TS_CONF_set_signer_key_wrap(conf, section, resp_ctx)) {
+    if (!ts_conf_set_signer_key_wrap(conf, section, resp_ctx)) {
 #else
     if (!TS_CONF_set_signer_key(conf, section, NULL, NULL, resp_ctx)) {
 #endif
