@@ -269,7 +269,7 @@ end:
         BN_free(serial_bn);
     } else {
         serial_hex = calloc(SERIAL_ID_SIZE, sizeof(char));
-        strncpy(serial_hex, " NO ID   ", SERIAL_ID_SIZE + 2);
+        strncpy(serial_hex, " NO ID   ", SERIAL_ID_SIZE + 4);
     }
 #endif
 #ifdef OPENSSL_API_1_0

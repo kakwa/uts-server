@@ -9,6 +9,9 @@
 #include <time.h>
 #include <unistd.h>
 
+extern int g_uts_sig_up;
+extern int g_uts_sig;
+
 static char *rand_string(char *str, size_t size) {
     const char charset[] = "1234567890ABCDEF";
     if (size) {

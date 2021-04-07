@@ -12,6 +12,10 @@
 #include <syslog.h>
 #include <unistd.h>
 
+// some global variable to handle signals
+int g_uts_sig_up;
+int g_uts_sig;
+
 static void signal_handler_general(int sig_num) {
     g_uts_sig = sig_num;
 }
