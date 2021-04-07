@@ -13,6 +13,7 @@
 #include <openssl/rand.h>
 #include <openssl/ssl.h>
 #include <openssl/ts.h>
+#include <openssl/engine.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -108,6 +109,58 @@ static ASN1_INTEGER *serial_cb(TS_RESP_CTX *ctx, void *data42) {
     return asnInt;
 }
 
+#ifndef OPENSSL_NO_ENGINE
+
+#define ENV_SIGNER_KEY "signer_key"
+#define ENV_CRYPTO_DEVICE "crypto_device"
+
+/*-
+ * This function wraps OpenSSL's TS_CONF_set_signer_key, which only supports
+ * loading keys from PEMs. It:
+ * - tries to load the configured PEM file
+ * - if that doesn't work, ask the configured ENGINE to provide the key pointer
+ * The use case is any ENGINE that stores keys internally, such as PKCS11,
+ * HSMs, TPMs, etc. commonly driven through OpenSSL CLI via:
+ * openssl <cmd> -keyform ENGINE -<key | sign | etc> "nickname_id_etc"
+ */
+static int ts_conf_set_signer_key_wrap(CONF *conf, const char *section,
+                                       TS_RESP_CTX *ctx) {
+    int ret = 0;
+    EVP_PKEY *key_obj = NULL;
+    const char *key = NULL;
+    const char *device = NULL;
+    ENGINE *e = NULL;
+
+    ERR_set_mark();
+    /* fetch a couple strings from the configuration file */
+    key = NCONF_get_string(conf, section, ENV_SIGNER_KEY);
+    device = NCONF_get_string(conf, section, ENV_CRYPTO_DEVICE);
+    /* first try to fetch the PEM directly */
+    if (!TS_CONF_set_signer_key(conf, section, NULL, NULL, ctx)
+        /* if that didn't work, query the ENGINE */
+        && ((e = ENGINE_by_id(device)) == NULL
+            || !ENGINE_init(e)
+            || (key_obj = ENGINE_load_private_key(e, key, NULL, NULL)) == NULL
+            || !TS_RESP_CTX_set_signer_key(ctx, key_obj)))
+        goto err;
+
+    /*-
+     * e.g. if TS_CONF_set_signer_key failed but the ENGINE provided the key,
+     * we don't want to clobber the error stack.
+     */
+    ERR_pop_to_mark();
+    ret = 1;
+
+ err:
+    /* cleanup */
+    EVP_PKEY_free(key_obj);
+    ENGINE_finish(e);
+    ENGINE_free(e);
+    return ret;
+}
+
+#endif
+
 // create a TS_RESP_CTX (OpenSSL Time-Stamp Response Context)
 TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                           const char *policy) {
@@ -130,9 +183,6 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
     if (!TS_CONF_set_crypto_device(conf, section, NULL)) {
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
                    "crypto_device", section);
-        uts_logger(ct, LOG_ERR,
-                   "failed to get or use the crypto device in section [ %s ]",
-                   section);
         goto end;
     }
     if (!TS_CONF_set_signer_cert(conf, section, NULL, resp_ctx)) {
@@ -145,7 +195,11 @@ TS_RESP_CTX *create_tsctx(rfc3161_context *ct, CONF *conf, const char *section,
                    "default_certs", section);
         goto end;
     }
+#ifndef OPENSSL_NO_ENGINE
+    if (!ts_conf_set_signer_key_wrap(conf, section, resp_ctx)) {
+#else
     if (!TS_CONF_set_signer_key(conf, section, NULL, NULL, resp_ctx)) {
+#endif
         uts_logger(ct, LOG_ERR, "failed to get or use '%s' in section [ %s ]",
                    "signer_key", section);
         goto end;
