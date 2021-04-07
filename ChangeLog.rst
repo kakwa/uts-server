@@ -1,6 +1,11 @@
 Changelogs
 ==========
 
+0.2.1
+-----
+
+* [fix ] fix compilation for newer GCC (>10.2) (global variable definition issue 
+
 0.2.0
 -----
 
