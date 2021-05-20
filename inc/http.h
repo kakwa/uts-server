@@ -10,7 +10,6 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg);
 #define STATIC_PAGE                                                               \
     "HTTP/1.1 200 OK\r\n"                                                         \
     "Content-Type: text/html\r\n"                                                 \
-    "Content-Length: 2774\r\n"                                                    \
     "\r\n"                                                                        \
     "<html>"                                                                      \
     "<head>"                                                                      \
