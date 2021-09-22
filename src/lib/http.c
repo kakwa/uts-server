@@ -195,14 +195,16 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
         free(content);
     } else {
         // default reply if we don't have a time-stamp request
-        content_length = strlen(content_static_page);
+        if (static_page_size == 0) {
+          static_page_size = strlen(content_static_page);
+        }
         mg_printf(conn,
                   "HTTP/1.1 200 OK\r\n"
                   "Content-Type: text/html\r\n"
                   "Content-Length: %d\r\n"
                   "\r\n",
-                  (int)content_length);
-        mg_write(conn, content_static_page, content_length);
+                  (int)static_page_size);
+        mg_write(conn, content_static_page, static_page_size);
     }
     // initialize a serial_id if not created by create_response
     if (serial_id == NULL) {

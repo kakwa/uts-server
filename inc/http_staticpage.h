@@ -1,6 +1,6 @@
 const char *content_static_page =                                                 \
     "<!DOCTYPE html>"                                                             \
-    "<html>"                                                                      \
+    "<html lang=\"en\">"                                                          \
     "<head>"                                                                      \
     "  <meta charset=\"utf-8\">"                                                  \
     "  <title>uts-server</title>"                                                 \
@@ -45,7 +45,6 @@ const char *content_static_page =                                               
     "  border-radius: 2px;"                                                       \
     "  padding: 10px 24px;"                                                       \
     "  margin: 0 auto;"                                                           \
-    "  display: inline;"                                                          \
     "  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, "      \
     "0, 0.19);"                                                                   \
     "  margin: 0 auto;"                                                           \
@@ -115,3 +114,5 @@ const char *content_static_page =                                               
     "</div>"                                                                      \
     "</body>"                                                                     \
     "</html>";
+
+int static_page_size = 0;
