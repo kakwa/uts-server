@@ -195,9 +195,6 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
         free(content);
     } else {
         // default reply if we don't have a time-stamp request
-        resp_code = 200;
-        //char *content_static = calloc(4096, sizeof(char));
-        //strncpy(content_static, STATIC_PAGE, 4096);
         content_length = strlen(content_static_page);
         mg_printf(conn,
                   "HTTP/1.1 200 OK\r\n"
@@ -206,7 +203,6 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
                   "\r\n",
                   (int)content_length);
         mg_write(conn, content_static_page, content_length);
-        //free(content_static);
     }
     // initialize a serial_id if not created by create_response
     if (serial_id == NULL) {
