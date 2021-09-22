@@ -8,6 +8,7 @@
 #include <sys/syslog.h>
 #include <time.h>
 #include <unistd.h>
+#include "http_staticpage.h"
 
 extern int g_uts_sig_up;
 extern int g_uts_sig;
@@ -194,8 +195,16 @@ int rfc3161_handler(struct mg_connection *conn, void *context) {
         free(content);
     } else {
         // default reply if we don't have a time-stamp request
-        resp_code = 200;
-        mg_printf(conn, STATIC_PAGE);
+        if (static_page_size == 0) {
+          static_page_size = strlen(content_static_page);
+        }
+        mg_printf(conn,
+                  "HTTP/1.1 200 OK\r\n"
+                  "Content-Type: text/html\r\n"
+                  "Content-Length: %d\r\n"
+                  "\r\n",
+                  (int)static_page_size);
+        mg_write(conn, content_static_page, static_page_size);
     }
     // initialize a serial_id if not created by create_response
     if (serial_id == NULL) {
@@ -279,6 +288,14 @@ int cert_serve_handler(struct mg_connection *conn, void *context) {
     return 1;
 }
 
+int notfound_handler(struct mg_connection *conn, void *context) {
+    /* In this handler, we ignore the req_info and send the file "filename". */
+    const struct mg_request_info *request_info = mg_get_request_info(conn);
+    rfc3161_context *ct = (rfc3161_context *)context;
+    mg_send_http_error(conn, 404, "");
+    return 1;
+}
+
 int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     struct mg_context *ctx;
     struct mg_callbacks callbacks;
@@ -305,6 +322,7 @@ int http_server_start(char *conffile, char *conf_wd, bool stdout_dbg) {
     ctx = mg_start(&callbacks, &user_data, ct->http_options);
     if (ctx != NULL) {
         mg_set_request_handler(ctx, "/", rfc3161_handler, (void *)ct);
+        mg_set_request_handler(ctx, "/favicon.ico", notfound_handler, (void *)ct);
         mg_set_request_handler(ctx, "/ca.pem", ca_serve_handler, (void *)ct);
         mg_set_request_handler(ctx, "/tsa_cert.pem", cert_serve_handler,
                                (void *)ct);
