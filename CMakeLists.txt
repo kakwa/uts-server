@@ -4,7 +4,7 @@ include(ExternalProject)
 
 set(CMAKE_C_STANDARD 99)
 
-set(VERSION 0.2.1)
+set(VERSION 0.2.2)
 
 option(DEBUG "compile with debug symbol" OFF)
 option(BUNDLE_CIVETWEB "bundle civetweb with uts-server" OFF)

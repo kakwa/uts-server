@@ -1,6 +1,12 @@
 Changelogs
 ==========
 
+0.2.2
+-----
+
+* [fix ] maintenance chores for cmake > 3.5 requirement and newer civetweb version
+* [fix ] re-create a CI (GH Actions based) + fix RTFD doc build& publishing
+
 0.2.1
 -----
 
