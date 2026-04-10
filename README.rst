@@ -5,8 +5,8 @@ uts-server
 
 |
 
-.. image:: https://travis-ci.org/kakwa/uts-server.svg?branch=master
-    :target: https://travis-ci.org/kakwa/uts-server
+.. image:: https://github.com/kakwa/uts-server/actions/workflows/build.yml/badge.svg
+    :target: https://github.com/kakwa/uts-server/actions/workflows/build.yml
 
 .. image:: https://readthedocs.org/projects/uts-server/badge/?version=latest
     :target: http://uts-server.readthedocs.org/en/latest/?badge=latest
